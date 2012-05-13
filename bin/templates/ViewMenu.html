@@ -1,0 +1,37 @@
+$$setval(li_style,
+            display: list-item;
+            float: left;
+            font-size: 14px;
+            margin: 0px;
+            padding: 5 10px;
+            background-color: grey; 
+        )
+
+<div id="simple-horizontal-menu"
+    style="background-color: grey; 
+            position:absolute;
+            bottom:0;
+            margin: 0px;
+            padding: 0px;
+            width:100%;
+            height:25px;
+        "
+>
+        <div id="propertyList"></div>
+       <ul style="list-style-image: none;
+                list-style-position: outside;
+                list-style-type: none;
+                margin: 0px;
+                padding: 0px;
+                "
+       >
+            <li class="ShowComponentsBtn" style="::li_style::">Trace test</li>
+            <li class="testBtn1" style="::li_style::">Create layer</li>
+            <li class="testBtn2" style="::li_style::">Get layers</li>
+            <li class="testBtn3" style="::li_style::">Create comp</li>
+            <li class="testBtn4" style="::li_style::">Get comp</li>
+            <li class="testBtn5" style="::li_style::">Display properties</li>
+    		<li class="testBtn6" style="::li_style::">Set prop</li>
+        </ul>
+</div>
+

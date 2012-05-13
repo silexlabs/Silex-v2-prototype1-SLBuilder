@@ -1,0 +1,36 @@
+$$setval(li_style,
+            display: list-item;
+            float: left;
+            font-size: 14px;
+            margin: 0px;
+            padding: 5 10px;
+            background-color: grey; 
+        )
+
+<div
+    style="background-color: grey; 
+            position:absolute;
+            top:0;
+            right:0;
+            margin: 0px;
+            padding: 0px;
+            border-radius: 10px;
+        "
+>
+        <div id="propertyList">
+            <h1>Properties of ::component.displayName::</h1>
+            <ul>
+            ::foreach properties::
+                <li>
+                    <strong>::displayName::</strong>
+                    <ul>
+                        <li >::description::</li>
+                        <li >::name:: = ::value:: </li>
+                        <li>(default is ::defaultValue::)</li>
+                    </ul>
+                </li>
+            ::end::
+            </ul>
+        </div>
+</div>
+
