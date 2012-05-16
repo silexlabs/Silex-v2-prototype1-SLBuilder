@@ -44,6 +44,7 @@ class SLBuilderBridge{
 		var res:HtmlDom = Lib.document.createElement("div");
 		res.className = className + " slbuilder layer";
 		res.id = id.seed;
+		res.style.verticalAlign = "top";
 
 		var parent:HtmlDom;
 		if (parentId == null)

@@ -63,7 +63,7 @@
 			"file": "src/demo/SLBuilderBridge.hx",
 			"settings":
 			{
-				"buffer_size": 6265,
+				"buffer_size": 6720,
 				"line_ending": "Windows"
 			}
 		},
@@ -87,7 +87,7 @@
 			"file": "src/slbuilder/SLBuilder.hx",
 			"settings":
 			{
-				"buffer_size": 6473,
+				"buffer_size": 6813,
 				"line_ending": "Unix"
 			}
 		},
@@ -95,7 +95,7 @@
 			"file": "bin/templates/ViewMenu.html",
 			"settings":
 			{
-				"buffer_size": 1219,
+				"buffer_size": 1132,
 				"line_ending": "Windows"
 			}
 		},
@@ -127,8 +127,16 @@
 			"file": "bin/templates/PropertiesList.html",
 			"settings":
 			{
-				"buffer_size": 937,
+				"buffer_size": 1041,
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/slbuilder/core/Config.hx",
+			"settings":
+			{
+				"buffer_size": 103,
+				"line_ending": "Unix"
 			}
 		}
 	],
@@ -160,6 +168,7 @@
 	},
 	"file_history":
 	[
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Application.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Descriptor",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Utils.hx"
 	],
@@ -206,7 +215,7 @@
 	"groups":
 	[
 		{
-			"selected": 5,
+			"selected": 6,
 			"sheets":
 			[
 				{
@@ -214,15 +223,15 @@
 					"file": "src/demo/SLBuilderBridge.hx",
 					"settings":
 					{
-						"buffer_size": 6265,
+						"buffer_size": 6720,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4558,
-								4558
+								1669,
+								1669
 							]
 						],
 						"settings":
@@ -231,7 +240,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2099.0,
+						"translation.y": 1232.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -254,7 +263,8 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage"
+							"syntax": "Packages/HaXe/HaXe.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -293,15 +303,15 @@
 					"file": "src/slbuilder/SLBuilder.hx",
 					"settings":
 					{
-						"buffer_size": 6473,
+						"buffer_size": 6813,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4034,
-								4034
+								4086,
+								4086
 							]
 						],
 						"settings":
@@ -309,8 +319,8 @@
 							"syntax": "Packages/HaXe/HaXe.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
-						"translation.x": 0.0,
-						"translation.y": 1657.0,
+						"translation.x": 60.0,
+						"translation.y": 1734.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -320,15 +330,15 @@
 					"file": "bin/templates/ViewMenu.html",
 					"settings":
 					{
-						"buffer_size": 1219,
+						"buffer_size": 1132,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								631,
-								631
+								722,
+								742
 							]
 						],
 						"settings":
@@ -355,8 +365,8 @@
 						"selection":
 						[
 							[
-								652,
-								652
+								521,
+								521
 							]
 						],
 						"settings":
@@ -382,13 +392,14 @@
 						"selection":
 						[
 							[
-								1316,
-								1316
+								1308,
+								1308
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage"
+							"syntax": "Packages/HaXe/HaXe.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 510.0,
@@ -427,15 +438,15 @@
 					"file": "bin/templates/PropertiesList.html",
 					"settings":
 					{
-						"buffer_size": 937,
+						"buffer_size": 1041,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								493,
-								493
+								485,
+								485
 							]
 						],
 						"settings":
@@ -443,6 +454,32 @@
 							"syntax": "Packages/HTML/HTML.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "src/slbuilder/core/Config.hx",
+					"settings":
+					{
+						"buffer_size": 103,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								83,
+								67
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HaXe/HaXe.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -484,10 +521,6 @@
 		]
 	},
 	"menu_visible": true,
-	"output.exec":
-	{
-		"height": 112.0
-	},
 	"replace":
 	{
 		"height": 0.0

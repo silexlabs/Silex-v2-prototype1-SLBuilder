@@ -85,7 +85,7 @@ class SLBuilder {
 				var layers = getLayers(null);
 				trace(layers);
 				for (layer in layers){
-					var color = Math.round(Math.random()*255);
+					var color = Math.round(Math.random()*255*255);
 					Lib.document.getElementById(layer.id.seed).style.backgroundColor = color;
 				}
 			case "testBtn3":
@@ -103,7 +103,7 @@ class SLBuilder {
 				var components = getComponents(getLayers(null)[0].id);
 				trace(components);
 				for (component in components){
-					var color = Math.round(Math.random()*255);
+					var color = Math.round(Math.random()*255*255);
 					Lib.document.getElementById(component.id.seed).style.backgroundColor = color;
 				}
 			case "testBtn5":

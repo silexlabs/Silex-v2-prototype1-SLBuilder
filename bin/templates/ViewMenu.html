@@ -1,23 +1,23 @@
 $$setval(li_style,
-            display: list-item;
-            float: left;
+            display: inline-block;
+            float: none;
             font-size: 14px;
             margin: 0px;
             padding: 5 10px;
-            background-color: grey; 
+            background-color: Gainsboro; 
+            height: ::Config.VIEW_MENU_HEIGHT::;
         )
 
-<div id="simple-horizontal-menu"
-    style="background-color: grey; 
-            position:absolute;
+<div
+    style="background-color: Silver; 
+            position:fixed;
             bottom:0;
             margin: 0px;
             padding: 0px;
             width:100%;
-            height:25px;
+            text-align: center;
         "
 >
-        <div id="propertyList"></div>
        <ul style="list-style-image: none;
                 list-style-position: outside;
                 list-style-type: none;
@@ -25,7 +25,6 @@ $$setval(li_style,
                 padding: 0px;
                 "
        >
-            <li class="ShowComponentsBtn" style="::li_style::">Trace test</li>
             <li class="testBtn1" style="::li_style::">Create layer</li>
             <li class="testBtn2" style="::li_style::">Get layers</li>
             <li class="testBtn3" style="::li_style::">Create comp</li>

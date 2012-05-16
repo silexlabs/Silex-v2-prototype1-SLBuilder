@@ -1,5 +1,5 @@
 package slbuilder.core;
 
 class Config {	
-//	public static inline var PLUGIN_NAME:String = "mobile_app";indexPhp.php";
+	public static inline var VIEW_MENU_HEIGHT:String = "20px";
 }

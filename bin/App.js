@@ -1120,7 +1120,7 @@ slbuilder.SLBuilder.prototype.onViewMenuClick = function(className) {
 			while(_g < layers.length) {
 				var layer = layers[_g];
 				++_g;
-				var color = Math.round(Math.random() * 255);
+				var color = Math.round(Math.random() * 255 * 255);
 				js.Lib.document.getElementById(layer.id.seed).style.backgroundColor = color;
 			}
 		}
@@ -1142,7 +1142,7 @@ slbuilder.SLBuilder.prototype.onViewMenuClick = function(className) {
 			while(_g < components.length) {
 				var component = components[_g];
 				++_g;
-				var color = Math.round(Math.random() * 255);
+				var color = Math.round(Math.random() * 255 * 255);
 				js.Lib.document.getElementById(component.id.seed).style.backgroundColor = color;
 			}
 		}
@@ -1407,6 +1407,7 @@ demo.SLBuilderBridge.prototype.createLayer = function(className,parentId) {
 	var res = js.Lib.document.createElement("div");
 	res.className = className + " slbuilder layer";
 	res.id = id.seed;
+	res.style.verticalAlign = "top";
 	var parent;
 	if(parentId == null) parent = js.Lib.document.getElementById("main");
 	else parent = js.Lib.document.getElementById(parentId.seed);
@@ -1464,9 +1465,9 @@ demo.SLBuilderBridge.prototype.getComponents = function(parentId) {
 }
 demo.SLBuilderBridge.prototype.getProperties = function(parentId) {
 	var parent = js.Lib.document.getElementById(parentId.seed);
-	haxe.Log.trace("getProperties " + parentId + " => " + parent,{ fileName : "SLBuilderBridge.hx", lineNumber : 160, className : "demo.SLBuilderBridge", methodName : "getProperties"});
+	haxe.Log.trace("getProperties " + parentId + " => " + parent,{ fileName : "SLBuilderBridge.hx", lineNumber : 161, className : "demo.SLBuilderBridge", methodName : "getProperties"});
 	var properties = Reflect.field(demo.Descriptor,parent.nodeName.toLowerCase());
-	haxe.Log.trace("getProperties " + parent.nodeName + " => " + properties,{ fileName : "SLBuilderBridge.hx", lineNumber : 162, className : "demo.SLBuilderBridge", methodName : "getProperties"});
+	haxe.Log.trace("getProperties " + parent.nodeName + " => " + properties,{ fileName : "SLBuilderBridge.hx", lineNumber : 163, className : "demo.SLBuilderBridge", methodName : "getProperties"});
 	{
 		var _g = 0;
 		while(_g < properties.length) {
@@ -1749,6 +1750,7 @@ haxe.Template.expr_trim = new EReg("^[ ]*([^ ]+)[ ]*$","");
 haxe.Template.expr_int = new EReg("^[0-9]+$","");
 haxe.Template.expr_float = new EReg("^([+-]?)(?=\\d|,\\d)\\d*(,\\d*)?([Ee]([+-]?\\d+))?$","");
 haxe.Template.globals = { };
+slbuilder.core.Config.VIEW_MENU_HEIGHT = "20px";
 demo.Descriptor.div = [{ name : "style.position", displayName : "css position", parentId : null, value : null, defaultValue : "relative", canBeNull : false, description : "CSS style postions (absolute, relative, ...)"},{ name : "style.top", displayName : "css top", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style top (y position)"},{ name : "style.bottom", displayName : "css bottom", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style bottom (y position)"},{ name : "style.left", displayName : "css left", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style left (y position)"},{ name : "style.right", displayName : "css right", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style right (y position)"},{ name : "style.width", displayName : "css width", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style width (y position)"},{ name : "style.height", displayName : "css height", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style height (y position)"}];
 js.Lib.onerror = null;
 slbuilder.core.Template.DEFAULT_TEMPLATE_FOLDER_PATH = "templates/";
