@@ -4,6 +4,7 @@ import js.Lib;
 import js.Dom;
 import slbuilder.core.Config;
 import slbuilder.ui.Menu;
+import slbuilder.ui.LayersWidget;
 import slbuilder.data.Types;
 import slbuilder.data.Property;
 import slbuilder.data.Component;
@@ -48,7 +49,7 @@ class SLBuilder {
 	 * init the application
 	 */
 	private function new(){
-		haxe.Firebug.redirectTraces(); 
+		//haxe.Firebug.redirectTraces(); 
 		trace("SLBuilder init");
 		initDomReferences();
 		initUis();
@@ -63,7 +64,8 @@ class SLBuilder {
 	 * init UIs
 	 */
 	private function initUis(){
-		new Menu(root, "ViewMenu").onClick = onViewMenuClick;
+		//new Menu(root, "ViewMenu").onClick = onViewMenuClick;
+		new LayersWidget(root);
 	}
 	private function onViewMenuClick(className:String) 
 	{

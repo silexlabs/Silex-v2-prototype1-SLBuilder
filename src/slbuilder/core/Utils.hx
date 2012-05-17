@@ -1,6 +1,8 @@
 package slbuilder.core;
 
 import slbuilder.data.Types;
+import js.Lib;
+import js.Dom;
 
 class Utils {
 	/**
@@ -18,5 +20,9 @@ class Utils {
 			seed:Std.string(type)+"_"+className
 			+"_"+Std.string(nextId++)+"_"+Math.round(Math.random()*999999)
 		};
+	}
+	public static function getElementsByClassName(className:String):HtmlCollection<HtmlDom>
+	{
+		return untyped __js__("document.getElementsByClassName(className)");
 	}
 }

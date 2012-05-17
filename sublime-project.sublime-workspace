@@ -4,6 +4,42 @@
 		"selected_items":
 		[
 			[
+				"bo",
+				"border	border-bottom-style: style"
+			],
+			[
+				"bac",
+				"background	background-color: rgb"
+			],
+			[
+				"on",
+				"onclick"
+			],
+			[
+				"a",
+				"appendChild"
+			],
+			[
+				"cre",
+				"createElement"
+			],
+			[
+				"ht",
+				"innerHTML"
+			],
+			[
+				"displ",
+				"displayName"
+			],
+			[
+				"add",
+				"addBtn"
+			],
+			[
+				"L",
+				"Layer"
+			],
+			[
 				"s",
 				"style"
 			],
@@ -60,83 +96,51 @@
 	"buffers":
 	[
 		{
-			"file": "src/demo/SLBuilderBridge.hx",
-			"settings":
-			{
-				"buffer_size": 6720,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/slbuilder/core/Utils.hx",
-			"settings":
-			{
-				"buffer_size": 472,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/data/Types.hx",
-			"settings":
-			{
-				"buffer_size": 319,
-				"line_ending": "Windows"
-			}
-		},
-		{
 			"file": "src/slbuilder/SLBuilder.hx",
 			"settings":
 			{
-				"buffer_size": 6813,
+				"buffer_size": 6877,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "bin/templates/ViewMenu.html",
+			"file": "src/slbuilder/ui/LayersWidget.hx",
 			"settings":
 			{
-				"buffer_size": 1132,
+				"buffer_size": 2427,
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "bin/templates/LayersWidget.html",
+			"settings":
+			{
+				"buffer_size": 743,
+				"line_ending": "Unix"
 			}
 		},
 		{
 			"file": "bin/index.html",
 			"settings":
 			{
-				"buffer_size": 756,
+				"buffer_size": 1342,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/demo/Descriptor.hx",
+			"file": "src/MainJs.hx",
 			"settings":
 			{
-				"buffer_size": 1417,
+				"buffer_size": 173,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/slbuilder/data/Property.hx",
+			"file": "src/demo/SLBuilderBridge.hx",
 			"settings":
 			{
-				"buffer_size": 346,
+				"buffer_size": 6720,
 				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "bin/templates/PropertiesList.html",
-			"settings":
-			{
-				"buffer_size": 1041,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/slbuilder/core/Config.hx",
-			"settings":
-			{
-				"buffer_size": 103,
-				"line_ending": "Unix"
 			}
 		}
 	],
@@ -168,9 +172,19 @@
 	},
 	"file_history":
 	[
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Utils.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/MainJs.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Config.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/templates/PropertiesList.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/data/Property.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/templates/ViewMenu.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/data/Types.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/SLBuilderBridge.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Descriptor.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/index.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/SLBuilder.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Application.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Descriptor",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Utils.hx"
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Descriptor"
 	],
 	"find":
 	{
@@ -178,7 +192,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 93.0,
 		"where_history":
 		[
 		]
@@ -188,6 +202,11 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"displayName\n",
+			"createLayer",
+			"refresh",
+			"'",
+			"style.",
 			"style=\"::li_style::\"",
 			"top",
 			"public var ",
@@ -215,11 +234,146 @@
 	"groups":
 	[
 		{
-			"selected": 6,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
+					"file": "src/slbuilder/SLBuilder.hx",
+					"settings":
+					{
+						"buffer_size": 6877,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2120,
+								2498
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HaXe/HaXe.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2299.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/slbuilder/ui/LayersWidget.hx",
+					"settings":
+					{
+						"buffer_size": 2427,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2177,
+								2177
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HaXe/HaXe.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1141.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "bin/templates/LayersWidget.html",
+					"settings":
+					{
+						"buffer_size": 743,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								454,
+								454
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "bin/index.html",
+					"settings":
+					{
+						"buffer_size": 1342,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								747,
+								747
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 102.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/MainJs.hx",
+					"settings":
+					{
+						"buffer_size": 173,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								173,
+								173
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HaXe/HaXe.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
 					"file": "src/demo/SLBuilderBridge.hx",
 					"settings":
 					{
@@ -230,8 +384,8 @@
 						"selection":
 						[
 							[
-								1669,
-								1669
+								5392,
+								5403
 							]
 						],
 						"settings":
@@ -240,249 +394,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1232.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/slbuilder/core/Utils.hx",
-					"settings":
-					{
-						"buffer_size": 472,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								174,
-								253
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/slbuilder/data/Types.hx",
-					"settings":
-					{
-						"buffer_size": 319,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								197,
-								198
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/slbuilder/SLBuilder.hx",
-					"settings":
-					{
-						"buffer_size": 6813,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4086,
-								4086
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 60.0,
-						"translation.y": 1734.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "bin/templates/ViewMenu.html",
-					"settings":
-					{
-						"buffer_size": 1132,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								722,
-								742
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "bin/index.html",
-					"settings":
-					{
-						"buffer_size": 756,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								521,
-								521
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "src/demo/Descriptor.hx",
-					"settings":
-					{
-						"buffer_size": 1417,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1308,
-								1308
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 510.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "src/slbuilder/data/Property.hx",
-					"settings":
-					{
-						"buffer_size": 346,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								346,
-								346
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "bin/templates/PropertiesList.html",
-					"settings":
-					{
-						"buffer_size": 1041,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								485,
-								485
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "src/slbuilder/core/Config.hx",
-					"settings":
-					{
-						"buffer_size": 103,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								83,
-								67
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2448.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -521,6 +433,10 @@
 		]
 	},
 	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 112.0
+	},
 	"replace":
 	{
 		"height": 0.0

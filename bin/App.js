@@ -7,6 +7,9 @@ slbuilder.core.Utils.nextId = null;
 slbuilder.core.Utils.toId = function(type,className) {
 	return { type : type, seed : Std.string(type) + "_" + className + "_" + Std.string(slbuilder.core.Utils.nextId++) + "_" + Math.round(Math.random() * 999999)};
 }
+slbuilder.core.Utils.getElementsByClassName = function(className) {
+	return document.getElementsByClassName(className);
+}
 slbuilder.core.Utils.prototype.__class__ = slbuilder.core.Utils;
 StringTools = function() { }
 StringTools.__name__ = ["StringTools"];
@@ -939,12 +942,6 @@ List.prototype.map = function(f) {
 	return b;
 }
 List.prototype.__class__ = List;
-slbuilder.core.Config = function() { }
-slbuilder.core.Config.__name__ = ["slbuilder","core","Config"];
-slbuilder.core.Config.prototype.__class__ = slbuilder.core.Config;
-demo.Descriptor = function() { }
-demo.Descriptor.__name__ = ["demo","Descriptor"];
-demo.Descriptor.prototype.__class__ = demo.Descriptor;
 haxe.Http = function(url) { if( url === $_ ) return; {
 	this.url = url;
 	this.headers = new Hash();
@@ -1062,6 +1059,12 @@ haxe.Http.prototype.onStatus = function(status) {
 	null;
 }
 haxe.Http.prototype.__class__ = haxe.Http;
+slbuilder.core.Config = function() { }
+slbuilder.core.Config.__name__ = ["slbuilder","core","Config"];
+slbuilder.core.Config.prototype.__class__ = slbuilder.core.Config;
+demo.Descriptor = function() { }
+demo.Descriptor.__name__ = ["demo","Descriptor"];
+demo.Descriptor.prototype.__class__ = demo.Descriptor;
 if(typeof js=='undefined') js = {}
 js.Lib = function() { }
 js.Lib.__name__ = ["js","Lib"];
@@ -1080,8 +1083,7 @@ js.Lib.setErrorHandler = function(f) {
 }
 js.Lib.prototype.__class__ = js.Lib;
 slbuilder.SLBuilder = function(p) { if( p === $_ ) return; {
-	haxe.Firebug.redirectTraces();
-	haxe.Log.trace("SLBuilder init",{ fileName : "SLBuilder.hx", lineNumber : 52, className : "slbuilder.SLBuilder", methodName : "new"});
+	haxe.Log.trace("SLBuilder init",{ fileName : "SLBuilder.hx", lineNumber : 53, className : "slbuilder.SLBuilder", methodName : "new"});
 	this.initDomReferences();
 	this.initUis();
 }}
@@ -1096,16 +1098,16 @@ slbuilder.SLBuilder.prototype.initDomReferences = function() {
 	this.root = js.Lib.document.getElementById("SLBuilder");
 }
 slbuilder.SLBuilder.prototype.initUis = function() {
-	new slbuilder.ui.Menu(this.root,"ViewMenu").onClick = $closure(this,"onViewMenuClick");
+	new slbuilder.ui.LayersWidget(this.root);
 }
 slbuilder.SLBuilder.prototype.onViewMenuClick = function(className) {
 	switch(className) {
 	case "ShowComponentsBtn":{
-		haxe.Log.trace("test",{ fileName : "SLBuilder.hx", lineNumber : 72, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
+		haxe.Log.trace("test",{ fileName : "SLBuilder.hx", lineNumber : 74, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
 	}break;
 	case "testBtn1":{
 		var layer = this.createLayer("basicLayer",null);
-		haxe.Log.trace(layer,{ fileName : "SLBuilder.hx", lineNumber : 75, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
+		haxe.Log.trace(layer,{ fileName : "SLBuilder.hx", lineNumber : 77, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
 		js.Lib.document.getElementById(layer.id.seed).style.display = "inline-block";
 		js.Lib.document.getElementById(layer.id.seed).style.width = "100px";
 		js.Lib.document.getElementById(layer.id.seed).style.height = "100px";
@@ -1114,7 +1116,7 @@ slbuilder.SLBuilder.prototype.onViewMenuClick = function(className) {
 	}break;
 	case "testBtn2":{
 		var layers = this.getLayers(null);
-		haxe.Log.trace(layers,{ fileName : "SLBuilder.hx", lineNumber : 86, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
+		haxe.Log.trace(layers,{ fileName : "SLBuilder.hx", lineNumber : 88, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
 		{
 			var _g = 0;
 			while(_g < layers.length) {
@@ -1127,7 +1129,7 @@ slbuilder.SLBuilder.prototype.onViewMenuClick = function(className) {
 	}break;
 	case "testBtn3":{
 		var component = this.createComponent("galery",this.getLayers(null)[0].id);
-		haxe.Log.trace(component,{ fileName : "SLBuilder.hx", lineNumber : 93, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
+		haxe.Log.trace(component,{ fileName : "SLBuilder.hx", lineNumber : 95, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
 		js.Lib.document.getElementById(component.id.seed).style.display = "inline-block";
 		js.Lib.document.getElementById(component.id.seed).style.width = "10px";
 		js.Lib.document.getElementById(component.id.seed).style.height = "10px";
@@ -1136,7 +1138,7 @@ slbuilder.SLBuilder.prototype.onViewMenuClick = function(className) {
 	}break;
 	case "testBtn4":{
 		var components = this.getComponents(this.getLayers(null)[0].id);
-		haxe.Log.trace(components,{ fileName : "SLBuilder.hx", lineNumber : 104, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
+		haxe.Log.trace(components,{ fileName : "SLBuilder.hx", lineNumber : 106, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
 		{
 			var _g = 0;
 			while(_g < components.length) {
@@ -1161,7 +1163,7 @@ slbuilder.SLBuilder.prototype.onViewMenuClick = function(className) {
 		this.testPropCount += 10;
 		this.setProperty(components[0].id,"style.position","absolute");
 		this.setProperty(components[0].id,"style.top",this.testPropCount + "px");
-		haxe.Log.trace(components[0].id,{ fileName : "SLBuilder.hx", lineNumber : 136, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
+		haxe.Log.trace(components[0].id,{ fileName : "SLBuilder.hx", lineNumber : 138, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
 	}break;
 	default:{
 		null;
@@ -1513,6 +1515,60 @@ demo.SLBuilderBridge.prototype.slectionLockChanged = function(componentsIds) {
 	null;
 }
 demo.SLBuilderBridge.prototype.__class__ = demo.SLBuilderBridge;
+if(!slbuilder.ui) slbuilder.ui = {}
+slbuilder.ui.LayersWidget = function(parent) { if( parent === $_ ) return; {
+	this.parent = parent;
+	new slbuilder.core.Template("LayersWidget").setOnLoad($closure(this,"attachTemplate"));
+}}
+slbuilder.ui.LayersWidget.__name__ = ["slbuilder","ui","LayersWidget"];
+slbuilder.ui.LayersWidget.prototype.onChange = null;
+slbuilder.ui.LayersWidget.prototype.list = null;
+slbuilder.ui.LayersWidget.prototype.addBtn = null;
+slbuilder.ui.LayersWidget.prototype.root = null;
+slbuilder.ui.LayersWidget.prototype.parent = null;
+slbuilder.ui.LayersWidget.prototype.attachTemplate = function(template) {
+	this.root = js.Lib.document.createElement("div");
+	this.root.innerHTML = template.execute({ Config : slbuilder.core.Config});
+	this.parent.appendChild(this.root);
+	this.list = slbuilder.core.Utils.getElementsByClassName("list")[0];
+	this.addBtn = slbuilder.core.Utils.getElementsByClassName("add")[0];
+	this.addBtn.onclick = $closure(this,"addLayer");
+	this.refresh();
+}
+slbuilder.ui.LayersWidget.prototype.refresh = function() {
+	this.list.innerHTML = "";
+	var layers = slbuilder.SLBuilder.getInstance().getLayers(null);
+	var t = this;
+	{
+		var _g = 0;
+		while(_g < layers.length) {
+			var layer = [layers[_g]];
+			++_g;
+			var elem = js.Lib.document.createElement("li");
+			elem.id = layer[0].id.seed;
+			elem.innerHTML = layer[0].displayName;
+			elem.onclick = function(layer) {
+				return function(e) {
+					t.removeLayer(layer[0].id);
+				}
+			}(layer);
+			this.list.appendChild(elem);
+		}
+	}
+}
+slbuilder.ui.LayersWidget.prototype.addLayer = function(e) {
+	var layer = slbuilder.SLBuilder.getInstance().createLayer("basicLayer",null);
+	slbuilder.SLBuilder.getInstance().setProperty(layer.id,"displayName","New Layer");
+	this.refresh();
+}
+slbuilder.ui.LayersWidget.prototype.removeLayer = function(id) {
+	slbuilder.SLBuilder.getInstance().removeLayer(id);
+	this.refresh();
+}
+slbuilder.ui.LayersWidget.prototype.onClickList = function(e) {
+	null;
+}
+slbuilder.ui.LayersWidget.prototype.__class__ = slbuilder.ui.LayersWidget;
 slbuilder.core.Template = function(name,templateFolderPath,templateExtenstion,onLoad,onError) { if( name === $_ ) return; {
 	if(templateExtenstion == null) templateExtenstion = ".html";
 	if(templateFolderPath == null) templateFolderPath = "templates/";
@@ -1644,7 +1700,6 @@ Hash.prototype.toString = function() {
 	return s.b.join("");
 }
 Hash.prototype.__class__ = Hash;
-if(!slbuilder.ui) slbuilder.ui = {}
 slbuilder.ui.Menu = function(parent,teamplateName) { if( parent === $_ ) return; {
 	this.parent = parent;
 	this.initTemplates(teamplateName);
@@ -1753,6 +1808,7 @@ haxe.Template.globals = { };
 slbuilder.core.Config.VIEW_MENU_HEIGHT = "20px";
 demo.Descriptor.div = [{ name : "style.position", displayName : "css position", parentId : null, value : null, defaultValue : "relative", canBeNull : false, description : "CSS style postions (absolute, relative, ...)"},{ name : "style.top", displayName : "css top", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style top (y position)"},{ name : "style.bottom", displayName : "css bottom", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style bottom (y position)"},{ name : "style.left", displayName : "css left", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style left (y position)"},{ name : "style.right", displayName : "css right", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style right (y position)"},{ name : "style.width", displayName : "css width", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style width (y position)"},{ name : "style.height", displayName : "css height", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style height (y position)"}];
 js.Lib.onerror = null;
+slbuilder.ui.LayersWidget.TEMPLATE_NAME = "LayersWidget";
 slbuilder.core.Template.DEFAULT_TEMPLATE_FOLDER_PATH = "templates/";
 slbuilder.core.Template.DEFAULT_TEMPLATE_EXTENSION = ".html";
 MainJs.main()
