@@ -1,119 +1,477 @@
 $estr = function() { return js.Boot.__string_rec(this,''); }
 if(typeof slbuilder=='undefined') slbuilder = {}
-if(!slbuilder.core) slbuilder.core = {}
-slbuilder.core.Utils = function() { }
-slbuilder.core.Utils.__name__ = ["slbuilder","core","Utils"];
-slbuilder.core.Utils.nextId = null;
-slbuilder.core.Utils.toId = function(type,className) {
-	return { type : type, seed : Std.string(type) + "_" + className + "_" + Std.string(slbuilder.core.Utils.nextId++) + "_" + Math.round(Math.random() * 999999)};
+if(!slbuilder.ui) slbuilder.ui = {}
+slbuilder.ui.ListWidget = function(parent,panel) { if( parent === $_ ) return; {
+	this.NAME_COLUMN_TITLE = "TO BE OVDERRIDEN IN SUBCLASS";
+	this.parent = parent;
+	this.panel = panel;
+	this.initExtJsUi();
+}}
+slbuilder.ui.ListWidget.__name__ = ["slbuilder","ui","ListWidget"];
+slbuilder.ui.ListWidget.prototype.NAME_COLUMN_TITLE = null;
+slbuilder.ui.ListWidget.prototype.arrayStore = null;
+slbuilder.ui.ListWidget.prototype.onChange = null;
+slbuilder.ui.ListWidget.prototype.addBtn = null;
+slbuilder.ui.ListWidget.prototype.removeBtn = null;
+slbuilder.ui.ListWidget.prototype.parent = null;
+slbuilder.ui.ListWidget.prototype.root = null;
+slbuilder.ui.ListWidget.prototype.panel = null;
+slbuilder.ui.ListWidget.prototype.grid = null;
+slbuilder.ui.ListWidget.prototype.initDomReferences = function() {
+	haxe.Log.trace(this.root.id,{ fileName : "ListWidget.hx", lineNumber : 66, className : "slbuilder.ui.ListWidget", methodName : "initDomReferences"});
+	this.addBtn = slbuilder.core.Utils.getElementsByClassName(this.root,"addBtn")[0];
+	this.addBtn.onclick = $closure(this,"add");
+	this.removeBtn = slbuilder.core.Utils.getElementsByClassName(this.root,"removeBtn")[0];
+	this.removeBtn.onclick = $closure(this,"remove");
+	this.refresh();
 }
-slbuilder.core.Utils.getElementsByClassName = function(className) {
-	return document.getElementsByClassName(className);
+slbuilder.ui.ListWidget.prototype.refresh = function() {
+	null;
 }
-slbuilder.core.Utils.prototype.__class__ = slbuilder.core.Utils;
-StringTools = function() { }
-StringTools.__name__ = ["StringTools"];
-StringTools.urlEncode = function(s) {
-	return encodeURIComponent(s);
+slbuilder.ui.ListWidget.prototype.add = function(e) {
+	this.refresh();
 }
-StringTools.urlDecode = function(s) {
-	return decodeURIComponent(s.split("+").join(" "));
+slbuilder.ui.ListWidget.prototype.remove = function(e) {
+	this.refresh();
 }
-StringTools.htmlEscape = function(s) {
-	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-}
-StringTools.htmlUnescape = function(s) {
-	return s.split("&gt;").join(">").split("&lt;").join("<").split("&amp;").join("&");
-}
-StringTools.startsWith = function(s,start) {
-	return s.length >= start.length && s.substr(0,start.length) == start;
-}
-StringTools.endsWith = function(s,end) {
-	var elen = end.length;
-	var slen = s.length;
-	return slen >= elen && s.substr(slen - elen,elen) == end;
-}
-StringTools.isSpace = function(s,pos) {
-	var c = s.charCodeAt(pos);
-	return c >= 9 && c <= 13 || c == 32;
-}
-StringTools.ltrim = function(s) {
-	var l = s.length;
-	var r = 0;
-	while(r < l && StringTools.isSpace(s,r)) {
-		r++;
+slbuilder.ui.ListWidget.prototype.onSelectionChanged = function(model,records) {
+	var selected = null;
+	if(records[0] != null) selected = records[0].data;
+	if(this.onChange != null) {
+		this.onChange(selected);
 	}
-	if(r > 0) return s.substr(r,l - r);
-	else return s;
 }
-StringTools.rtrim = function(s) {
-	var l = s.length;
-	var r = 0;
-	while(r < l && StringTools.isSpace(s,l - r - 1)) {
-		r++;
+slbuilder.ui.ListWidget.prototype.initExtJsUi = function() {
+	this.arrayStore = Ext.create("Ext.data.ArrayStore",{ fields : [{ name : "id"},{ name : "parentId"},{ name : "displayName"}]});
+	this.grid = Ext.create("Ext.grid.GridPanel",{ columnWidth : 0.60, xtype : "gridpanel", store : this.arrayStore, height : 150, width : 150, columns : [{ id : "col", text : this.NAME_COLUMN_TITLE, flex : 1, sortable : true, dataIndex : "displayName"}], listeners : { selectionchange : $closure(this,"onSelectionChanged")}, buttons : [{ cls : "addBtn", text : "+", xtype : "button"},{ cls : "removeBtn", text : "-", xtype : "button"}]});
+	this.panel.add(this.grid);
+	this.root = this.grid.getEl().dom;
+	this.root.style.position = "relative";
+	(this.root.style)["float"] = "left";
+	this.initDomReferences();
+}
+slbuilder.ui.ListWidget.prototype.__class__ = slbuilder.ui.ListWidget;
+slbuilder.ui.ComponentsWidget = function(parent,panel) { if( parent === $_ ) return; {
+	this.NAME_COLUMN_TITLE = "Components";
+	slbuilder.ui.ListWidget.call(this,parent,panel);
+}}
+slbuilder.ui.ComponentsWidget.__name__ = ["slbuilder","ui","ComponentsWidget"];
+slbuilder.ui.ComponentsWidget.__super__ = slbuilder.ui.ListWidget;
+for(var k in slbuilder.ui.ListWidget.prototype ) slbuilder.ui.ComponentsWidget.prototype[k] = slbuilder.ui.ListWidget.prototype[k];
+slbuilder.ui.ComponentsWidget.prototype.parentId = null;
+slbuilder.ui.ComponentsWidget.prototype.initDomReferences = function() {
+	slbuilder.ui.ListWidget.prototype.initDomReferences.call(this);
+}
+slbuilder.ui.ComponentsWidget.prototype.refresh = function() {
+	if(this.parentId != null) {
+		var components = slbuilder.SLBuilder.getInstance().getComponents(this.parentId);
+		var arraArray = Ext.Array.from(components);
+		this.arrayStore.loadData(arraArray);
 	}
-	if(r > 0) {
-		return s.substr(0,l - r);
+	else this.arrayStore.removeAll();
+	slbuilder.ui.ListWidget.prototype.refresh.call(this);
+}
+slbuilder.ui.ComponentsWidget.prototype.add = function(e) {
+	var component = slbuilder.SLBuilder.getInstance().createComponent("basicComponent",this.parentId);
+	slbuilder.SLBuilder.getInstance().setProperty(component.id,"displayName","New Component");
+	slbuilder.ui.ListWidget.prototype.add.call(this,e);
+}
+slbuilder.ui.ComponentsWidget.prototype.remove = function(e) {
+	slbuilder.SLBuilder.getInstance().removeComponent(this.grid.selModel.selected.items[0].data.id);
+	slbuilder.ui.ListWidget.prototype.remove.call(this,e);
+}
+slbuilder.ui.ComponentsWidget.prototype.onSelectionChanged = function(model,records) {
+	slbuilder.ui.ListWidget.prototype.onSelectionChanged.call(this,model,records);
+}
+slbuilder.ui.ComponentsWidget.prototype.initExtJsUi = function() {
+	slbuilder.ui.ListWidget.prototype.initExtJsUi.call(this);
+}
+slbuilder.ui.ComponentsWidget.prototype.__class__ = slbuilder.ui.ComponentsWidget;
+if(typeof demo=='undefined') demo = {}
+demo.Descriptor = function() { }
+demo.Descriptor.__name__ = ["demo","Descriptor"];
+demo.Descriptor.prototype.__class__ = demo.Descriptor;
+if(typeof haxe=='undefined') haxe = {}
+haxe.Http = function(url) { if( url === $_ ) return; {
+	this.url = url;
+	this.headers = new Hash();
+	this.params = new Hash();
+	this.async = true;
+}}
+haxe.Http.__name__ = ["haxe","Http"];
+haxe.Http.requestUrl = function(url) {
+	var h = new haxe.Http(url);
+	h.async = false;
+	var r = null;
+	h.onData = function(d) {
+		r = d;
+	}
+	h.onError = function(e) {
+		throw e;
+	}
+	h.request(false);
+	return r;
+}
+haxe.Http.prototype.url = null;
+haxe.Http.prototype.async = null;
+haxe.Http.prototype.postData = null;
+haxe.Http.prototype.headers = null;
+haxe.Http.prototype.params = null;
+haxe.Http.prototype.setHeader = function(header,value) {
+	this.headers.set(header,value);
+}
+haxe.Http.prototype.setParameter = function(param,value) {
+	this.params.set(param,value);
+}
+haxe.Http.prototype.setPostData = function(data) {
+	this.postData = data;
+}
+haxe.Http.prototype.request = function(post) {
+	var me = this;
+	var r = new js.XMLHttpRequest();
+	var onreadystatechange = function() {
+		if(r.readyState != 4) return;
+		var s = (function($this) {
+			var $r;
+			try {
+				$r = r.status;
+			}
+			catch( $e0 ) {
+				{
+					var e = $e0;
+					$r = null;
+				}
+			}
+			return $r;
+		}(this));
+		if(s == undefined) s = null;
+		if(s != null) me.onStatus(s);
+		if(s != null && s >= 200 && s < 400) me.onData(r.responseText);
+		else switch(s) {
+		case null: case undefined:{
+			me.onError("Failed to connect or resolve host");
+		}break;
+		case 12029:{
+			me.onError("Failed to connect to host");
+		}break;
+		case 12007:{
+			me.onError("Unknown host");
+		}break;
+		default:{
+			me.onError("Http Error #" + r.status);
+		}break;
+		}
+	}
+	if(this.async) r.onreadystatechange = onreadystatechange;
+	var uri = this.postData;
+	if(uri != null) post = true;
+	else { var $it1 = this.params.keys();
+	while( $it1.hasNext() ) { var p = $it1.next();
+	{
+		if(uri == null) uri = "";
+		else uri += "&";
+		uri += StringTools.urlDecode(p) + "=" + StringTools.urlEncode(this.params.get(p));
+	}
+	}}
+	try {
+		if(post) r.open("POST",this.url,this.async);
+		else if(uri != null) {
+			var question = this.url.split("?").length <= 1;
+			r.open("GET",this.url + (question?"?":"&") + uri,this.async);
+			uri = null;
+		}
+		else r.open("GET",this.url,this.async);
+	}
+	catch( $e2 ) {
+		{
+			var e = $e2;
+			{
+				this.onError(e.toString());
+				return;
+			}
+		}
+	}
+	if(this.headers.get("Content-Type") == null && post && this.postData == null) r.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+	{ var $it3 = this.headers.keys();
+	while( $it3.hasNext() ) { var h = $it3.next();
+	r.setRequestHeader(h,this.headers.get(h));
+	}}
+	r.send(uri);
+	if(!this.async) onreadystatechange();
+}
+haxe.Http.prototype.onData = function(data) {
+	null;
+}
+haxe.Http.prototype.onError = function(msg) {
+	null;
+}
+haxe.Http.prototype.onStatus = function(status) {
+	null;
+}
+haxe.Http.prototype.__class__ = haxe.Http;
+List = function(p) { if( p === $_ ) return; {
+	this.length = 0;
+}}
+List.__name__ = ["List"];
+List.prototype.h = null;
+List.prototype.q = null;
+List.prototype.length = null;
+List.prototype.add = function(item) {
+	var x = [item];
+	if(this.h == null) this.h = x;
+	else this.q[1] = x;
+	this.q = x;
+	this.length++;
+}
+List.prototype.push = function(item) {
+	var x = [item,this.h];
+	this.h = x;
+	if(this.q == null) this.q = x;
+	this.length++;
+}
+List.prototype.first = function() {
+	return this.h == null?null:this.h[0];
+}
+List.prototype.last = function() {
+	return this.q == null?null:this.q[0];
+}
+List.prototype.pop = function() {
+	if(this.h == null) return null;
+	var x = this.h[0];
+	this.h = this.h[1];
+	if(this.h == null) this.q = null;
+	this.length--;
+	return x;
+}
+List.prototype.isEmpty = function() {
+	return this.h == null;
+}
+List.prototype.clear = function() {
+	this.h = null;
+	this.q = null;
+	this.length = 0;
+}
+List.prototype.remove = function(v) {
+	var prev = null;
+	var l = this.h;
+	while(l != null) {
+		if(l[0] == v) {
+			if(prev == null) this.h = l[1];
+			else prev[1] = l[1];
+			if(this.q == l) this.q = prev;
+			this.length--;
+			return true;
+		}
+		prev = l;
+		l = l[1];
+	}
+	return false;
+}
+List.prototype.iterator = function() {
+	return { h : this.h, hasNext : function() {
+		return this.h != null;
+	}, next : function() {
+		if(this.h == null) return null;
+		var x = this.h[0];
+		this.h = this.h[1];
+		return x;
+	}};
+}
+List.prototype.toString = function() {
+	var s = new StringBuf();
+	var first = true;
+	var l = this.h;
+	s.b[s.b.length] = "{";
+	while(l != null) {
+		if(first) first = false;
+		else s.b[s.b.length] = ", ";
+		s.b[s.b.length] = Std.string(l[0]);
+		l = l[1];
+	}
+	s.b[s.b.length] = "}";
+	return s.b.join("");
+}
+List.prototype.join = function(sep) {
+	var s = new StringBuf();
+	var first = true;
+	var l = this.h;
+	while(l != null) {
+		if(first) first = false;
+		else s.b[s.b.length] = sep;
+		s.b[s.b.length] = l[0];
+		l = l[1];
+	}
+	return s.b.join("");
+}
+List.prototype.filter = function(f) {
+	var l2 = new List();
+	var l = this.h;
+	while(l != null) {
+		var v = l[0];
+		l = l[1];
+		if(f(v)) l2.add(v);
+	}
+	return l2;
+}
+List.prototype.map = function(f) {
+	var b = new List();
+	var l = this.h;
+	while(l != null) {
+		var v = l[0];
+		l = l[1];
+		b.add(f(v));
+	}
+	return b;
+}
+List.prototype.__class__ = List;
+MainJs = function() { }
+MainJs.__name__ = ["MainJs"];
+MainJs.main = function() {
+	haxe.Firebug.redirectTraces();
+	new demo.Application();
+}
+MainJs.prototype.__class__ = MainJs;
+demo.Application = function(p) { if( p === $_ ) return; {
+	this.slBuilderBridge = new demo.SLBuilderBridge(slbuilder.SLBuilder.getInstance());
+}}
+demo.Application.__name__ = ["demo","Application"];
+demo.Application.prototype.slBuilderBridge = null;
+demo.Application.prototype.__class__ = demo.Application;
+slbuilder.SLBuilder = function(p) { if( p === $_ ) return; {
+	haxe.Log.trace("SLBuilder init",{ fileName : "SLBuilder.hx", lineNumber : 63, className : "slbuilder.SLBuilder", methodName : "new"});
+	this.initDomReferences();
+	this.initUis();
+}}
+slbuilder.SLBuilder.__name__ = ["slbuilder","SLBuilder"];
+slbuilder.SLBuilder.instance = null;
+slbuilder.SLBuilder.getInstance = function() {
+	if(slbuilder.SLBuilder.instance == null) slbuilder.SLBuilder.instance = new slbuilder.SLBuilder();
+	return slbuilder.SLBuilder.instance;
+}
+slbuilder.SLBuilder.prototype.layersWidget = null;
+slbuilder.SLBuilder.prototype.componentsWidget = null;
+slbuilder.SLBuilder.prototype.root = null;
+slbuilder.SLBuilder.prototype.initDomReferences = function() {
+	this.root = slbuilder.core.Utils.getElementsByClassName(js.Lib.document.body,"SLBuilderMain")[0];
+}
+slbuilder.SLBuilder.prototype.initUis = function() {
+	Ext.require(["Ext.form.*","Ext.data.*","Ext.grid.Panel","Ext.grid.GridPanel","Ext.layout.container.Column"]);
+	Ext.onReady($closure(this,"initExtJsUi"));
+}
+slbuilder.SLBuilder.prototype.initExtJsUi = function() {
+	var gridForm;
+	gridForm = Ext.create("Ext.form.Panel",{ id : "slbuilder-form", frame : true, title : "SLBuilder Editor", height : 350, width : 800, layout : "column", fieldDefaults : { labelAlign : "left", msgTarget : "side"}, renderTo : this.root});
+	var gridFormHtmlDom = (gridForm.getEl()).dom;
+	gridFormHtmlDom.style.position = "absolute";
+	gridFormHtmlDom.style.bottom = "0";
+	gridFormHtmlDom.style.left = "0";
+	this.layersWidget = new slbuilder.ui.LayersWidget(this.root,gridForm);
+	this.layersWidget.onChange = $closure(this,"onLayerChange");
+	this.componentsWidget = new slbuilder.ui.ComponentsWidget(this.root,gridForm);
+	this.componentsWidget.onChange = $closure(this,"onComponentChange");
+}
+slbuilder.SLBuilder.prototype.onLayerChange = function(layer) {
+	var displayName = "none";
+	if(layer != null) {
+		displayName = layer.displayName;
+		this.componentsWidget.parentId = layer.id;
 	}
 	else {
-		return s;
+		this.componentsWidget.parentId = null;
+	}
+	this.componentsWidget.refresh();
+	haxe.Log.trace("Layer selected: " + displayName,{ fileName : "SLBuilder.hx", lineNumber : 138, className : "slbuilder.SLBuilder", methodName : "onLayerChange"});
+}
+slbuilder.SLBuilder.prototype.onComponentChange = function(component) {
+	var displayName = "none";
+	if(component != null) {
+		displayName = component.displayName;
+	}
+	haxe.Log.trace("Component selected: " + displayName,{ fileName : "SLBuilder.hx", lineNumber : 146, className : "slbuilder.SLBuilder", methodName : "onComponentChange"});
+}
+slbuilder.SLBuilder.prototype.onViewMenuClick = function(className) {
+	switch(className) {
+	case "ShowComponentsBtn":{
+		haxe.Log.trace("test",{ fileName : "SLBuilder.hx", lineNumber : 152, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
+	}break;
+	case "testBtn1":{
+		var layer = this.createLayer("basicLayer",null);
+		haxe.Log.trace(layer,{ fileName : "SLBuilder.hx", lineNumber : 155, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
+		js.Lib.document.getElementById(layer.id.seed).style.display = "inline-block";
+		js.Lib.document.getElementById(layer.id.seed).style.width = "100px";
+		js.Lib.document.getElementById(layer.id.seed).style.height = "100px";
+		var color = Math.round(Math.random() * 255);
+		js.Lib.document.getElementById(layer.id.seed).style.backgroundColor = "rgb(" + color + "," + color + "," + color + ")";
+	}break;
+	case "testBtn2":{
+		var layers = this.getLayers(null);
+		haxe.Log.trace(layers,{ fileName : "SLBuilder.hx", lineNumber : 166, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
+		{
+			var _g = 0;
+			while(_g < layers.length) {
+				var layer = layers[_g];
+				++_g;
+				var color = Math.round(Math.random() * 255 * 255);
+				js.Lib.document.getElementById(layer.id.seed).style.backgroundColor = color;
+			}
+		}
+	}break;
+	case "testBtn3":{
+		var component = this.createComponent("galery",this.getLayers(null)[0].id);
+		haxe.Log.trace(component,{ fileName : "SLBuilder.hx", lineNumber : 173, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
+		js.Lib.document.getElementById(component.id.seed).style.display = "inline-block";
+		js.Lib.document.getElementById(component.id.seed).style.width = "10px";
+		js.Lib.document.getElementById(component.id.seed).style.height = "10px";
+		var color = Math.round(Math.random() * 255);
+		js.Lib.document.getElementById(component.id.seed).style.backgroundColor = "rgb(" + color + "," + color + "," + color + ")";
+	}break;
+	case "testBtn4":{
+		var components = this.getComponents(this.getLayers(null)[0].id);
+		haxe.Log.trace(components,{ fileName : "SLBuilder.hx", lineNumber : 184, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
+		{
+			var _g = 0;
+			while(_g < components.length) {
+				var component = components[_g];
+				++_g;
+				var color = Math.round(Math.random() * 255 * 255);
+				js.Lib.document.getElementById(component.id.seed).style.backgroundColor = color;
+			}
+		}
+	}break;
+	case "testBtn5":{
+		var properties = this.getProperties(this.getComponents(this.getLayers(null)[0].id)[0].id);
+		var t = this;
+		new slbuilder.core.Template("PropertiesList").setOnLoad(function(template) {
+			var container = js.Lib.document.createElement("div");
+			container.innerHTML = template.execute({ Config : slbuilder.core.Config, properties : properties, component : t.getComponents(t.getLayers(null)[0].id)[0]});
+			t.root.appendChild(container);
+		});
+	}break;
+	case "testBtn6":{
+		var components = this.getComponents(this.getLayers(null)[0].id);
+		this.testPropCount += 10;
+		this.setProperty(components[0].id,"style.position","absolute");
+		this.setProperty(components[0].id,"style.top",this.testPropCount + "px");
+		haxe.Log.trace(components[0].id,{ fileName : "SLBuilder.hx", lineNumber : 216, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
+	}break;
+	default:{
+		null;
+	}break;
 	}
 }
-StringTools.trim = function(s) {
-	return StringTools.ltrim(StringTools.rtrim(s));
-}
-StringTools.rpad = function(s,c,l) {
-	var sl = s.length;
-	var cl = c.length;
-	while(sl < l) {
-		if(l - sl < cl) {
-			s += c.substr(0,l - sl);
-			sl = l;
-		}
-		else {
-			s += c;
-			sl += cl;
-		}
-	}
-	return s;
-}
-StringTools.lpad = function(s,c,l) {
-	var ns = "";
-	var sl = s.length;
-	if(sl >= l) return s;
-	var cl = c.length;
-	while(sl < l) {
-		if(l - sl < cl) {
-			ns += c.substr(0,l - sl);
-			sl = l;
-		}
-		else {
-			ns += c;
-			sl += cl;
-		}
-	}
-	return ns + s;
-}
-StringTools.replace = function(s,sub,by) {
-	return s.split(sub).join(by);
-}
-StringTools.hex = function(n,digits) {
-	var s = "";
-	var hexChars = "0123456789ABCDEF";
-	do {
-		s = hexChars.charAt(n & 15) + s;
-		n >>>= 4;
-	} while(n > 0);
-	if(digits != null) while(s.length < digits) s = "0" + s;
-	return s;
-}
-StringTools.fastCodeAt = function(s,index) {
-	return s.cca(index);
-}
-StringTools.isEOF = function(c) {
-	return c != c;
-}
-StringTools.prototype.__class__ = StringTools;
+slbuilder.SLBuilder.prototype.testPropCount = null;
+slbuilder.SLBuilder.prototype.createLayer = null;
+slbuilder.SLBuilder.prototype.removeLayer = null;
+slbuilder.SLBuilder.prototype.getLayers = null;
+slbuilder.SLBuilder.prototype.createComponent = null;
+slbuilder.SLBuilder.prototype.removeComponent = null;
+slbuilder.SLBuilder.prototype.getComponents = null;
+slbuilder.SLBuilder.prototype.getProperties = null;
+slbuilder.SLBuilder.prototype.setProperty = null;
+slbuilder.SLBuilder.prototype.domChanged = null;
+slbuilder.SLBuilder.prototype.slectionChanged = null;
+slbuilder.SLBuilder.prototype.slectionLockChanged = null;
+slbuilder.SLBuilder.prototype.__class__ = slbuilder.SLBuilder;
 Reflect = function() { }
 Reflect.__name__ = ["Reflect"];
 Reflect.hasField = function(o,field) {
@@ -224,48 +582,272 @@ Reflect.makeVarArgs = function(f) {
 	}
 }
 Reflect.prototype.__class__ = Reflect;
-if(typeof haxe=='undefined') haxe = {}
-haxe.Log = function() { }
-haxe.Log.__name__ = ["haxe","Log"];
-haxe.Log.trace = function(v,infos) {
-	js.Boot.__trace(v,infos);
-}
-haxe.Log.clear = function() {
-	js.Boot.__clear_trace();
-}
-haxe.Log.prototype.__class__ = haxe.Log;
-if(typeof demo=='undefined') demo = {}
-demo.Application = function(p) { if( p === $_ ) return; {
-	this.slBuilderBridge = new demo.SLBuilderBridge(slbuilder.SLBuilder.getInstance());
+IntIter = function(min,max) { if( min === $_ ) return; {
+	this.min = min;
+	this.max = max;
 }}
-demo.Application.__name__ = ["demo","Application"];
-demo.Application.prototype.slBuilderBridge = null;
-demo.Application.prototype.__class__ = demo.Application;
-StringBuf = function(p) { if( p === $_ ) return; {
-	this.b = new Array();
-}}
-StringBuf.__name__ = ["StringBuf"];
-StringBuf.prototype.add = function(x) {
-	this.b[this.b.length] = x;
+IntIter.__name__ = ["IntIter"];
+IntIter.prototype.min = null;
+IntIter.prototype.max = null;
+IntIter.prototype.hasNext = function() {
+	return this.min < this.max;
 }
-StringBuf.prototype.addSub = function(s,pos,len) {
-	this.b[this.b.length] = s.substr(pos,len);
+IntIter.prototype.next = function() {
+	return this.min++;
 }
-StringBuf.prototype.addChar = function(c) {
-	this.b[this.b.length] = String.fromCharCode(c);
+IntIter.prototype.__class__ = IntIter;
+if(!slbuilder.core) slbuilder.core = {}
+slbuilder.core.Config = function() { }
+slbuilder.core.Config.__name__ = ["slbuilder","core","Config"];
+slbuilder.core.Config.prototype.__class__ = slbuilder.core.Config;
+if(typeof js=='undefined') js = {}
+js.Boot = function() { }
+js.Boot.__name__ = ["js","Boot"];
+js.Boot.__unhtml = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
 }
-StringBuf.prototype.toString = function() {
-	return this.b.join("");
+js.Boot.__trace = function(v,i) {
+	var msg = i != null?i.fileName + ":" + i.lineNumber + ": ":"";
+	msg += js.Boot.__unhtml(js.Boot.__string_rec(v,"")) + "<br/>";
+	var d = document.getElementById("haxe:trace");
+	if(d == null) alert("No haxe:trace element defined\n" + msg);
+	else d.innerHTML += msg;
 }
-StringBuf.prototype.b = null;
-StringBuf.prototype.__class__ = StringBuf;
-MainJs = function() { }
-MainJs.__name__ = ["MainJs"];
-MainJs.main = function() {
-	haxe.Firebug.redirectTraces();
-	new demo.Application();
+js.Boot.__clear_trace = function() {
+	var d = document.getElementById("haxe:trace");
+	if(d != null) d.innerHTML = "";
+	else null;
 }
-MainJs.prototype.__class__ = MainJs;
+js.Boot.__closure = function(o,f) {
+	var m = o[f];
+	if(m == null) return null;
+	var f1 = function() {
+		return m.apply(o,arguments);
+	}
+	f1.scope = o;
+	f1.method = m;
+	return f1;
+}
+js.Boot.__string_rec = function(o,s) {
+	if(o == null) return "null";
+	if(s.length >= 5) return "<...>";
+	var t = typeof(o);
+	if(t == "function" && (o.__name__ != null || o.__ename__ != null)) t = "object";
+	switch(t) {
+	case "object":{
+		if(o instanceof Array) {
+			if(o.__enum__ != null) {
+				if(o.length == 2) return o[0];
+				var str = o[0] + "(";
+				s += "\t";
+				{
+					var _g1 = 2, _g = o.length;
+					while(_g1 < _g) {
+						var i = _g1++;
+						if(i != 2) str += "," + js.Boot.__string_rec(o[i],s);
+						else str += js.Boot.__string_rec(o[i],s);
+					}
+				}
+				return str + ")";
+			}
+			var l = o.length;
+			var i;
+			var str = "[";
+			s += "\t";
+			{
+				var _g = 0;
+				while(_g < l) {
+					var i1 = _g++;
+					str += (i1 > 0?",":"") + js.Boot.__string_rec(o[i1],s);
+				}
+			}
+			str += "]";
+			return str;
+		}
+		var tostr;
+		try {
+			tostr = o.toString;
+		}
+		catch( $e0 ) {
+			{
+				var e = $e0;
+				{
+					return "???";
+				}
+			}
+		}
+		if(tostr != null && tostr != Object.toString) {
+			var s2 = o.toString();
+			if(s2 != "[object Object]") return s2;
+		}
+		var k = null;
+		var str = "{\n";
+		s += "\t";
+		var hasp = o.hasOwnProperty != null;
+		for( var k in o ) { ;
+		if(hasp && !o.hasOwnProperty(k)) continue;
+		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__") continue;
+		if(str.length != 2) str += ", \n";
+		str += s + k + " : " + js.Boot.__string_rec(o[k],s);
+		}
+		s = s.substring(1);
+		str += "\n" + s + "}";
+		return str;
+	}break;
+	case "function":{
+		return "<function>";
+	}break;
+	case "string":{
+		return o;
+	}break;
+	default:{
+		return String(o);
+	}break;
+	}
+}
+js.Boot.__interfLoop = function(cc,cl) {
+	if(cc == null) return false;
+	if(cc == cl) return true;
+	var intf = cc.__interfaces__;
+	if(intf != null) {
+		var _g1 = 0, _g = intf.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var i1 = intf[i];
+			if(i1 == cl || js.Boot.__interfLoop(i1,cl)) return true;
+		}
+	}
+	return js.Boot.__interfLoop(cc.__super__,cl);
+}
+js.Boot.__instanceof = function(o,cl) {
+	try {
+		if(o instanceof cl) {
+			if(cl == Array) return o.__enum__ == null;
+			return true;
+		}
+		if(js.Boot.__interfLoop(o.__class__,cl)) return true;
+	}
+	catch( $e0 ) {
+		{
+			var e = $e0;
+			{
+				if(cl == null) return false;
+			}
+		}
+	}
+	switch(cl) {
+	case Int:{
+		return Math.ceil(o%2147483648.0) === o;
+	}break;
+	case Float:{
+		return typeof(o) == "number";
+	}break;
+	case Bool:{
+		return o === true || o === false;
+	}break;
+	case String:{
+		return typeof(o) == "string";
+	}break;
+	case Dynamic:{
+		return true;
+	}break;
+	default:{
+		if(o == null) return false;
+		return o.__enum__ == cl || cl == Class && o.__name__ != null || cl == Enum && o.__ename__ != null;
+	}break;
+	}
+}
+js.Boot.__init = function() {
+	js.Lib.isIE = typeof document!='undefined' && document.all != null && typeof window!='undefined' && window.opera == null;
+	js.Lib.isOpera = typeof window!='undefined' && window.opera != null;
+	Array.prototype.copy = Array.prototype.slice;
+	Array.prototype.insert = function(i,x) {
+		this.splice(i,0,x);
+	}
+	Array.prototype.remove = Array.prototype.indexOf?function(obj) {
+		var idx = this.indexOf(obj);
+		if(idx == -1) return false;
+		this.splice(idx,1);
+		return true;
+	}:function(obj) {
+		var i = 0;
+		var l = this.length;
+		while(i < l) {
+			if(this[i] == obj) {
+				this.splice(i,1);
+				return true;
+			}
+			i++;
+		}
+		return false;
+	}
+	Array.prototype.iterator = function() {
+		return { cur : 0, arr : this, hasNext : function() {
+			return this.cur < this.arr.length;
+		}, next : function() {
+			return this.arr[this.cur++];
+		}};
+	}
+	if(String.prototype.cca == null) String.prototype.cca = String.prototype.charCodeAt;
+	String.prototype.charCodeAt = function(i) {
+		var x = this.cca(i);
+		if(x != x) return null;
+		return x;
+	}
+	var oldsub = String.prototype.substr;
+	String.prototype.substr = function(pos,len) {
+		if(pos != null && pos != 0 && len != null && len < 0) return "";
+		if(len == null) len = this.length;
+		if(pos < 0) {
+			pos = this.length + pos;
+			if(pos < 0) pos = 0;
+		}
+		else if(len < 0) {
+			len = this.length + len - pos;
+		}
+		return oldsub.apply(this,[pos,len]);
+	}
+	$closure = js.Boot.__closure;
+}
+js.Boot.prototype.__class__ = js.Boot;
+haxe.Firebug = function() { }
+haxe.Firebug.__name__ = ["haxe","Firebug"];
+haxe.Firebug.detect = function() {
+	try {
+		return console != null && console.error != null;
+	}
+	catch( $e0 ) {
+		{
+			var e = $e0;
+			{
+				return false;
+			}
+		}
+	}
+}
+haxe.Firebug.redirectTraces = function() {
+	haxe.Log.trace = $closure(haxe.Firebug,"trace");
+	js.Lib.setErrorHandler($closure(haxe.Firebug,"onError"));
+}
+haxe.Firebug.onError = function(err,stack) {
+	var buf = err + "\n";
+	{
+		var _g = 0;
+		while(_g < stack.length) {
+			var s = stack[_g];
+			++_g;
+			buf += "Called from " + s + "\n";
+		}
+	}
+	haxe.Firebug.trace(buf,null);
+	return true;
+}
+haxe.Firebug.trace = function(v,inf) {
+	var type = inf != null && inf.customParams != null?inf.customParams[0]:null;
+	if(type != "warn" && type != "info" && type != "debug" && type != "error") type = inf == null?"error":"log";
+	console[type]((inf == null?"":inf.fileName + ":" + inf.lineNumber + " : ") + Std.string(v));
+}
+haxe.Firebug.prototype.__class__ = haxe.Firebug;
 if(!haxe._Template) haxe._Template = {}
 haxe._Template.TemplateExpr = { __ename__ : ["haxe","_Template","TemplateExpr"], __constructs__ : ["OpVar","OpExpr","OpIf","OpStr","OpBlock","OpForeach","OpMacro"] }
 haxe._Template.TemplateExpr.OpVar = function(v) { var $x = ["OpVar",0,v]; $x.__enum__ = haxe._Template.TemplateExpr; $x.toString = $estr; return $x; }
@@ -750,652 +1332,12 @@ haxe.Template.prototype.run = function(e) {
 	}
 }
 haxe.Template.prototype.__class__ = haxe.Template;
-haxe.Firebug = function() { }
-haxe.Firebug.__name__ = ["haxe","Firebug"];
-haxe.Firebug.detect = function() {
-	try {
-		return console != null && console.error != null;
-	}
-	catch( $e0 ) {
-		{
-			var e = $e0;
-			{
-				return false;
-			}
-		}
-	}
-}
-haxe.Firebug.redirectTraces = function() {
-	haxe.Log.trace = $closure(haxe.Firebug,"trace");
-	js.Lib.setErrorHandler($closure(haxe.Firebug,"onError"));
-}
-haxe.Firebug.onError = function(err,stack) {
-	var buf = err + "\n";
-	{
-		var _g = 0;
-		while(_g < stack.length) {
-			var s = stack[_g];
-			++_g;
-			buf += "Called from " + s + "\n";
-		}
-	}
-	haxe.Firebug.trace(buf,null);
-	return true;
-}
-haxe.Firebug.trace = function(v,inf) {
-	var type = inf != null && inf.customParams != null?inf.customParams[0]:null;
-	if(type != "warn" && type != "info" && type != "debug" && type != "error") type = inf == null?"error":"log";
-	console[type]((inf == null?"":inf.fileName + ":" + inf.lineNumber + " : ") + Std.string(v));
-}
-haxe.Firebug.prototype.__class__ = haxe.Firebug;
-IntIter = function(min,max) { if( min === $_ ) return; {
-	this.min = min;
-	this.max = max;
-}}
-IntIter.__name__ = ["IntIter"];
-IntIter.prototype.min = null;
-IntIter.prototype.max = null;
-IntIter.prototype.hasNext = function() {
-	return this.min < this.max;
-}
-IntIter.prototype.next = function() {
-	return this.min++;
-}
-IntIter.prototype.__class__ = IntIter;
-Std = function() { }
-Std.__name__ = ["Std"];
-Std["is"] = function(v,t) {
-	return js.Boot.__instanceof(v,t);
-}
-Std.string = function(s) {
-	return js.Boot.__string_rec(s,"");
-}
-Std["int"] = function(x) {
-	if(x < 0) return Math.ceil(x);
-	return Math.floor(x);
-}
-Std.parseInt = function(x) {
-	var v = parseInt(x,10);
-	if(v == 0 && x.charCodeAt(1) == 120) v = parseInt(x);
-	if(isNaN(v)) return null;
-	return v;
-}
-Std.parseFloat = function(x) {
-	return parseFloat(x);
-}
-Std.random = function(x) {
-	return Math.floor(Math.random() * x);
-}
-Std.prototype.__class__ = Std;
-List = function(p) { if( p === $_ ) return; {
-	this.length = 0;
-}}
-List.__name__ = ["List"];
-List.prototype.h = null;
-List.prototype.q = null;
-List.prototype.length = null;
-List.prototype.add = function(item) {
-	var x = [item];
-	if(this.h == null) this.h = x;
-	else this.q[1] = x;
-	this.q = x;
-	this.length++;
-}
-List.prototype.push = function(item) {
-	var x = [item,this.h];
-	this.h = x;
-	if(this.q == null) this.q = x;
-	this.length++;
-}
-List.prototype.first = function() {
-	return this.h == null?null:this.h[0];
-}
-List.prototype.last = function() {
-	return this.q == null?null:this.q[0];
-}
-List.prototype.pop = function() {
-	if(this.h == null) return null;
-	var x = this.h[0];
-	this.h = this.h[1];
-	if(this.h == null) this.q = null;
-	this.length--;
-	return x;
-}
-List.prototype.isEmpty = function() {
-	return this.h == null;
-}
-List.prototype.clear = function() {
-	this.h = null;
-	this.q = null;
-	this.length = 0;
-}
-List.prototype.remove = function(v) {
-	var prev = null;
-	var l = this.h;
-	while(l != null) {
-		if(l[0] == v) {
-			if(prev == null) this.h = l[1];
-			else prev[1] = l[1];
-			if(this.q == l) this.q = prev;
-			this.length--;
-			return true;
-		}
-		prev = l;
-		l = l[1];
-	}
-	return false;
-}
-List.prototype.iterator = function() {
-	return { h : this.h, hasNext : function() {
-		return this.h != null;
-	}, next : function() {
-		if(this.h == null) return null;
-		var x = this.h[0];
-		this.h = this.h[1];
-		return x;
-	}};
-}
-List.prototype.toString = function() {
-	var s = new StringBuf();
-	var first = true;
-	var l = this.h;
-	s.b[s.b.length] = "{";
-	while(l != null) {
-		if(first) first = false;
-		else s.b[s.b.length] = ", ";
-		s.b[s.b.length] = Std.string(l[0]);
-		l = l[1];
-	}
-	s.b[s.b.length] = "}";
-	return s.b.join("");
-}
-List.prototype.join = function(sep) {
-	var s = new StringBuf();
-	var first = true;
-	var l = this.h;
-	while(l != null) {
-		if(first) first = false;
-		else s.b[s.b.length] = sep;
-		s.b[s.b.length] = l[0];
-		l = l[1];
-	}
-	return s.b.join("");
-}
-List.prototype.filter = function(f) {
-	var l2 = new List();
-	var l = this.h;
-	while(l != null) {
-		var v = l[0];
-		l = l[1];
-		if(f(v)) l2.add(v);
-	}
-	return l2;
-}
-List.prototype.map = function(f) {
-	var b = new List();
-	var l = this.h;
-	while(l != null) {
-		var v = l[0];
-		l = l[1];
-		b.add(f(v));
-	}
-	return b;
-}
-List.prototype.__class__ = List;
-haxe.Http = function(url) { if( url === $_ ) return; {
-	this.url = url;
-	this.headers = new Hash();
-	this.params = new Hash();
-	this.async = true;
-}}
-haxe.Http.__name__ = ["haxe","Http"];
-haxe.Http.requestUrl = function(url) {
-	var h = new haxe.Http(url);
-	h.async = false;
-	var r = null;
-	h.onData = function(d) {
-		r = d;
-	}
-	h.onError = function(e) {
-		throw e;
-	}
-	h.request(false);
-	return r;
-}
-haxe.Http.prototype.url = null;
-haxe.Http.prototype.async = null;
-haxe.Http.prototype.postData = null;
-haxe.Http.prototype.headers = null;
-haxe.Http.prototype.params = null;
-haxe.Http.prototype.setHeader = function(header,value) {
-	this.headers.set(header,value);
-}
-haxe.Http.prototype.setParameter = function(param,value) {
-	this.params.set(param,value);
-}
-haxe.Http.prototype.setPostData = function(data) {
-	this.postData = data;
-}
-haxe.Http.prototype.request = function(post) {
-	var me = this;
-	var r = new js.XMLHttpRequest();
-	var onreadystatechange = function() {
-		if(r.readyState != 4) return;
-		var s = (function($this) {
-			var $r;
-			try {
-				$r = r.status;
-			}
-			catch( $e0 ) {
-				{
-					var e = $e0;
-					$r = null;
-				}
-			}
-			return $r;
-		}(this));
-		if(s == undefined) s = null;
-		if(s != null) me.onStatus(s);
-		if(s != null && s >= 200 && s < 400) me.onData(r.responseText);
-		else switch(s) {
-		case null: case undefined:{
-			me.onError("Failed to connect or resolve host");
-		}break;
-		case 12029:{
-			me.onError("Failed to connect to host");
-		}break;
-		case 12007:{
-			me.onError("Unknown host");
-		}break;
-		default:{
-			me.onError("Http Error #" + r.status);
-		}break;
-		}
-	}
-	if(this.async) r.onreadystatechange = onreadystatechange;
-	var uri = this.postData;
-	if(uri != null) post = true;
-	else { var $it1 = this.params.keys();
-	while( $it1.hasNext() ) { var p = $it1.next();
-	{
-		if(uri == null) uri = "";
-		else uri += "&";
-		uri += StringTools.urlDecode(p) + "=" + StringTools.urlEncode(this.params.get(p));
-	}
-	}}
-	try {
-		if(post) r.open("POST",this.url,this.async);
-		else if(uri != null) {
-			var question = this.url.split("?").length <= 1;
-			r.open("GET",this.url + (question?"?":"&") + uri,this.async);
-			uri = null;
-		}
-		else r.open("GET",this.url,this.async);
-	}
-	catch( $e2 ) {
-		{
-			var e = $e2;
-			{
-				this.onError(e.toString());
-				return;
-			}
-		}
-	}
-	if(this.headers.get("Content-Type") == null && post && this.postData == null) r.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-	{ var $it3 = this.headers.keys();
-	while( $it3.hasNext() ) { var h = $it3.next();
-	r.setRequestHeader(h,this.headers.get(h));
-	}}
-	r.send(uri);
-	if(!this.async) onreadystatechange();
-}
-haxe.Http.prototype.onData = function(data) {
-	null;
-}
-haxe.Http.prototype.onError = function(msg) {
-	null;
-}
-haxe.Http.prototype.onStatus = function(status) {
-	null;
-}
-haxe.Http.prototype.__class__ = haxe.Http;
-slbuilder.core.Config = function() { }
-slbuilder.core.Config.__name__ = ["slbuilder","core","Config"];
-slbuilder.core.Config.prototype.__class__ = slbuilder.core.Config;
-demo.Descriptor = function() { }
-demo.Descriptor.__name__ = ["demo","Descriptor"];
-demo.Descriptor.prototype.__class__ = demo.Descriptor;
-if(typeof js=='undefined') js = {}
-js.Lib = function() { }
-js.Lib.__name__ = ["js","Lib"];
-js.Lib.isIE = null;
-js.Lib.isOpera = null;
-js.Lib.document = null;
-js.Lib.window = null;
-js.Lib.alert = function(v) {
-	alert(js.Boot.__string_rec(v,""));
-}
-js.Lib.eval = function(code) {
-	return eval(code);
-}
-js.Lib.setErrorHandler = function(f) {
-	js.Lib.onerror = f;
-}
-js.Lib.prototype.__class__ = js.Lib;
-slbuilder.SLBuilder = function(p) { if( p === $_ ) return; {
-	haxe.Log.trace("SLBuilder init",{ fileName : "SLBuilder.hx", lineNumber : 53, className : "slbuilder.SLBuilder", methodName : "new"});
-	this.initDomReferences();
-	this.initUis();
-}}
-slbuilder.SLBuilder.__name__ = ["slbuilder","SLBuilder"];
-slbuilder.SLBuilder.instance = null;
-slbuilder.SLBuilder.getInstance = function() {
-	if(slbuilder.SLBuilder.instance == null) slbuilder.SLBuilder.instance = new slbuilder.SLBuilder();
-	return slbuilder.SLBuilder.instance;
-}
-slbuilder.SLBuilder.prototype.root = null;
-slbuilder.SLBuilder.prototype.initDomReferences = function() {
-	this.root = js.Lib.document.getElementById("SLBuilder");
-}
-slbuilder.SLBuilder.prototype.initUis = function() {
-	new slbuilder.ui.LayersWidget(this.root);
-}
-slbuilder.SLBuilder.prototype.onViewMenuClick = function(className) {
-	switch(className) {
-	case "ShowComponentsBtn":{
-		haxe.Log.trace("test",{ fileName : "SLBuilder.hx", lineNumber : 74, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
-	}break;
-	case "testBtn1":{
-		var layer = this.createLayer("basicLayer",null);
-		haxe.Log.trace(layer,{ fileName : "SLBuilder.hx", lineNumber : 77, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
-		js.Lib.document.getElementById(layer.id.seed).style.display = "inline-block";
-		js.Lib.document.getElementById(layer.id.seed).style.width = "100px";
-		js.Lib.document.getElementById(layer.id.seed).style.height = "100px";
-		var color = Math.round(Math.random() * 255);
-		js.Lib.document.getElementById(layer.id.seed).style.backgroundColor = "rgb(" + color + "," + color + "," + color + ")";
-	}break;
-	case "testBtn2":{
-		var layers = this.getLayers(null);
-		haxe.Log.trace(layers,{ fileName : "SLBuilder.hx", lineNumber : 88, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
-		{
-			var _g = 0;
-			while(_g < layers.length) {
-				var layer = layers[_g];
-				++_g;
-				var color = Math.round(Math.random() * 255 * 255);
-				js.Lib.document.getElementById(layer.id.seed).style.backgroundColor = color;
-			}
-		}
-	}break;
-	case "testBtn3":{
-		var component = this.createComponent("galery",this.getLayers(null)[0].id);
-		haxe.Log.trace(component,{ fileName : "SLBuilder.hx", lineNumber : 95, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
-		js.Lib.document.getElementById(component.id.seed).style.display = "inline-block";
-		js.Lib.document.getElementById(component.id.seed).style.width = "10px";
-		js.Lib.document.getElementById(component.id.seed).style.height = "10px";
-		var color = Math.round(Math.random() * 255);
-		js.Lib.document.getElementById(component.id.seed).style.backgroundColor = "rgb(" + color + "," + color + "," + color + ")";
-	}break;
-	case "testBtn4":{
-		var components = this.getComponents(this.getLayers(null)[0].id);
-		haxe.Log.trace(components,{ fileName : "SLBuilder.hx", lineNumber : 106, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
-		{
-			var _g = 0;
-			while(_g < components.length) {
-				var component = components[_g];
-				++_g;
-				var color = Math.round(Math.random() * 255 * 255);
-				js.Lib.document.getElementById(component.id.seed).style.backgroundColor = color;
-			}
-		}
-	}break;
-	case "testBtn5":{
-		var properties = this.getProperties(this.getComponents(this.getLayers(null)[0].id)[0].id);
-		var t = this;
-		new slbuilder.core.Template("PropertiesList").setOnLoad(function(template) {
-			var container = js.Lib.document.createElement("div");
-			container.innerHTML = template.execute({ Config : slbuilder.core.Config, properties : properties, component : t.getComponents(t.getLayers(null)[0].id)[0]});
-			t.root.appendChild(container);
-		});
-	}break;
-	case "testBtn6":{
-		var components = this.getComponents(this.getLayers(null)[0].id);
-		this.testPropCount += 10;
-		this.setProperty(components[0].id,"style.position","absolute");
-		this.setProperty(components[0].id,"style.top",this.testPropCount + "px");
-		haxe.Log.trace(components[0].id,{ fileName : "SLBuilder.hx", lineNumber : 138, className : "slbuilder.SLBuilder", methodName : "onViewMenuClick"});
-	}break;
-	default:{
-		null;
-	}break;
-	}
-}
-slbuilder.SLBuilder.prototype.testPropCount = null;
-slbuilder.SLBuilder.prototype.createLayer = null;
-slbuilder.SLBuilder.prototype.removeLayer = null;
-slbuilder.SLBuilder.prototype.getLayers = null;
-slbuilder.SLBuilder.prototype.createComponent = null;
-slbuilder.SLBuilder.prototype.getComponents = null;
-slbuilder.SLBuilder.prototype.getProperties = null;
-slbuilder.SLBuilder.prototype.setProperty = null;
-slbuilder.SLBuilder.prototype.domChanged = null;
-slbuilder.SLBuilder.prototype.slectionChanged = null;
-slbuilder.SLBuilder.prototype.slectionLockChanged = null;
-slbuilder.SLBuilder.prototype.__class__ = slbuilder.SLBuilder;
-js.Boot = function() { }
-js.Boot.__name__ = ["js","Boot"];
-js.Boot.__unhtml = function(s) {
-	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-}
-js.Boot.__trace = function(v,i) {
-	var msg = i != null?i.fileName + ":" + i.lineNumber + ": ":"";
-	msg += js.Boot.__unhtml(js.Boot.__string_rec(v,"")) + "<br/>";
-	var d = document.getElementById("haxe:trace");
-	if(d == null) alert("No haxe:trace element defined\n" + msg);
-	else d.innerHTML += msg;
-}
-js.Boot.__clear_trace = function() {
-	var d = document.getElementById("haxe:trace");
-	if(d != null) d.innerHTML = "";
-	else null;
-}
-js.Boot.__closure = function(o,f) {
-	var m = o[f];
-	if(m == null) return null;
-	var f1 = function() {
-		return m.apply(o,arguments);
-	}
-	f1.scope = o;
-	f1.method = m;
-	return f1;
-}
-js.Boot.__string_rec = function(o,s) {
-	if(o == null) return "null";
-	if(s.length >= 5) return "<...>";
-	var t = typeof(o);
-	if(t == "function" && (o.__name__ != null || o.__ename__ != null)) t = "object";
-	switch(t) {
-	case "object":{
-		if(o instanceof Array) {
-			if(o.__enum__ != null) {
-				if(o.length == 2) return o[0];
-				var str = o[0] + "(";
-				s += "\t";
-				{
-					var _g1 = 2, _g = o.length;
-					while(_g1 < _g) {
-						var i = _g1++;
-						if(i != 2) str += "," + js.Boot.__string_rec(o[i],s);
-						else str += js.Boot.__string_rec(o[i],s);
-					}
-				}
-				return str + ")";
-			}
-			var l = o.length;
-			var i;
-			var str = "[";
-			s += "\t";
-			{
-				var _g = 0;
-				while(_g < l) {
-					var i1 = _g++;
-					str += (i1 > 0?",":"") + js.Boot.__string_rec(o[i1],s);
-				}
-			}
-			str += "]";
-			return str;
-		}
-		var tostr;
-		try {
-			tostr = o.toString;
-		}
-		catch( $e0 ) {
-			{
-				var e = $e0;
-				{
-					return "???";
-				}
-			}
-		}
-		if(tostr != null && tostr != Object.toString) {
-			var s2 = o.toString();
-			if(s2 != "[object Object]") return s2;
-		}
-		var k = null;
-		var str = "{\n";
-		s += "\t";
-		var hasp = o.hasOwnProperty != null;
-		for( var k in o ) { ;
-		if(hasp && !o.hasOwnProperty(k)) continue;
-		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__") continue;
-		if(str.length != 2) str += ", \n";
-		str += s + k + " : " + js.Boot.__string_rec(o[k],s);
-		}
-		s = s.substring(1);
-		str += "\n" + s + "}";
-		return str;
-	}break;
-	case "function":{
-		return "<function>";
-	}break;
-	case "string":{
-		return o;
-	}break;
-	default:{
-		return String(o);
-	}break;
-	}
-}
-js.Boot.__interfLoop = function(cc,cl) {
-	if(cc == null) return false;
-	if(cc == cl) return true;
-	var intf = cc.__interfaces__;
-	if(intf != null) {
-		var _g1 = 0, _g = intf.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var i1 = intf[i];
-			if(i1 == cl || js.Boot.__interfLoop(i1,cl)) return true;
-		}
-	}
-	return js.Boot.__interfLoop(cc.__super__,cl);
-}
-js.Boot.__instanceof = function(o,cl) {
-	try {
-		if(o instanceof cl) {
-			if(cl == Array) return o.__enum__ == null;
-			return true;
-		}
-		if(js.Boot.__interfLoop(o.__class__,cl)) return true;
-	}
-	catch( $e0 ) {
-		{
-			var e = $e0;
-			{
-				if(cl == null) return false;
-			}
-		}
-	}
-	switch(cl) {
-	case Int:{
-		return Math.ceil(o%2147483648.0) === o;
-	}break;
-	case Float:{
-		return typeof(o) == "number";
-	}break;
-	case Bool:{
-		return o === true || o === false;
-	}break;
-	case String:{
-		return typeof(o) == "string";
-	}break;
-	case Dynamic:{
-		return true;
-	}break;
-	default:{
-		if(o == null) return false;
-		return o.__enum__ == cl || cl == Class && o.__name__ != null || cl == Enum && o.__ename__ != null;
-	}break;
-	}
-}
-js.Boot.__init = function() {
-	js.Lib.isIE = typeof document!='undefined' && document.all != null && typeof window!='undefined' && window.opera == null;
-	js.Lib.isOpera = typeof window!='undefined' && window.opera != null;
-	Array.prototype.copy = Array.prototype.slice;
-	Array.prototype.insert = function(i,x) {
-		this.splice(i,0,x);
-	}
-	Array.prototype.remove = Array.prototype.indexOf?function(obj) {
-		var idx = this.indexOf(obj);
-		if(idx == -1) return false;
-		this.splice(idx,1);
-		return true;
-	}:function(obj) {
-		var i = 0;
-		var l = this.length;
-		while(i < l) {
-			if(this[i] == obj) {
-				this.splice(i,1);
-				return true;
-			}
-			i++;
-		}
-		return false;
-	}
-	Array.prototype.iterator = function() {
-		return { cur : 0, arr : this, hasNext : function() {
-			return this.cur < this.arr.length;
-		}, next : function() {
-			return this.arr[this.cur++];
-		}};
-	}
-	if(String.prototype.cca == null) String.prototype.cca = String.prototype.charCodeAt;
-	String.prototype.charCodeAt = function(i) {
-		var x = this.cca(i);
-		if(x != x) return null;
-		return x;
-	}
-	var oldsub = String.prototype.substr;
-	String.prototype.substr = function(pos,len) {
-		if(pos != null && pos != 0 && len != null && len < 0) return "";
-		if(len == null) len = this.length;
-		if(pos < 0) {
-			pos = this.length + pos;
-			if(pos < 0) pos = 0;
-		}
-		else if(len < 0) {
-			len = this.length + len - pos;
-		}
-		return oldsub.apply(this,[pos,len]);
-	}
-	$closure = js.Boot.__closure;
-}
-js.Boot.prototype.__class__ = js.Boot;
 demo.SLBuilderBridge = function(slBuilder) { if( slBuilder === $_ ) return; {
 	slBuilder.createLayer = $closure(this,"createLayer");
 	slBuilder.removeLayer = $closure(this,"removeLayer");
 	slBuilder.getLayers = $closure(this,"getLayers");
 	slBuilder.createComponent = $closure(this,"createComponent");
+	slBuilder.removeComponent = $closure(this,"removeComponent");
 	slBuilder.getComponents = $closure(this,"getComponents");
 	slBuilder.getProperties = $closure(this,"getProperties");
 	slBuilder.setProperty = $closure(this,"setProperty");
@@ -1450,6 +1392,14 @@ demo.SLBuilderBridge.prototype.createComponent = function(className,parentId) {
 	parent.appendChild(res);
 	return { parentId : parentId, id : id, displayName : id.seed};
 }
+demo.SLBuilderBridge.prototype.removeComponent = function(id) {
+	var element = js.Lib.document.getElementById(id.seed);
+	if(element != null) {
+		element.parentNode.removeChild(element);
+		return true;
+	}
+	return false;
+}
 demo.SLBuilderBridge.prototype.getComponents = function(parentId) {
 	var parent = js.Lib.document.getElementById(parentId.seed);
 	var components = parent.getElementsByClassName("component");
@@ -1467,9 +1417,9 @@ demo.SLBuilderBridge.prototype.getComponents = function(parentId) {
 }
 demo.SLBuilderBridge.prototype.getProperties = function(parentId) {
 	var parent = js.Lib.document.getElementById(parentId.seed);
-	haxe.Log.trace("getProperties " + parentId + " => " + parent,{ fileName : "SLBuilderBridge.hx", lineNumber : 161, className : "demo.SLBuilderBridge", methodName : "getProperties"});
+	haxe.Log.trace("getProperties " + parentId + " => " + parent,{ fileName : "SLBuilderBridge.hx", lineNumber : 173, className : "demo.SLBuilderBridge", methodName : "getProperties"});
 	var properties = Reflect.field(demo.Descriptor,parent.nodeName.toLowerCase());
-	haxe.Log.trace("getProperties " + parent.nodeName + " => " + properties,{ fileName : "SLBuilderBridge.hx", lineNumber : 163, className : "demo.SLBuilderBridge", methodName : "getProperties"});
+	haxe.Log.trace("getProperties " + parent.nodeName + " => " + properties,{ fileName : "SLBuilderBridge.hx", lineNumber : 175, className : "demo.SLBuilderBridge", methodName : "getProperties"});
 	{
 		var _g = 0;
 		while(_g < properties.length) {
@@ -1515,60 +1465,42 @@ demo.SLBuilderBridge.prototype.slectionLockChanged = function(componentsIds) {
 	null;
 }
 demo.SLBuilderBridge.prototype.__class__ = demo.SLBuilderBridge;
-if(!slbuilder.ui) slbuilder.ui = {}
-slbuilder.ui.LayersWidget = function(parent) { if( parent === $_ ) return; {
-	this.parent = parent;
-	new slbuilder.core.Template("LayersWidget").setOnLoad($closure(this,"attachTemplate"));
-}}
-slbuilder.ui.LayersWidget.__name__ = ["slbuilder","ui","LayersWidget"];
-slbuilder.ui.LayersWidget.prototype.onChange = null;
-slbuilder.ui.LayersWidget.prototype.list = null;
-slbuilder.ui.LayersWidget.prototype.addBtn = null;
-slbuilder.ui.LayersWidget.prototype.root = null;
-slbuilder.ui.LayersWidget.prototype.parent = null;
-slbuilder.ui.LayersWidget.prototype.attachTemplate = function(template) {
-	this.root = js.Lib.document.createElement("div");
-	this.root.innerHTML = template.execute({ Config : slbuilder.core.Config});
-	this.parent.appendChild(this.root);
-	this.list = slbuilder.core.Utils.getElementsByClassName("list")[0];
-	this.addBtn = slbuilder.core.Utils.getElementsByClassName("add")[0];
-	this.addBtn.onclick = $closure(this,"addLayer");
-	this.refresh();
+slbuilder.core.Utils = function() { }
+slbuilder.core.Utils.__name__ = ["slbuilder","core","Utils"];
+slbuilder.core.Utils.nextId = null;
+slbuilder.core.Utils.toId = function(type,className) {
+	return { type : type, seed : Std.string(type) + "_" + className + "_" + Std.string(slbuilder.core.Utils.nextId++) + "_" + Math.round(Math.random() * 999999)};
 }
-slbuilder.ui.LayersWidget.prototype.refresh = function() {
-	this.list.innerHTML = "";
-	var layers = slbuilder.SLBuilder.getInstance().getLayers(null);
-	var t = this;
-	{
-		var _g = 0;
-		while(_g < layers.length) {
-			var layer = [layers[_g]];
-			++_g;
-			var elem = js.Lib.document.createElement("li");
-			elem.id = layer[0].id.seed;
-			elem.innerHTML = layer[0].displayName;
-			elem.onclick = function(layer) {
-				return function(e) {
-					t.removeLayer(layer[0].id);
-				}
-			}(layer);
-			this.list.appendChild(elem);
-		}
+slbuilder.core.Utils.getElementsByClassName = function(parent,className) {
+	return parent.getElementsByClassName(className);
+}
+slbuilder.core.Utils.inspectTrace = function(obj) {
+	var _g = 0, _g1 = Reflect.fields(obj);
+	while(_g < _g1.length) {
+		var prop = _g1[_g];
+		++_g;
+		haxe.Log.trace("- " + prop + " = " + Reflect.field(obj,prop),{ fileName : "Utils.hx", lineNumber : 28, className : "slbuilder.core.Utils", methodName : "inspectTrace"});
 	}
 }
-slbuilder.ui.LayersWidget.prototype.addLayer = function(e) {
-	var layer = slbuilder.SLBuilder.getInstance().createLayer("basicLayer",null);
-	slbuilder.SLBuilder.getInstance().setProperty(layer.id,"displayName","New Layer");
-	this.refresh();
+slbuilder.core.Utils.prototype.__class__ = slbuilder.core.Utils;
+StringBuf = function(p) { if( p === $_ ) return; {
+	this.b = new Array();
+}}
+StringBuf.__name__ = ["StringBuf"];
+StringBuf.prototype.add = function(x) {
+	this.b[this.b.length] = x;
 }
-slbuilder.ui.LayersWidget.prototype.removeLayer = function(id) {
-	slbuilder.SLBuilder.getInstance().removeLayer(id);
-	this.refresh();
+StringBuf.prototype.addSub = function(s,pos,len) {
+	this.b[this.b.length] = s.substr(pos,len);
 }
-slbuilder.ui.LayersWidget.prototype.onClickList = function(e) {
-	null;
+StringBuf.prototype.addChar = function(c) {
+	this.b[this.b.length] = String.fromCharCode(c);
 }
-slbuilder.ui.LayersWidget.prototype.__class__ = slbuilder.ui.LayersWidget;
+StringBuf.prototype.toString = function() {
+	return this.b.join("");
+}
+StringBuf.prototype.b = null;
+StringBuf.prototype.__class__ = StringBuf;
 slbuilder.core.Template = function(name,templateFolderPath,templateExtenstion,onLoad,onError) { if( name === $_ ) return; {
 	if(templateExtenstion == null) templateExtenstion = ".html";
 	if(templateFolderPath == null) templateFolderPath = "templates/";
@@ -1620,6 +1552,15 @@ slbuilder.core.Template.prototype.execute = function(context) {
 	return output;
 }
 slbuilder.core.Template.prototype.__class__ = slbuilder.core.Template;
+haxe.Log = function() { }
+haxe.Log.__name__ = ["haxe","Log"];
+haxe.Log.trace = function(v,infos) {
+	js.Boot.__trace(v,infos);
+}
+haxe.Log.clear = function() {
+	js.Boot.__clear_trace();
+}
+haxe.Log.prototype.__class__ = haxe.Log;
 if(!slbuilder.data) slbuilder.data = {}
 slbuilder.data.ElementType = { __ename__ : ["slbuilder","data","ElementType"], __constructs__ : ["layer","component"] }
 slbuilder.data.ElementType.layer = ["layer",0];
@@ -1700,6 +1641,31 @@ Hash.prototype.toString = function() {
 	return s.b.join("");
 }
 Hash.prototype.__class__ = Hash;
+Std = function() { }
+Std.__name__ = ["Std"];
+Std["is"] = function(v,t) {
+	return js.Boot.__instanceof(v,t);
+}
+Std.string = function(s) {
+	return js.Boot.__string_rec(s,"");
+}
+Std["int"] = function(x) {
+	if(x < 0) return Math.ceil(x);
+	return Math.floor(x);
+}
+Std.parseInt = function(x) {
+	var v = parseInt(x,10);
+	if(v == 0 && x.charCodeAt(1) == 120) v = parseInt(x);
+	if(isNaN(v)) return null;
+	return v;
+}
+Std.parseFloat = function(x) {
+	return parseFloat(x);
+}
+Std.random = function(x) {
+	return Math.floor(Math.random() * x);
+}
+Std.prototype.__class__ = Std;
 slbuilder.ui.Menu = function(parent,teamplateName) { if( parent === $_ ) return; {
 	this.parent = parent;
 	this.initTemplates(teamplateName);
@@ -1731,45 +1697,160 @@ slbuilder.ui.Menu.prototype.onClickBtn = function(e) {
 	if(this.onClick != null) this.onClick(e.target.className);
 }
 slbuilder.ui.Menu.prototype.__class__ = slbuilder.ui.Menu;
+slbuilder.ui.LayersWidget = function(parent,panel) { if( parent === $_ ) return; {
+	this.NAME_COLUMN_TITLE = "Layers";
+	slbuilder.ui.ListWidget.call(this,parent,panel);
+}}
+slbuilder.ui.LayersWidget.__name__ = ["slbuilder","ui","LayersWidget"];
+slbuilder.ui.LayersWidget.__super__ = slbuilder.ui.ListWidget;
+for(var k in slbuilder.ui.ListWidget.prototype ) slbuilder.ui.LayersWidget.prototype[k] = slbuilder.ui.ListWidget.prototype[k];
+slbuilder.ui.LayersWidget.prototype.initDomReferences = function() {
+	slbuilder.ui.ListWidget.prototype.initDomReferences.call(this);
+}
+slbuilder.ui.LayersWidget.prototype.refresh = function() {
+	var layers = slbuilder.SLBuilder.getInstance().getLayers(null);
+	var arraArray = Ext.Array.from(layers);
+	this.arrayStore.loadData(arraArray);
+	slbuilder.ui.ListWidget.prototype.refresh.call(this);
+}
+slbuilder.ui.LayersWidget.prototype.add = function(e) {
+	var layer = slbuilder.SLBuilder.getInstance().createLayer("basicLayer",null);
+	slbuilder.SLBuilder.getInstance().setProperty(layer.id,"displayName","New Layer");
+	slbuilder.ui.ListWidget.prototype.add.call(this,e);
+}
+slbuilder.ui.LayersWidget.prototype.remove = function(e) {
+	slbuilder.SLBuilder.getInstance().removeLayer(this.grid.selModel.selected.items[0].data.id);
+	slbuilder.ui.ListWidget.prototype.remove.call(this,e);
+}
+slbuilder.ui.LayersWidget.prototype.onSelectionChanged = function(model,records) {
+	slbuilder.ui.ListWidget.prototype.onSelectionChanged.call(this,model,records);
+}
+slbuilder.ui.LayersWidget.prototype.initExtJsUi = function() {
+	slbuilder.ui.ListWidget.prototype.initExtJsUi.call(this);
+}
+slbuilder.ui.LayersWidget.prototype.__class__ = slbuilder.ui.LayersWidget;
+js.Lib = function() { }
+js.Lib.__name__ = ["js","Lib"];
+js.Lib.isIE = null;
+js.Lib.isOpera = null;
+js.Lib.document = null;
+js.Lib.window = null;
+js.Lib.alert = function(v) {
+	alert(js.Boot.__string_rec(v,""));
+}
+js.Lib.eval = function(code) {
+	return eval(code);
+}
+js.Lib.setErrorHandler = function(f) {
+	js.Lib.onerror = f;
+}
+js.Lib.prototype.__class__ = js.Lib;
+StringTools = function() { }
+StringTools.__name__ = ["StringTools"];
+StringTools.urlEncode = function(s) {
+	return encodeURIComponent(s);
+}
+StringTools.urlDecode = function(s) {
+	return decodeURIComponent(s.split("+").join(" "));
+}
+StringTools.htmlEscape = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+}
+StringTools.htmlUnescape = function(s) {
+	return s.split("&gt;").join(">").split("&lt;").join("<").split("&amp;").join("&");
+}
+StringTools.startsWith = function(s,start) {
+	return s.length >= start.length && s.substr(0,start.length) == start;
+}
+StringTools.endsWith = function(s,end) {
+	var elen = end.length;
+	var slen = s.length;
+	return slen >= elen && s.substr(slen - elen,elen) == end;
+}
+StringTools.isSpace = function(s,pos) {
+	var c = s.charCodeAt(pos);
+	return c >= 9 && c <= 13 || c == 32;
+}
+StringTools.ltrim = function(s) {
+	var l = s.length;
+	var r = 0;
+	while(r < l && StringTools.isSpace(s,r)) {
+		r++;
+	}
+	if(r > 0) return s.substr(r,l - r);
+	else return s;
+}
+StringTools.rtrim = function(s) {
+	var l = s.length;
+	var r = 0;
+	while(r < l && StringTools.isSpace(s,l - r - 1)) {
+		r++;
+	}
+	if(r > 0) {
+		return s.substr(0,l - r);
+	}
+	else {
+		return s;
+	}
+}
+StringTools.trim = function(s) {
+	return StringTools.ltrim(StringTools.rtrim(s));
+}
+StringTools.rpad = function(s,c,l) {
+	var sl = s.length;
+	var cl = c.length;
+	while(sl < l) {
+		if(l - sl < cl) {
+			s += c.substr(0,l - sl);
+			sl = l;
+		}
+		else {
+			s += c;
+			sl += cl;
+		}
+	}
+	return s;
+}
+StringTools.lpad = function(s,c,l) {
+	var ns = "";
+	var sl = s.length;
+	if(sl >= l) return s;
+	var cl = c.length;
+	while(sl < l) {
+		if(l - sl < cl) {
+			ns += c.substr(0,l - sl);
+			sl = l;
+		}
+		else {
+			ns += c;
+			sl += cl;
+		}
+	}
+	return ns + s;
+}
+StringTools.replace = function(s,sub,by) {
+	return s.split(sub).join(by);
+}
+StringTools.hex = function(n,digits) {
+	var s = "";
+	var hexChars = "0123456789ABCDEF";
+	do {
+		s = hexChars.charAt(n & 15) + s;
+		n >>>= 4;
+	} while(n > 0);
+	if(digits != null) while(s.length < digits) s = "0" + s;
+	return s;
+}
+StringTools.fastCodeAt = function(s,index) {
+	return s.cca(index);
+}
+StringTools.isEOF = function(c) {
+	return c != c;
+}
+StringTools.prototype.__class__ = StringTools;
 $_ = {}
 js.Boot.__res = {}
 js.Boot.__init();
-{
-	String.prototype.__class__ = String;
-	String.__name__ = ["String"];
-	Array.prototype.__class__ = Array;
-	Array.__name__ = ["Array"];
-	Int = { __name__ : ["Int"]};
-	Dynamic = { __name__ : ["Dynamic"]};
-	Float = Number;
-	Float.__name__ = ["Float"];
-	Bool = { __ename__ : ["Bool"]};
-	Class = { __name__ : ["Class"]};
-	Enum = { };
-	Void = { __ename__ : ["Void"]};
-}
-{
-	Math.__name__ = ["Math"];
-	Math.NaN = Number["NaN"];
-	Math.NEGATIVE_INFINITY = Number["NEGATIVE_INFINITY"];
-	Math.POSITIVE_INFINITY = Number["POSITIVE_INFINITY"];
-	Math.isFinite = function(i) {
-		return isFinite(i);
-	}
-	Math.isNaN = function(i) {
-		return isNaN(i);
-	}
-}
-{
-	js.Lib.document = document;
-	js.Lib.window = window;
-	onerror = function(msg,url,line) {
-		var f = js.Lib.onerror;
-		if( f == null )
-			return false;
-		return f(msg,[url+":"+line]);
-	}
-}
 {
 	js["XMLHttpRequest"] = window.XMLHttpRequest?XMLHttpRequest:window.ActiveXObject?function() {
 		try {
@@ -1799,16 +1880,51 @@ js.Boot.__init();
 		return $r;
 	}(this));
 }
+{
+	Math.__name__ = ["Math"];
+	Math.NaN = Number["NaN"];
+	Math.NEGATIVE_INFINITY = Number["NEGATIVE_INFINITY"];
+	Math.POSITIVE_INFINITY = Number["POSITIVE_INFINITY"];
+	Math.isFinite = function(i) {
+		return isFinite(i);
+	}
+	Math.isNaN = function(i) {
+		return isNaN(i);
+	}
+}
+{
+	String.prototype.__class__ = String;
+	String.__name__ = ["String"];
+	Array.prototype.__class__ = Array;
+	Array.__name__ = ["Array"];
+	Int = { __name__ : ["Int"]};
+	Dynamic = { __name__ : ["Dynamic"]};
+	Float = Number;
+	Float.__name__ = ["Float"];
+	Bool = { __ename__ : ["Bool"]};
+	Class = { __name__ : ["Class"]};
+	Enum = { };
+	Void = { __ename__ : ["Void"]};
+}
+{
+	js.Lib.document = document;
+	js.Lib.window = window;
+	onerror = function(msg,url,line) {
+		var f = js.Lib.onerror;
+		if( f == null )
+			return false;
+		return f(msg,[url+":"+line]);
+	}
+}
+demo.Descriptor.div = [{ name : "style.position", displayName : "css position", parentId : null, value : null, defaultValue : "relative", canBeNull : false, description : "CSS style postions (absolute, relative, ...)"},{ name : "style.top", displayName : "css top", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style top (y position)"},{ name : "style.bottom", displayName : "css bottom", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style bottom (y position)"},{ name : "style.left", displayName : "css left", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style left (y position)"},{ name : "style.right", displayName : "css right", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style right (y position)"},{ name : "style.width", displayName : "css width", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style width (y position)"},{ name : "style.height", displayName : "css height", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style height (y position)"}];
+slbuilder.core.Config.VIEW_MENU_HEIGHT = "20px";
 haxe.Template.splitter = new EReg("(::[A-Za-z0-9_ ()&|!+=/><*.\"-]+::|\\$\\$([A-Za-z0-9_-]+)\\()","");
 haxe.Template.expr_splitter = new EReg("(\\(|\\)|[ \r\n\t]*\"[^\"]*\"[ \r\n\t]*|[!+=/><*.&|-]+)","");
 haxe.Template.expr_trim = new EReg("^[ ]*([^ ]+)[ ]*$","");
 haxe.Template.expr_int = new EReg("^[0-9]+$","");
 haxe.Template.expr_float = new EReg("^([+-]?)(?=\\d|,\\d)\\d*(,\\d*)?([Ee]([+-]?\\d+))?$","");
 haxe.Template.globals = { };
-slbuilder.core.Config.VIEW_MENU_HEIGHT = "20px";
-demo.Descriptor.div = [{ name : "style.position", displayName : "css position", parentId : null, value : null, defaultValue : "relative", canBeNull : false, description : "CSS style postions (absolute, relative, ...)"},{ name : "style.top", displayName : "css top", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style top (y position)"},{ name : "style.bottom", displayName : "css bottom", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style bottom (y position)"},{ name : "style.left", displayName : "css left", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style left (y position)"},{ name : "style.right", displayName : "css right", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style right (y position)"},{ name : "style.width", displayName : "css width", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style width (y position)"},{ name : "style.height", displayName : "css height", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style height (y position)"}];
-js.Lib.onerror = null;
-slbuilder.ui.LayersWidget.TEMPLATE_NAME = "LayersWidget";
 slbuilder.core.Template.DEFAULT_TEMPLATE_FOLDER_PATH = "templates/";
 slbuilder.core.Template.DEFAULT_TEMPLATE_EXTENSION = ".html";
+js.Lib.onerror = null;
 MainJs.main()

@@ -2,3 +2,4 @@
 -cp src
 #--no-traces
 -js ../bin/App.js
+-lib extjs

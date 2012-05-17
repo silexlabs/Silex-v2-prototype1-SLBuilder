@@ -3,8 +3,10 @@ package slbuilder;
 import js.Lib;
 import js.Dom;
 import slbuilder.core.Config;
+import slbuilder.core.Utils;
 import slbuilder.ui.Menu;
 import slbuilder.ui.LayersWidget;
+import slbuilder.ui.ComponentsWidget;
 import slbuilder.data.Types;
 import slbuilder.data.Property;
 import slbuilder.data.Component;
@@ -30,6 +32,14 @@ class SLBuilder {
 	 * Singleton pattern
 	 */
 	static private var instance:SLBuilder;
+	/**
+	 * widget
+	 */
+	private var layersWidget:LayersWidget;
+	/**
+	 * widget
+	 */
+	private var componentsWidget:ComponentsWidget;
 	/**
 	 * Singleton pattern
 	 */
@@ -58,14 +68,82 @@ class SLBuilder {
 	 * retrieve references to the Dom 
 	 */
 	private function initDomReferences(){
-		root = Lib.document.getElementById("SLBuilder");
+		root = Utils.getElementsByClassName(Lib.document.body, "SLBuilderMain")[0];
 	}
 	/**
 	 * init UIs
 	 */
 	private function initUis(){
+		Ext.require([
+		    'Ext.form.*',
+		    'Ext.data.*',
+		    'Ext.grid.Panel',
+		    'Ext.grid.GridPanel',
+		    'Ext.layout.container.Column'
+		]);
+		Ext.onReady(initExtJsUi);
+	}
+	private function initExtJsUi(){
+     	// Here is where we create the Form
+	    var gridForm:ext.form.Panel;
+	    gridForm = Ext.create('Ext.form.Panel', {
+	        id: 'slbuilder-form',
+	        frame: true,
+	        title: 'SLBuilder Editor',
+            height: 350,
+            width: 800,
+
+	        /*
+	        style : {
+	        	left: '0',
+			    top: '0',
+			    position: 'absolute',
+			    width: '100%'
+			},
+			*/
+	        layout: 'column',    // Specifies that the items will now be arranged in columns
+
+	        fieldDefaults: {
+	            labelAlign: 'left',
+	            msgTarget: 'side'
+	        },
+	        renderTo: root
+	    });
+		var gridFormHtmlDom:HtmlDom = cast(gridForm.getEl()).dom;
+		gridFormHtmlDom.style.position="absolute";
+		gridFormHtmlDom.style.bottom="0";
+		gridFormHtmlDom.style.left="0";
+		//gridFormHtmlDom.style.width="800px";
+		//gridFormHtmlDom.style.height="250px";
+
 		//new Menu(root, "ViewMenu").onClick = onViewMenuClick;
-		new LayersWidget(root);
+		
+		layersWidget = new LayersWidget(root, gridForm);
+		layersWidget.onChange = onLayerChange;
+
+		componentsWidget = new ComponentsWidget(root, gridForm);
+		componentsWidget.onChange = onComponentChange;
+
+	}
+	private function onLayerChange(layer:Layer) {
+		var displayName = "none";
+		if (layer != null){
+			displayName = layer.displayName;
+			componentsWidget.parentId = layer.id;
+		}
+		else{
+			componentsWidget.parentId = null;
+		}
+		componentsWidget.refresh();
+		trace ("Layer selected: "+displayName);
+	}
+	private function onComponentChange(component:Component) {
+		var displayName = "none";
+		if (component != null){
+			displayName = component.displayName;
+		}
+
+		trace ("Component selected: "+displayName);
 	}
 	private function onViewMenuClick(className:String) 
 	{
@@ -166,6 +244,10 @@ class SLBuilder {
 	 */
 	public var createComponent:ClassName->Id->Null<Component>;
 
+	/**
+	 * Remove the corresponding layer and return true on success
+	 */
+	public var removeComponent:Id->Bool;
 
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to return a list of components, which are contained in the layer with the provided ID.

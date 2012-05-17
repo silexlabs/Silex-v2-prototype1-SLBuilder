@@ -1,0 +1,36 @@
+.slBuilderContainer {
+    border: 1px solid grey;
+    width: 200px;
+    height: 300px;
+    padding: 0;
+    margin: 10;
+    position: absolute;
+    bottom: 0;
+}
+.slBuilderContainer li {
+    list-style-type: none;
+    padding: 5px;
+    padding: 5px;
+    margin: 2px;
+    cursor: pointer;
+    background-color: MintCream;
+    border: 1px solid grey;
+    overflow: hidden;
+}
+.slBuilderContainer .add {
+    cursor: pointer;
+    background-color: MintCream;
+    border: 1px solid grey;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    height: 25px;
+    width: 25px;
+}
+.slBuilderContainer .list{
+    border: 1px solid grey;
+    height: 90%;
+    overflow: auto;
+    margin: 0;
+    padding: 0;
+}

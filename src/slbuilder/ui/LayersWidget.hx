@@ -7,6 +7,7 @@ import slbuilder.core.Config;
 import slbuilder.core.Utils;
 import slbuilder.data.Layer;
 import slbuilder.data.Types;
+import slbuilder.ui.ListWidget;
 
 /**
  * layers widget
@@ -19,83 +20,61 @@ import slbuilder.data.Types;
  * - navigate vs edit in place
  * - Pages: selection = dropdown + add / suppr
  */
-class LayersWidget {
+class LayersWidget extends ListWidget<Layer> {
 	/**
-	 * template name
+	 * init the widget
 	 */
-	static inline var TEMPLATE_NAME:String = "LayersWidget";
-	/**
-	 * on change callback
-	 */
-	public var onChange:Layer->Void;
-	/**
-	 * the list
-	 */
-	private var list:HtmlDom;
-	/**
-	 * button
-	 */
-	private var addBtn:HtmlDom;
-	/**
-	 * root container
-	 */
-	private var root:HtmlDom;
-	/**
-	 * parent container, provided as a constructor param
-	 */
-	private var parent:HtmlDom;
-	/**
-	 * init the ViewMenu
-	 */
-	public function new(parent:HtmlDom){
-		this.parent = parent;
-		// load the templates
-		new Template(TEMPLATE_NAME).onLoad = attachTemplate;
+	override public function new(parent:HtmlDom, panel:ext.form.Panel){
+		NAME_COLUMN_TITLE = "Layers";
+		super(parent, panel);
 	}
 	/**
-	 * callback for loaded teplates
+	 * get elements by class names 
+	 * initializes the process of refreshing the list
 	 */
-	private function attachTemplate(template:Template){
-		root = Lib.document.createElement("div");
-		root.innerHTML = template.execute({Config:Config});
-		parent.appendChild(root);
-		// init the UIs contained in the template
-		list = Utils.getElementsByClassName("list")[0];
-		addBtn = Utils.getElementsByClassName("add")[0];
-		addBtn.onclick = addLayer;
-
-		refresh();
+	override private function initDomReferences() {
+		super.initDomReferences();
 	}
-
-	private function refresh() {
-		list.innerHTML = "";
+	/**
+	 * refresh the list, i.e. arrayStore.loadData( ... )
+	 * to be overriden to handle the model
+	 */
+	override public function refresh() {
 		var layers = SLBuilder.getInstance().getLayers(null);
-		var t = this;
-		//var liString = "";
-		for (layer in layers){
-			//liString += "<li id='"+layer.id+"'>"+layer.displayName+"</li>";
-			var elem = Lib.document.createElement("li");
-			elem.id = layer.id.seed;
-			elem.innerHTML = layer.displayName;
-			elem.onclick = function(e:js.Event){
-				t.removeLayer(layer.id);
-			};
-			list.appendChild(elem);
-		}
-		//list.innerHTML = liString;
+		var arraArray:ext.Array<Dynamic> = ext.Array.from(layers);
+		arrayStore.loadData(arraArray);
+		super.refresh();
 	}
-	private function addLayer(e:js.Event) {
+	/**
+	 * add an element to the model and refresh the list
+	 * to be overriden to handle the model
+	 */
+	override private function add(e:js.Event) {
 		var layer = SLBuilder.getInstance().createLayer("basicLayer", null);
 		SLBuilder.getInstance().setProperty(layer.id, "displayName", "New Layer");
-		refresh();
+		super.add(e);
 	}
-	private function removeLayer(id:Id) {
-		SLBuilder.getInstance().removeLayer(id);
-		refresh();
+	/**
+	 * remove an element from the model and refresh the list
+	 * to be overriden to handle the model
+	 */
+	override private function remove(e:js.Event) {
+		//Utils.inspectTrace(grid.selModel.selected.items[0].data);
+		SLBuilder.getInstance().removeLayer(grid.selModel.selected.items[0].data.id);
+		super.remove(e);
 	}
-	private function onClickList(e:js.Event) {
-		//trace("click "+e.target.className);
-//		if (onChange != null)
-//			onChange(e.target.className);
+	/**
+	 * handle a selection change
+	 * call onChange if defined
+	 */
+	override private function onSelectionChanged(model:Dynamic, records:Array<Dynamic>) {
+		super.onSelectionChanged(model, records);
+	}
+
+	/**
+	 * init the extjs list 
+	 */
+	override private function initExtJsUi(){
+		super.initExtJsUi();
 	}
 }

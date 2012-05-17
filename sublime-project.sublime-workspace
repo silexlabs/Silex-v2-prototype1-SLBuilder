@@ -4,6 +4,26 @@
 		"selected_items":
 		[
 			[
+				"init",
+				"initDomReferences"
+			],
+			[
+				"d",
+				"display"
+			],
+			[
+				"Arr",
+				"Array"
+			],
+			[
+				"Array",
+				"ArrayStore"
+			],
+			[
+				"get",
+				"getLayers"
+			],
+			[
 				"bo",
 				"border	border-bottom-style: style"
 			],
@@ -99,7 +119,7 @@
 			"file": "src/slbuilder/SLBuilder.hx",
 			"settings":
 			{
-				"buffer_size": 6877,
+				"buffer_size": 8991,
 				"line_ending": "Unix"
 			}
 		},
@@ -107,24 +127,24 @@
 			"file": "src/slbuilder/ui/LayersWidget.hx",
 			"settings":
 			{
-				"buffer_size": 2427,
+				"buffer_size": 2135,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "bin/templates/LayersWidget.html",
+			"file": "src/slbuilder/ui/ComponentsWidget.hx",
 			"settings":
 			{
-				"buffer_size": 743,
+				"buffer_size": 2301,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "bin/index.html",
+			"file": "src/slbuilder/ui/ListWidget.hx",
 			"settings":
 			{
-				"buffer_size": 1342,
-				"line_ending": "Windows"
+				"buffer_size": 5937,
+				"line_ending": "Unix"
 			}
 		},
 		{
@@ -139,8 +159,40 @@
 			"file": "src/demo/SLBuilderBridge.hx",
 			"settings":
 			{
-				"buffer_size": 6720,
+				"buffer_size": 7059,
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "bin/styles/layers-widget.css",
+			"settings":
+			{
+				"buffer_size": 697,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "bin/styles/slbuilder.css",
+			"settings":
+			{
+				"buffer_size": 561,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "bin/libs/test.js",
+			"settings":
+			{
+				"buffer_size": 3962,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/slbuilder/core/Utils.hx",
+			"settings":
+			{
+				"buffer_size": 830,
+				"line_ending": "Unix"
 			}
 		}
 	],
@@ -172,16 +224,27 @@
 	},
 	"file_history":
 	[
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/templates/ViewMenu.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/templates/LayersWidget.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/index.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/build.hxml",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/ext-js-dark.css",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/libs/test.js",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/mainPannel/SLBuilerPannel/app/view/Viewport.js",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/mainPannel/SLBuilerPannel/app.js",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/mainPannel/SLBuilerPannel/app/view/MyWindow.js",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/mainPannel/jsClassNeedsToBeSet.ui.js",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/mainPannel/SLBuilerPannel/app.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/layers-widget.css",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/slbuilder.css",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Utils.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/MainJs.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Config.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/templates/PropertiesList.html",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/data/Property.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/templates/ViewMenu.html",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/data/Types.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/SLBuilderBridge.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Descriptor.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/index.html",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/SLBuilder.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Application.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Descriptor"
@@ -202,6 +265,40 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"removeComponent",
+			"width",
+			"height",
+			"ComponentsWidget",
+			"componentsWidget",
+			"gridFormHtmlDom",
+			"initDomReferences",
+			"getComponents",
+			"parent",
+			"parentId",
+			"root",
+			"NAME_COLUMN_TITLE",
+			"Layer",
+			"layers",
+			"NAME_COLUMN_TITLE",
+			"layer",
+			"Layer",
+			"list",
+			"Layer",
+			"onSelectionChanged",
+			"add",
+			"initDomReferences",
+			"LayersWidget",
+			"mode",
+			"onSelectionChanged",
+			"getElementsByClassName",
+			"addlayerBtn",
+			"addBtn",
+			"dsLayers",
+			"root\nroot\n\nroot",
+			"root\nroot\n\n",
+			"ds",
+			"company",
+			"conta",
 			"displayName\n",
 			"createLayer",
 			"refresh",
@@ -219,7 +316,7 @@
 			"Utils"
 		],
 		"highlight": true,
-		"in_selection": false,
+		"in_selection": true,
 		"preserve_case": false,
 		"regex": false,
 		"replace_history":
@@ -234,7 +331,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -242,15 +339,15 @@
 					"file": "src/slbuilder/SLBuilder.hx",
 					"settings":
 					{
-						"buffer_size": 6877,
+						"buffer_size": 8991,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2120,
-								2498
+								3905,
+								3905
 							]
 						],
 						"settings":
@@ -259,7 +356,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2299.0,
+						"translation.y": 1828.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -269,15 +366,15 @@
 					"file": "src/slbuilder/ui/LayersWidget.hx",
 					"settings":
 					{
-						"buffer_size": 2427,
+						"buffer_size": 2135,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2177,
-								2177
+								1503,
+								1503
 							]
 						],
 						"settings":
@@ -286,62 +383,61 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1141.0,
+						"translation.y": 255.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "bin/templates/LayersWidget.html",
+					"file": "src/slbuilder/ui/ComponentsWidget.hx",
 					"settings":
 					{
-						"buffer_size": 743,
+						"buffer_size": 2301,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								454,
-								454
+								1930,
+								1930
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/HaXe/HaXe.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 510.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "bin/index.html",
+					"file": "src/slbuilder/ui/ListWidget.hx",
 					"settings":
 					{
-						"buffer_size": 1342,
+						"buffer_size": 5937,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								747,
-								747
+								3604,
+								3604
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"syntax": "Packages/HaXe/HaXe.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 102.0,
+						"translation.y": 2229.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -377,15 +473,15 @@
 					"file": "src/demo/SLBuilderBridge.hx",
 					"settings":
 					{
-						"buffer_size": 6720,
+						"buffer_size": 7059,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5392,
-								5403
+								1730,
+								1730
 							]
 						],
 						"settings":
@@ -394,7 +490,115 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2448.0,
+						"translation.y": 837.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "bin/styles/layers-widget.css",
+					"settings":
+					{
+						"buffer_size": 697,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								592,
+								592
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CSS/CSS.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "bin/styles/slbuilder.css",
+					"settings":
+					{
+						"buffer_size": 561,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								561,
+								561
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CSS/CSS.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "bin/libs/test.js",
+					"settings":
+					{
+						"buffer_size": 3962,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								3962
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1071.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "src/slbuilder/core/Utils.hx",
+					"settings":
+					{
+						"buffer_size": 830,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								700,
+								712
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HaXe/HaXe.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

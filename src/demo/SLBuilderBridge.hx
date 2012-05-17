@@ -23,6 +23,7 @@ class SLBuilderBridge{
 		slBuilder.removeLayer = removeLayer;
 		slBuilder.getLayers = getLayers;
 		slBuilder.createComponent = createComponent;
+		slBuilder.removeComponent = removeComponent;
 		slBuilder.getComponents = getComponents;
 		slBuilder.getProperties = getProperties;
 		slBuilder.setProperty = setProperty;
@@ -123,6 +124,17 @@ class SLBuilderBridge{
 			id : id, 
 			displayName : id.seed
 		};
+	}
+	/**
+	 * Remove the corresponding component and return true on success
+	 */
+	private function removeComponent(id:Id):Bool{
+		var element:HtmlDom = Lib.document.getElementById(id.seed);
+		if (element != null){
+			element.parentNode.removeChild(element);
+			return true;
+		}
+		return false;
 	}
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to return a list of components, which are contained in the layer with the provided ID.
