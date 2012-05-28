@@ -8,7 +8,7 @@ class Utils {
 	/**
 	 * incremental id counter
 	 */
-	static var nextId:Int;
+	private static var nextId:Int;
 	/**
 	 * creates an id with type and seed
 	 * seed is type, className, nextId, random, concatenated with "_" as a separator

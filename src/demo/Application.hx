@@ -2,7 +2,7 @@ package demo;
 
 import js.Lib;
 import js.Dom;
-import slbuilder.SLBuilder;
+import slbuilder.core.SLBuilder;
 import demo.SLBuilderBridge;
 
 /**
@@ -15,6 +15,7 @@ class Application {
 	 * init the application
 	 */
 	public function new(){
-		slBuilderBridge = new SLBuilderBridge(SLBuilder.getInstance());
+		slBuilderBridge = new SLBuilderBridge();
+		SLBuilder.getInstance().slBuilderBridge = slBuilderBridge;
 	}
 }

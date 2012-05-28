@@ -2,6 +2,7 @@ package slbuilder.ui;
 
 import js.Lib;
 import js.Dom;
+import slbuilder.core.SLBuilder;
 import slbuilder.core.Template;
 import slbuilder.core.Config;
 import slbuilder.core.Utils;
@@ -18,15 +19,23 @@ import slbuilder.ui.ListWidget;
  * - zorder in current page / all pages
  * - move to page?
  * - navigate vs edit in place
- * - Pages: selection = dropdown + add / suppr
  */
 class LayersWidget extends ListWidget<Layer> {
 	/**
+	 * ID of the page of which we display the layers
+	 */
+	public var parentId:Id;
+/*
+	public var parentId(setParentId,default):Id;
+	private function setParentId(newParentId:Id):Id{
+		refresh();
+		return newParentId;
+	}
+*/	/**
 	 * init the widget
 	 */
 	override public function new(parent:HtmlDom, panel:ext.form.Panel){
-		NAME_COLUMN_TITLE = "Layers";
-		super(parent, panel);
+		super(parent, panel, "Layers");
 	}
 	/**
 	 * get elements by class names 
@@ -40,9 +49,15 @@ class LayersWidget extends ListWidget<Layer> {
 	 * to be overriden to handle the model
 	 */
 	override public function refresh() {
-		var layers = SLBuilder.getInstance().getLayers(null);
-		var arraArray:ext.Array<Dynamic> = ext.Array.from(layers);
-		arrayStore.loadData(arraArray);
+		if (parentId!=null){
+			var layers = SLBuilder.getInstance().getLayers(parentId);
+			var arraArray:ext.Array<Dynamic> = ext.Array.from(layers);
+			arrayStore.loadData(arraArray);
+		}
+		else{
+			// empty selection
+			arrayStore.removeAll();
+		}
 		super.refresh();
 	}
 	/**
@@ -50,7 +65,7 @@ class LayersWidget extends ListWidget<Layer> {
 	 * to be overriden to handle the model
 	 */
 	override private function add(e:js.Event) {
-		var layer = SLBuilder.getInstance().createLayer("basicLayer", null);
+		var layer = SLBuilder.getInstance().createLayer("basicLayer", parentId);
 		SLBuilder.getInstance().setProperty(layer.id, "displayName", "New Layer");
 		super.add(e);
 	}

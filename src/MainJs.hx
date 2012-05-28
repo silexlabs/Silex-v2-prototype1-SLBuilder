@@ -1,6 +1,5 @@
 package; 
 
-import slbuilder.SLBuilder;
 import demo.Application;
 
 class MainJs {

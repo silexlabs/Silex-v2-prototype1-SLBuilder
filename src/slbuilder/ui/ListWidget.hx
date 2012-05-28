@@ -12,11 +12,11 @@ import slbuilder.data.Types;
  * display the layers or components in a list
  * this class has to be overriden
  */
-class ListWidget<ElementType> {
+class ListWidget<ElementClass> {
 	/**
 	 * name of the "name" column
 	 */
-	private var NAME_COLUMN_TITLE:String;
+	private var widgetTitle:String;
 	/**
 	 * extjs data store
 	 */
@@ -24,7 +24,7 @@ class ListWidget<ElementType> {
 	/**
 	 * on change callback
 	 */
-	public var onChange:ElementType->Void;
+	public var onChange:ElementClass->Void;
 	/**
 	 * button
 	 */
@@ -52,8 +52,8 @@ class ListWidget<ElementType> {
 	/**
 	 * init the widget
 	 */
-	public function new(parent:HtmlDom, panel:ext.form.Panel){
-		NAME_COLUMN_TITLE = "TO BE OVDERRIDEN IN SUBCLASS";
+	public function new(parent:HtmlDom, panel:ext.form.Panel, title:String){
+		widgetTitle = title;
 		this.parent = parent;
 		this.panel = panel;
 		initExtJsUi();
@@ -98,9 +98,10 @@ class ListWidget<ElementType> {
 	private function onSelectionChanged(model:Dynamic, records:Array<Dynamic>) {
 		//trace("onSelectionChanged "+Type.typeof(model.selected)+" - "+Type.typeof(records));
 		//Utils.inspectTrace(model.selected);
-		//trace("------");
-		//Utils.inspectTrace(records[0].data);
-		var selected:ElementType = null;
+//		trace("------");
+//		Utils.inspectTrace(records[0].data);
+
+		var selected:ElementClass = null;
 		if (records[0] != null)
 			selected = records[0].data;
 
@@ -126,18 +127,21 @@ class ListWidget<ElementType> {
             xtype: 'gridpanel',
             store: arrayStore,
             height: 150,
+            minWidth: 150,
             width: 150,
-/*
             style: {
+	            minWidth: "150px",
+	            width: "150px",
 				float: "left",
 				position: "relative",
 				height: "250px"
            	},
+/*
 */
             columns: [
                 {
                     id       :'col',
-                    text   : NAME_COLUMN_TITLE,
+                    text   : widgetTitle,
                     flex: 1,
                     sortable : true,
                     dataIndex: 'displayName'
@@ -156,10 +160,11 @@ class ListWidget<ElementType> {
 	        	cls:'removeBtn',
 	        	text:'-',
 	            xtype: 'button'
-	        }]
+	        }],
 	    });
 	    panel.add(grid);
 	    root = grid.getEl().dom;
+
 		root.style.position="relative";
 		cast(root.style).float="left";
 		//root.style.width="380px";

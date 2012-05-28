@@ -1,37 +1,50 @@
-package slbuilder;
+package slbuilder.core;
 
 import js.Lib;
 import js.Dom;
 import slbuilder.core.Config;
 import slbuilder.core.Utils;
 import slbuilder.ui.Menu;
+import slbuilder.ui.PagesWidget;
 import slbuilder.ui.LayersWidget;
 import slbuilder.ui.ComponentsWidget;
 import slbuilder.data.Types;
 import slbuilder.data.Property;
 import slbuilder.data.Component;
 import slbuilder.data.Layer;
+import slbuilder.data.Page;
 import slbuilder.core.Template;
+import slbuilder.core.ISLBuilderBridge;
 
 /**
  * SLBuilder class
  *
  * The loads on top of your application and interacts with it through a set of callbacks, 
- * which you are expected to provide, 
- * and a set of event methods which you want to call when something happened in your application.
- *
- * initialize the builder, create all tool boxes
- * exposes the callbacks and event methods, as defined here https://github.com/silexlabs/SLBuilder/wiki/Specifications
+ * which you are expected to provide, and a set of event methods which you want to call when something happened in your application.
+ * To provide these methods, create a class which implements an ISLBuilderBridge 
+ * and set SLBuilder::slBuilderBridge to an instance of this class 
+ * 
+ * This class exposes the callbacks and event methods, as defined here https://github.com/silexlabs/SLBuilder/wiki/Specifications
  * this is a singleton pattern, and the SLBuilder is initialized the first time you call SLBuilder.getInstance()
+ * 
+ * This class implements ISLBuilderBridge because it redirects all ISLBuilderBridge methods calls 
+ * to the slBuilderBridge object which your application is supposed to provide
  */
-class SLBuilder {
+class SLBuilder implements ISLBuilderBridge{
+	/**
+	 * ISLBuilderBridge object used to interact with the dom
+	 * The implementation of ISLBuilderBridge which your application is to provide
+	 * so that the SLBuilder can interact with you DOM
+	 */
+	public var slBuilderBridge:ISLBuilderBridge;
+
 	////////////////////////////////////////////////////////////////////
-	// Singleton patter
+	// Widgets composing the SLBuilder
 	////////////////////////////////////////////////////////////////////
 	/**
-	 * Singleton pattern
+	 * widget
 	 */
-	static private var instance:SLBuilder;
+	private var pagesWidget:PagesWidget;
 	/**
 	 * widget
 	 */
@@ -40,6 +53,13 @@ class SLBuilder {
 	 * widget
 	 */
 	private var componentsWidget:ComponentsWidget;
+	////////////////////////////////////////////////////////////////////
+	// Singleton patter
+	////////////////////////////////////////////////////////////////////
+	/**
+	 * Singleton pattern
+	 */
+	static private var instance:SLBuilder;
 	/**
 	 * Singleton pattern
 	 */
@@ -118,12 +138,28 @@ class SLBuilder {
 
 		//new Menu(root, "ViewMenu").onClick = onViewMenuClick;
 		
+		pagesWidget = new PagesWidget(root, gridForm);
+		pagesWidget.onChange = onPageChange;
+		pagesWidget.refresh();
+		
 		layersWidget = new LayersWidget(root, gridForm);
 		layersWidget.onChange = onLayerChange;
 
 		componentsWidget = new ComponentsWidget(root, gridForm);
 		componentsWidget.onChange = onComponentChange;
 
+	}
+	private function onPageChange(page:Page) {
+		var displayName = "none";
+		if (page != null){
+			displayName = page.displayName;
+			layersWidget.parentId = page.id;
+		}
+		else{
+			layersWidget.parentId = null;
+		}
+		layersWidget.refresh();
+		trace ("Page selected: "+displayName);
 	}
 	private function onLayerChange(layer:Layer) {
 		var displayName = "none";
@@ -145,126 +181,123 @@ class SLBuilder {
 
 		trace ("Component selected: "+displayName);
 	}
-	private function onViewMenuClick(className:String) 
-	{
-		switch (className) {
-			case "ShowComponentsBtn":
-				trace("test");
-			case "testBtn1":
-				var layer = createLayer("basicLayer", null);
-				trace(layer);
-			
-				Lib.document.getElementById(layer.id.seed).style.display = "inline-block";
+	/////////////////////////////////////////////////////////////////////
+	// DOM interactions
+	// These methods call your application's methods, so that it can interact with your object model
+	/////////////////////////////////////////////////////////////////////
+	/**
+	 * When the SLBuilder application calls this callback, you are supposed to create a container (e.g. a div in html) 
+	 * which will be associated with a page
+	 * Returns the id of the new page on success
+	 */
+	public function createPage(deeplink:Deeplink):Page {
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
 
-				Lib.document.getElementById(layer.id.seed).style.width = "100px";
-				Lib.document.getElementById(layer.id.seed).style.height = "100px";
-
-				var color = Math.round(Math.random()*255);
-				Lib.document.getElementById(layer.id.seed).style.backgroundColor = "rgb("+color+","+color+","+color+")";
-			case "testBtn2":
-				var layers = getLayers(null);
-				trace(layers);
-				for (layer in layers){
-					var color = Math.round(Math.random()*255*255);
-					Lib.document.getElementById(layer.id.seed).style.backgroundColor = color;
-				}
-			case "testBtn3":
-				var component = createComponent("galery", getLayers(null)[0].id);
-				trace(component);
-			
-				Lib.document.getElementById(component.id.seed).style.display = "inline-block";
-
-				Lib.document.getElementById(component.id.seed).style.width = "10px";
-				Lib.document.getElementById(component.id.seed).style.height = "10px";
-
-				var color = Math.round(Math.random()*255);
-				Lib.document.getElementById(component.id.seed).style.backgroundColor = "rgb("+color+","+color+","+color+")";
-			case "testBtn4":
-				var components = getComponents(getLayers(null)[0].id);
-				trace(components);
-				for (component in components){
-					var color = Math.round(Math.random()*255*255);
-					Lib.document.getElementById(component.id.seed).style.backgroundColor = color;
-				}
-			case "testBtn5":
-				var properties = getProperties(getComponents(getLayers(null)[0].id)[0].id);
-				//trace(properties);
-/*				var str = "<ul>";
-				for (property in properties){
-					str+="<li>"+property+"</li>";
-				}
-				str += "</ul>";
-				Lib.document.getElementById("propertyList").innerHTML = str;
-*/				
-				var t = this;
-				new Template("PropertiesList").onLoad = function(template:Template){
-					var container = Lib.document.createElement("div");
-					container.innerHTML = template.execute({
-						Config:Config, 
-						properties:properties,
-						component: t.getComponents(t.getLayers(null)[0].id)[0]
-					});
-					t.root.appendChild(container);
-				};
-
-			case "testBtn6":
-				var components = getComponents(getLayers(null)[0].id);
-				//var properties = getProperties(components[0].id);
-				testPropCount+=10;
-				setProperty(components[0].id, "style.position", "absolute");
-				setProperty(components[0].id, "style.top", testPropCount+"px");
-				trace(components[0].id);
-			default:
-		}
+		return slBuilderBridge.createPage(deeplink);
 	}
-	private var testPropCount:Int;
-	/////////////////////////////////////////////////////////////////////
-	// Callbacks
-	// These must be provided to the SLBuilder application, so that it can interact with your object model
-	/////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Remove the corresponding page and return true on success
+	 */
+	public function removePage(id:Id):Bool{
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.removePage(id);
+	}
+
+	/**
+	 * When the SLBuilder calls this callback, you are supposed to return a list of pages
+	 */
+	public function getPages():Array<Page> {
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.getPages();
+	}
 	/**
 	 * When the SLBuilder application calls this callback, you are supposed to create a container (e.g. a div in html) which will be associated with a layer.
 	 * Returns the id of the new layer on success
 	 */
-	public var createLayer:ClassName->Id->Null<Layer>;
+	public function createLayer(c:ClassName, id:Id):Null<Layer>{
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.createLayer(c, id);
+	}
 
 	/**
 	 * Remove the corresponding layer and return true on success
 	 */
-	public var removeLayer:Id->Bool;
+	public function removeLayer(id:Id):Bool{
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.removeLayer(id);
+	}
 
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to return a list of layers
 	 */
-	public var getLayers:Id->Array<Layer>;
+	public function getLayers(id:Id):Array<Layer>{
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
 
+		return slBuilderBridge.getLayers(id);
+	}
 
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to create a component in your object model, with the ID layerId and of the type className
 	 */
-	public var createComponent:ClassName->Id->Null<Component>;
+	public function createComponent(c:ClassName, id:Id):Null<Component>{
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.createComponent(c, id);
+	}
 
 	/**
 	 * Remove the corresponding layer and return true on success
 	 */
-	public var removeComponent:Id->Bool;
+	public function removeComponent(id:Id):Bool{
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.removeComponent(id);
+	}
 
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to return a list of components, which are contained in the layer with the provided ID.
 	 */
-	public var getComponents:Id->Array<Component>;
+	public function getComponents(id:Id):Array<Component>{
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.getComponents(id);
+	}
 
 
 	/**
 	 * Use class name like the slplayer does to retrieve the class name and path, then instanciate the class. Then look for the getProperties method or use reflexion.
 	 */
-	public var getProperties:Id->Array<Property>;
+	public function getProperties(id:Id):Array<Property>{
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.getProperties(id);
+	}
 
 
 	/**
 	 * Retrieve the component and set the property
 	 */
-	public var setProperty:Id->String->Dynamic->Void;
+	public function setProperty(id:Id, p:String, v:Dynamic):Void{
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.setProperty(id, p, v);
+	}
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// events
@@ -274,16 +307,28 @@ class SLBuilder {
 	///////////////////////////////////////////////////////////////////////////////////
 	/*
 	 * Your application is in charge of calling this method when your object model has changed.
+	 * @example		SLBuilder.getInstance().domChanged(id);
 	 */
-	public var domChanged:Id->Void;
+	public function domChanged(id:Id):Void{
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.domChanged(id);
+	}
 
 	/**
 	 * Call this method when your want the selection to change.
+	 * @example		SLBuilder.getInstance().slectionChanged([id1,id2]);
 	 */
-	public var slectionChanged:Array<Id>->Void;
+	public function slectionChanged(ids:Array<Id>):Void{
+		throw("not implemented");
+	}
 
 	/**
 	 * Call this method when your want to lock or unlock components.
+	 * @example		SLBuilder.getInstance().slectionLockChanged([id1,id2]);
 	 */
-	public var slectionLockChanged:Array<Id>->Void;
+	public function slectionLockChanged(ids:Array<Id>):Void{
+		throw("not implemented");
+	}
 }

@@ -1,11 +1,13 @@
 package demo;
 
-import slbuilder.SLBuilder;
+import slbuilder.core.SLBuilder;
 import slbuilder.core.Utils;
 import slbuilder.data.Types;
 import slbuilder.data.Property;
 import slbuilder.data.Component;
 import slbuilder.data.Layer;
+import slbuilder.data.Page;
+import slbuilder.core.ISLBuilderBridge;
 import js.Lib;
 import js.Dom;
 
@@ -14,32 +16,85 @@ import js.Dom;
  * This class provides the SLBuilder with the callbacks it needs
  * and exposes the SLBuilder methods to dispatch the application events
  */
-class SLBuilderBridge{
+class SLBuilderBridge implements ISLBuilderBridge{
 	/**
-	 * init the callbacks and events of SLBuilder
+	 *
 	 */
-	public function new(slBuilder:SLBuilder){
-		slBuilder.createLayer = createLayer;
-		slBuilder.removeLayer = removeLayer;
-		slBuilder.getLayers = getLayers;
-		slBuilder.createComponent = createComponent;
-		slBuilder.removeComponent = removeComponent;
-		slBuilder.getComponents = getComponents;
-		slBuilder.getProperties = getProperties;
-		slBuilder.setProperty = setProperty;
-		slBuilder.slectionChanged = slectionChanged;
-		slBuilder.domChanged = domChanged;
-		slBuilder.slectionLockChanged = slectionLockChanged;
+	public function new(){
 	}
 	/////////////////////////////////////////////////////////////////////
 	// Callbacks
 	// These must be provided to the SLBuilder application, so that it can interact with your object model
 	/////////////////////////////////////////////////////////////////////
 	/**
+	 * When the SLBuilder application calls this callback, you are supposed to create a container (e.g. a div in html) 
+	 * which will be associated with a page
+	 * Returns the id of the new page on success
+	 */
+	public function createPage(deeplink:Deeplink):Page {
+		var id:Id = Utils.toId(page, deeplink);
+
+		var res:HtmlDom = Lib.document.createElement("a");
+		res.className = "slbuilder page";
+		res.id = id.seed;
+		res.setAttribute("name", deeplink);
+		res.style.verticalAlign = "top";
+
+		var parent = Lib.document.getElementById("main");
+		parent.appendChild(res);
+
+		return {
+			id : id, 
+			displayName : id.seed,
+			deeplink : deeplink
+		};
+	}
+
+	/**
+	 * Remove the corresponding page and return true on success
+	 */
+	public function removePage(id:Id):Bool{
+		trace("removePage("+id.seed);
+		if (id.type != page)
+			throw ("Error: trying to remove a page, but the ID is the ID of a "+Std.string(id.type));
+
+		var element:HtmlDom = Lib.document.getElementById(id.seed);
+		if (element != null){
+			element.parentNode.removeChild(element);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * When the SLBuilder calls this callback, you are supposed to return a list of pages
+	 */
+	public function getPages():Array<Page> {
+		var parent:HtmlDom = Lib.document.getElementById("main");
+		var pages:HtmlCollection<HtmlDom> = untyped(parent.getElementsByClassName("page"));
+
+		var res:Array<Page> = [];
+		for (elementIdx in 0...pages.length){
+			var element:HtmlDom = Reflect.field(pages, Std.string(elementIdx));
+			var page:Page = {
+				id : {
+					type:page,
+					seed:element.id
+				}, 
+				displayName : element.id,
+				deeplink : element.getAttribute("name")
+			};
+			res.push(page);
+		}
+
+		return res;
+	}
+
+	/**
 	 * When the SLBuilder application calls this callback, you are supposed to create a container (e.g. a div in html) which will be associated with a layer.
 	 * Returns the id of the new layer on success
 	 */
-	private function createLayer(className:ClassName, parentId:Id = null):Null<Layer> {
+	public function createLayer(className:ClassName, parentId:Id):Null<Layer> {
 		var id:Id = Utils.toId(layer, className);
 
 		var res:HtmlDom = Lib.document.createElement("div");
@@ -47,11 +102,7 @@ class SLBuilderBridge{
 		res.id = id.seed;
 		res.style.verticalAlign = "top";
 
-		var parent:HtmlDom;
-		if (parentId == null)
-			parent = Lib.document.getElementById("main");
-		else 
-			parent = Lib.document.getElementById(parentId.seed);
+		var parent:HtmlDom = Lib.document.getElementById(parentId.seed);
 
 		parent.appendChild(res);
 
@@ -65,7 +116,10 @@ class SLBuilderBridge{
 	/**
 	 * Remove the corresponding layer and return true on success
 	 */
-	private function removeLayer(id:Id):Bool{
+	public function removeLayer(id:Id):Bool{
+		if (id.type != layer)		if (id.type != page)
+			throw ("Error: trying to remove a layer, but the ID is the ID of a "+Std.string(id.type));
+
 		var element:HtmlDom = Lib.document.getElementById(id.seed);
 		if (element != null){
 			element.parentNode.removeChild(element);
@@ -77,7 +131,7 @@ class SLBuilderBridge{
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to return a list of layers
 	 */
-	private function getLayers(parentId:Id = null):Array<Layer> {
+	public function getLayers(parentId:Id):Array<Layer> {
 		var parent:HtmlDom;
 		if (parentId == null)
 			parent = Lib.document.getElementById("main");
@@ -109,7 +163,7 @@ class SLBuilderBridge{
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to create a component in your object model, with the ID layerId and of the type className
 	 */
-	private function createComponent(className:ClassName, parentId:Id):Null<Component>{
+	public function createComponent(className:ClassName, parentId:Id):Null<Component>{
 		var id:Id = Utils.toId(component, className);
 
 		var res:HtmlDom = Lib.document.createElement("div");
@@ -128,7 +182,10 @@ class SLBuilderBridge{
 	/**
 	 * Remove the corresponding component and return true on success
 	 */
-	private function removeComponent(id:Id):Bool{
+	public function removeComponent(id:Id):Bool{
+		if (id.type != component)		if (id.type != page)
+			throw ("Error: trying to remove a component, but the ID is the ID of a "+Std.string(id.type));
+
 		var element:HtmlDom = Lib.document.getElementById(id.seed);
 		if (element != null){
 			element.parentNode.removeChild(element);
@@ -139,7 +196,7 @@ class SLBuilderBridge{
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to return a list of components, which are contained in the layer with the provided ID.
 	 */
-	private function getComponents(parentId:Id):Array<Component>{
+	public function getComponents(parentId:Id):Array<Component>{
 		var parent:HtmlDom = Lib.document.getElementById(parentId.seed);
 
 		var components:HtmlCollection<HtmlDom> = untyped(parent.getElementsByClassName("component"));
@@ -168,7 +225,7 @@ class SLBuilderBridge{
 	/**
 	 * Use class name like the slplayer does to retrieve the class name and path, then instanciate the class. Then look for the getProperties method or use reflexion.
 	 */
-	private function getProperties(parentId:Id):Array<Property>{
+	public function getProperties(parentId:Id):Array<Property>{
 		var parent:HtmlDom = Lib.document.getElementById(parentId.seed);
 		trace("getProperties "+parentId+" => "+parent);
 		var properties:Array<Property> = Reflect.field(Descriptor, parent.nodeName.toLowerCase());
@@ -190,7 +247,7 @@ class SLBuilderBridge{
 	/**
 	 * Retrieve the component and set the property
 	 */
-	private function setProperty(parentId:Id, propName:String, propValue:Dynamic):Void{
+	public function setProperty(parentId:Id, propName:String, propValue:Dynamic):Void{
 		var parent:HtmlDom = Lib.document.getElementById(parentId.seed);
 		// split at "." in order to handle properties like "style.top"
 		var propArray:Array<String> = propName.split(".");
@@ -211,18 +268,18 @@ class SLBuilderBridge{
 	/*
 	 * Your application is in charge of calling this method when your object model has changed.
 	 */
-	private function domChanged(layerId:Id):Void{
+	public function domChanged(layerId:Id):Void{
 	}
 
 	/**
 	 * Call this method when your want the selection to change.
 	 */
-	private function slectionChanged(componentsIds:Array<Id>):Void{
+	public function slectionChanged(componentsIds:Array<Id>):Void{
 	}
 
 	/**
 	 * Call this method when your want to lock or unlock components.
 	 */
-	private function slectionLockChanged(componentsIds:Array<Id>):Void{
+	public function slectionLockChanged(componentsIds:Array<Id>):Void{
 	}
 }

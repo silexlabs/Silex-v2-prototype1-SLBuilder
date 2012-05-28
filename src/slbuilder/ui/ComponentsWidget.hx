@@ -2,6 +2,7 @@ package slbuilder.ui;
 
 import js.Lib;
 import js.Dom;
+import slbuilder.core.SLBuilder;
 import slbuilder.core.Template;
 import slbuilder.core.Config;
 import slbuilder.core.Utils;
@@ -22,13 +23,15 @@ import slbuilder.ui.ListWidget;
  * - navigate/use vs edit in place
  */
 class ComponentsWidget extends ListWidget<Component> {
+	/**
+	 * ID of the layer of which we display the components
+	 */
 	public var parentId:Id;
 	/**
 	 * init the widget
 	 */
 	override public function new(parent:HtmlDom, panel:ext.form.Panel){
-		NAME_COLUMN_TITLE = "Components";
-		super(parent, panel);
+		super(parent, panel, "Components");
 	}
 	/**
 	 * get elements by class names 
