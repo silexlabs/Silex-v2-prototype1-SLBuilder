@@ -1,43 +1,74 @@
 <html>
 	<head>
-		<title>SLBuilder demo</title>
-		<link href="./assets/intermedia/icone_imp.png" rel="shortcut icon" />
-		<link href="./assets/intermedia/favicon.ico" rel="icon" />
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<meta name="Viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=1;">
-		<meta name="SLBuilder demo" content="yes" />
 		<link rel="stylesheet" type="text/css" href="styles/slbuilder.css" />
-		<link rel="stylesheet" type="text/css" href="styles/layers-widget.css" />
-		<script type="text/javascript" src="libs/extjs-4.1.0/ext-all-debug.js"></script>
-		<link rel="stylesheet" type="text/css" href="styles/ext-all-debug.css" />
-<!--
-		<link rel="stylesheet" type="text/css" href="styles/ext-all-access-debug.css" />
-		<script type="text/javascript" src="libs/test.js"></script>
-		<script type="text/javascript" src="libs/extjs-4.1.0/ext-neptune.js"></script>
--->
+		<link rel="stylesheet" type="text/css" href="styles/slbuilder_demo.css" />
+		<script src="SLPlayer.js"></script>
+		<script data-slp-use="slbuilder.ui.ToolBoxes"></script>
+		<script data-slp-use="slbuilder.ui.LayersWidget"></script>
+		<script data-slp-use="slbuilder.ui.ComponentsWidget"></script>
 	</head>
-	<body> 
-		<div id="main" style="width: 100%; height: 100%; ">
-<div id="main" style="width: 100%; height: 100%; ">
-	<a class="slbuilder page" id="page_page1_0_839841" name="page1" style="vertical-align: top; ">
-		<div class="basicLayer slbuilder layer" id="layer_basicLayer_6_5076291" style="vertical-align: top; ">
-			<div class="basicComponent slbuilder component" id="component_basicComponent_3_203798713"></div>
+	<body>
+		<div class="">
+			<div class="ToolBoxes">
+				<div class="layers toolbox LayersWidget">
+					<div class="toolboxheader">
+						<div class="pages">
+							<select class="dropdown">
+								<option value="page1"> page1 </option>
+								<option value="page2"> page2 </option>
+							</select>
+							<button class="add">+</button>
+							<button class="remove">-</button>
+						</div>
+						<h1>Layers</h1>
+					</div>
+					<ul class="list">
+						<li>::displayName::</li>
+					</ul>
+					<div class="toolboxfooter">
+						<button class="add">+</button>
+						<button class="remove">-</button>
+					</div>
+				</div>
+				<div class="components toolbox ComponentsWidget">
+					<div class="toolboxheader">
+						<h1>Components</h1>
+					</div>
+					<ul class="list">
+						<li>::displayName::</li>
+					</ul>
+					<div class="toolboxfooter">
+						<button class="add">+</button>
+						<button class="remove">-</button>
+					</div>
+				</div>
+				<div class="properties toolbox">
+					<div class="toolboxheader">
+						<h1>Properties</h1>
+					</div>
+					<form action="javascript:alert('test');">
+						<fieldset>
+							<label>position</label>
+							<input type="text" value="relative"/>
+						</fieldset>
+						<fieldset>
+							<label>text-align</label>
+							<input type="text" value="left" />
+						</fieldset>
+						<fieldset>
+							<label>position</label>
+							<input type="text" value="relative"/>
+						</fieldset>
+						<fieldset>
+							<label>text-align</label>
+							<input type="text" value="left" />
+						</fieldset>
+						<div class="toolboxfooter">
+							<button type="submit">Revert</button>
+						</div>
+					</form>
+				</div>
+			</div>
 		</div>
-	</a>
-	<a class="slbuilder page" id="page_page2_1_561687" name="page2" style="vertical-align: top; ">
-		<div class="basicLayer slbuilder layer" id="layer_basicLayer_5_96846" style="vertical-align: top; ">
-			<div class="basicComponent slbuilder component" id="component_basicComponent_2_393341"></div>
-			<div class="basicComponent slbuilder component" id="component_basicComponent_4_780753"></div>
-		</div>
-		<div class="basicLayer slbuilder layer" id="layer_basicLayer_6_507621" style="vertical-align: top; ">
-			<div class="basicComponent slbuilder component" id="component_basicComponent_3_203713"></div>
-		</div>
-	</a>
-</div>
-<!--			
--->		<div class="SLBuilderMain">
-		</div>
-		<div id="haxe:trace"></div>
-		<script type="text/javascript" src="App.js"></script>
 	</body>
 </html>

@@ -2,25 +2,36 @@ package slbuilder.ui;
 
 import js.Lib;
 import js.Dom;
-import slbuilder.core.Template;
 import slbuilder.core.Config;
 import slbuilder.core.Utils;
 import slbuilder.data.Types;
+
+import slplayer.ui.DisplayObject;
 
 /**
  * list widget
  * display the layers or components in a list
  * this class has to be overriden
  */
-class ListWidget<ElementClass> {
+class ListWidget<ElementClass> extends DisplayObject{
 	/**
-	 * name of the "name" column
+	 * list
 	 */
-	private var widgetTitle:String;
+	public var list:HtmlDom;
 	/**
-	 * extjs data store
+	 * list elements template
+	 * @example 	&lt;li&gt;::displayName::&lt;/li&gt;
 	 */
-	private var arrayStore : ext.data.ArrayStore;
+	public var listTemplate:String;
+	/**
+	 * data store
+	 */
+	public var dataProvider:Array<ElementClass>;
+	/**
+	 * selected item if any
+	 */
+	public var selectedItem(getSelectedItem, setSelectedItem):Null<ElementClass>;
+	private var _selectedItem:Null<ElementClass>;
 	/**
 	 * on change callback
 	 */
@@ -33,49 +44,68 @@ class ListWidget<ElementClass> {
 	 * button
 	 */
 	private var removeBtn:HtmlDom;
-	/**
-	 * parent container, provided as a constructor param
-	 */
-	private var parent:HtmlDom;
-	/**
-	 * container of this component 
-	 */
-	private var root:HtmlDom;
-	/**
-	 * extjs container
-	 */
-	private var panel:ext.form.Panel;
-	/**
-	 * extjs container
-	 */
-	private var grid:Dynamic;
+
 	/**
 	 * init the widget
-	 */
-	public function new(parent:HtmlDom, panel:ext.form.Panel, title:String){
-		widgetTitle = title;
-		this.parent = parent;
-		this.panel = panel;
-		initExtJsUi();
-	}
-	/**
 	 * get elements by class names 
 	 * initializes the process of refreshing the list
 	 */
-	private function initDomReferences() {
-		trace(root.id);
+	override public dynamic function init(?args:Hash<String>) : Void { 
+		super.init(args);
+		//haxe.Firebug.redirectTraces(); 
+		selectedItem = null;
 
-		addBtn = Utils.getElementsByClassName(root, "addBtn")[0];
+		addBtn = Utils.getElementsByClassName(rootElement, "addBtn")[0];
 		addBtn.onclick = add;
-		removeBtn = Utils.getElementsByClassName(root, "removeBtn")[0];
+
+		removeBtn = Utils.getElementsByClassName(rootElement, "removeBtn")[0];
 		removeBtn.onclick = remove;
+
+		// list and list template
+		list = Utils.getElementsByClassName(rootElement, "list")[0];
+		trace("LIST FOUND "+list);
+		listTemplate = list.innerHTML;
+
 		refresh();
 	}
 	/**
-	 * refresh the list, i.e. arrayStore.loadData( ... )
+	 * refresh the list, i.e. reload the dataProvider( ... )
 	 * to be overriden to handle the model
 	 */
 	public function refresh() {
+		var listInnerHtml:String = "";
+		var t = new haxe.Template(listTemplate);
+		for (elem in dataProvider){
+			listInnerHtml += t.execute(elem);
+		}
+		list.innerHTML = listInnerHtml;
+		attachListEvents();
+		selectedItem = null;
+	}
+	function getSelectedItem():Null<ElementClass> {
+		return _selectedItem;
+	}
+	function setSelectedItem(selected:Null<ElementClass>):Null<ElementClass> {
+		_selectedItem = selected;
+		onSelectionChanged([selected]);
+		return selected;
+	}
+	/**
+	 * attach mouse events to the list and the items
+	 */
+	private function attachListEvents(){
+		for (idx in 0...list.childNodes.length){
+			Reflect.setField(list.childNodes[idx], "data-listwidgetitemidx", Std.string(idx));
+			list.childNodes[idx].onclick = onClick;
+		}
+	}
+	/**
+	 * handle click in the list
+	 * TODO: multiple selection
+	 */
+	private function onClick(e:js.Event) {
+		var idx:Int = Std.parseInt(Reflect.field(e.target, "data-listwidgetitemidx"));
+		onSelectionChanged([dataProvider[idx]]);
 	}
 	/**
 	 * add an element to the model and refresh the list
@@ -94,157 +124,16 @@ class ListWidget<ElementClass> {
 	/**
 	 * handle a selection change
 	 * call onChange if defined
+	 * TODO: multiple selection
 	 */
-	private function onSelectionChanged(model:Dynamic, records:Array<Dynamic>) {
-		//trace("onSelectionChanged "+Type.typeof(model.selected)+" - "+Type.typeof(records));
-		//Utils.inspectTrace(model.selected);
-//		trace("------");
-//		Utils.inspectTrace(records[0].data);
-
+	private function onSelectionChanged(selection:Array<ElementClass>) {
 		var selected:ElementClass = null;
-		if (records[0] != null)
-			selected = records[0].data;
+		if (selection.length > 0){
+			selected = selection[0];
+		}
 
 		if (onChange != null){
 			onChange(selected);
 		}
 	}
-	/**
-	 * init the extjs list 
-	 */
-	private function initExtJsUi(){
-
-		// init data store
-	    arrayStore = Ext.create('Ext.data.ArrayStore', {
-	        fields: [
-	            {name: 'id'},
-	            {name: 'parentId'},
-	            {name: 'displayName'}
-	        ]
-	    });
-	    grid = Ext.create('Ext.grid.GridPanel', {
-            columnWidth: 0.60,
-            xtype: 'gridpanel',
-            store: arrayStore,
-            height: 150,
-            minWidth: 150,
-            width: 150,
-            style: {
-	            minWidth: "150px",
-	            width: "150px",
-				float: "left",
-				position: "relative",
-				height: "250px"
-           	},
-/*
-*/
-            columns: [
-                {
-                    id       :'col',
-                    text   : widgetTitle,
-                    flex: 1,
-                    sortable : true,
-                    dataIndex: 'displayName'
-                },
-            ],
-
-            listeners: {
-                selectionchange: onSelectionChanged
-                //function(model, records) {
-            },
-	        buttons: [{
-	        	cls:'addBtn',
-	        	text:'+',
-	            xtype: 'button'
-	        },{
-	        	cls:'removeBtn',
-	        	text:'-',
-	            xtype: 'button'
-	        }],
-	    });
-	    panel.add(grid);
-	    root = grid.getEl().dom;
-
-		root.style.position="relative";
-		cast(root.style).float="left";
-		//root.style.width="380px";
-		//root.style.height="400px";
-
-
-	    initDomReferences();
-
-/*	        items: [{
-	            columnWidth: 0.60,
-	            xtype: 'gridpanel',
-	            store: arrayStore,
-	            height: 250,
-
-	            columns: [
-	                {
-	                    id       :'layers',
-	                    text   : 'Layers',
-	                    flex: 1,
-	                    sortable : true,
-	                    dataIndex: 'displayName'
-	                },
-	            ],
-
-	            listeners: {
-	                selectionchange: onSelectionChanged
-	                //function(model, records) {
-	            },
-		        buttons: [{
-		        	cls:'addBtn',
-		        	text:'+',
-		            xtype: 'button'
-		        },{
-		        	cls:'removeBtn',
-		        	text:'-',
-		            xtype: 'button'
-		        }]
-	       }, {
-	            columnWidth: 0.4,
-	            margin: '0 0 0 10',
-	            xtype: 'fieldset',
-	            title:'Company details',
-	            defaults: {
-	                width: 240,
-	                labelWidth: 90
-	            },
-	            defaultType: 'textfield',
-	            items: [{
-	                fieldLabel: 'Name',
-	                name: 'displayName'
-	            }/*,{
-	                fieldLabel: 'Price',
-	                name: 'price'
-	            },{
-	                fieldLabel: '% Change',
-	                name: 'pctChange'
-	            },{
-	                xtype: 'datefield',
-	                fieldLabel: 'Last Updated',
-	                name: 'lastChange'
-	            }, {
-	                xtype: 'radiogroup',
-	                fieldLabel: 'Rating',
-	                columns: 3,
-	                defaults: {
-	                    name: 'rating' //Each radio has the same name so the browser will make sure only one is checked at once
-	                },
-	                items: [{
-	                    inputValue: '0',
-	                    boxLabel: 'A'
-	                }, {
-	                    inputValue: '1',
-	                    boxLabel: 'B'
-	                }, {
-	                    inputValue: '2',
-	                    boxLabel: 'C'
-	                }]
-	            }*//*]
-	        }]*/
-	}
-
-
 }

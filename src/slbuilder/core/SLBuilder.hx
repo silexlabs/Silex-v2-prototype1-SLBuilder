@@ -1,23 +1,14 @@
 package slbuilder.core;
 
-import js.Lib;
-import js.Dom;
-import slbuilder.core.Config;
-import slbuilder.core.Utils;
-import slbuilder.ui.Menu;
-import slbuilder.ui.PagesWidget;
-import slbuilder.ui.LayersWidget;
-import slbuilder.ui.ComponentsWidget;
 import slbuilder.data.Types;
 import slbuilder.data.Property;
 import slbuilder.data.Component;
 import slbuilder.data.Layer;
 import slbuilder.data.Page;
-import slbuilder.core.Template;
 import slbuilder.core.ISLBuilderBridge;
 
 /**
- * SLBuilder class
+ * SLBuilder singleton
  *
  * The loads on top of your application and interacts with it through a set of callbacks, 
  * which you are expected to provide, and a set of event methods which you want to call when something happened in your application.
@@ -30,7 +21,8 @@ import slbuilder.core.ISLBuilderBridge;
  * This class implements ISLBuilderBridge because it redirects all ISLBuilderBridge methods calls 
  * to the slBuilderBridge object which your application is supposed to provide
  */
-class SLBuilder implements ISLBuilderBridge{
+class SLBuilder implements ISLBuilderBridge
+{
 	/**
 	 * ISLBuilderBridge object used to interact with the dom
 	 * The implementation of ISLBuilderBridge which your application is to provide
@@ -39,22 +31,7 @@ class SLBuilder implements ISLBuilderBridge{
 	public var slBuilderBridge:ISLBuilderBridge;
 
 	////////////////////////////////////////////////////////////////////
-	// Widgets composing the SLBuilder
-	////////////////////////////////////////////////////////////////////
-	/**
-	 * widget
-	 */
-	private var pagesWidget:PagesWidget;
-	/**
-	 * widget
-	 */
-	private var layersWidget:LayersWidget;
-	/**
-	 * widget
-	 */
-	private var componentsWidget:ComponentsWidget;
-	////////////////////////////////////////////////////////////////////
-	// Singleton patter
+	// Singleton pattern
 	////////////////////////////////////////////////////////////////////
 	/**
 	 * Singleton pattern
@@ -68,118 +45,12 @@ class SLBuilder implements ISLBuilderBridge{
 			instance = new SLBuilder();
 		return instance;
 	}
-	/////////////////////////////////////////////////////////////////
-	// tool boxes
-	/////////////////////////////////////////////////////////////////
 	/**
-	 * SLBuilder root container
-	 */
-	private var root:HtmlDom;
-	/**
-	 * init the application
+	 * constructor
+	 * should not be called directly
 	 */
 	private function new(){
-		//haxe.Firebug.redirectTraces(); 
-		trace("SLBuilder init");
-		initDomReferences();
-		initUis();
-	}
-	/**
-	 * retrieve references to the Dom 
-	 */
-	private function initDomReferences(){
-		root = Utils.getElementsByClassName(Lib.document.body, "SLBuilderMain")[0];
-	}
-	/**
-	 * init UIs
-	 */
-	private function initUis(){
-		Ext.require([
-		    'Ext.form.*',
-		    'Ext.data.*',
-		    'Ext.grid.Panel',
-		    'Ext.grid.GridPanel',
-		    'Ext.layout.container.Column'
-		]);
-		Ext.onReady(initExtJsUi);
-	}
-	private function initExtJsUi(){
-     	// Here is where we create the Form
-	    var gridForm:ext.form.Panel;
-	    gridForm = Ext.create('Ext.form.Panel', {
-	        id: 'slbuilder-form',
-	        frame: true,
-	        title: 'SLBuilder Editor',
-            height: 350,
-            width: 800,
-
-	        /*
-	        style : {
-	        	left: '0',
-			    top: '0',
-			    position: 'absolute',
-			    width: '100%'
-			},
-			*/
-	        layout: 'column',    // Specifies that the items will now be arranged in columns
-
-	        fieldDefaults: {
-	            labelAlign: 'left',
-	            msgTarget: 'side'
-	        },
-	        renderTo: root
-	    });
-		var gridFormHtmlDom:HtmlDom = cast(gridForm.getEl()).dom;
-		gridFormHtmlDom.style.position="absolute";
-		gridFormHtmlDom.style.bottom="0";
-		gridFormHtmlDom.style.left="0";
-		//gridFormHtmlDom.style.width="800px";
-		//gridFormHtmlDom.style.height="250px";
-
-		//new Menu(root, "ViewMenu").onClick = onViewMenuClick;
-		
-		pagesWidget = new PagesWidget(root, gridForm);
-		pagesWidget.onChange = onPageChange;
-		pagesWidget.refresh();
-		
-		layersWidget = new LayersWidget(root, gridForm);
-		layersWidget.onChange = onLayerChange;
-
-		componentsWidget = new ComponentsWidget(root, gridForm);
-		componentsWidget.onChange = onComponentChange;
-
-	}
-	private function onPageChange(page:Page) {
-		var displayName = "none";
-		if (page != null){
-			displayName = page.displayName;
-			layersWidget.parentId = page.id;
-		}
-		else{
-			layersWidget.parentId = null;
-		}
-		layersWidget.refresh();
-		trace ("Page selected: "+displayName);
-	}
-	private function onLayerChange(layer:Layer) {
-		var displayName = "none";
-		if (layer != null){
-			displayName = layer.displayName;
-			componentsWidget.parentId = layer.id;
-		}
-		else{
-			componentsWidget.parentId = null;
-		}
-		componentsWidget.refresh();
-		trace ("Layer selected: "+displayName);
-	}
-	private function onComponentChange(component:Component) {
-		var displayName = "none";
-		if (component != null){
-			displayName = component.displayName;
-		}
-
-		trace ("Component selected: "+displayName);
+		haxe.Firebug.redirectTraces();
 	}
 	/////////////////////////////////////////////////////////////////////
 	// DOM interactions

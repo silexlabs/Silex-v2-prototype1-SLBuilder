@@ -7,3 +7,10 @@ It is a WYSIWYG editor to be integrated into an existing template systems, in we
 
 Screenshots and description
 - http://www.youtube.com/watch?v=EYeCGEyhzxg
+
+Remarks about SLPlayer
+- index.html as a compilation flag
+- error message should give a solution: "slplayer/macro/AppBuilder.hx:44: characters 3-8 : index.html not found !"
+- maybe put "discoverUIElts" in DisplayObject or simplify the process of creation of a component
+- pass the root node of the component in init() ?
+- 

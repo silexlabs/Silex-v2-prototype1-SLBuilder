@@ -1,30 +1,108 @@
-.layer{
-	display: inline-block;
-	width: 100px;
-	height: 100px;
-	background-color: grey;
-	border-style: dotted;
+.slbuilder{
+	font-family: Verdana, Arial;
+	font-size: 14pt;
 }
-.component{
-	display: inline-block;
-	width: 10px;
-	height: 10px;
-	background-color: black;
-	border-style: dotted;
+.template{
+    display: none;
 }
-body{
-	margin : 0px; 
-	padding : 0px; 
-	overflow: auto;
-	font-family: 'PT Sans', 'DejaVu Sans', 'Bitstream Vera Sans', Verdana, sans-serif;
-	font-size: 14px;
-	font-style: normal;
-	font-variant: normal;
-	font-weight: normal;
-	line-height: 1.4;
+.toolboxes{
+    background-color: Silver;
+    border-color: gray;
+    border-style: double;
+    bottom: 0;
+    height: 300px;
+    max-height: 30%;
+    min-height: 150px;
+    position: absolute;
+    width: 99%;
+    overflow: auto;
 }
-.SLBuilderMain {
-	position:absolute; 
-	top: 0; left: 0;
-	width: 100%; height: 100%; 
+.toolbox{
+    border-style: groove;
+    border-width: thin;
+    float: left;
+    margin-right: 5px;
+    max-width: 300px;
+    min-width: 20%;
+    overflow: auto;
 }
+.toolbox ul{
+	padding: 0px;
+	margin: 0px;
+}
+.toolbox li{
+    border-width: 1px 0;
+    border-style: solid;
+    border-width: thin;
+    border-collapse: separate;
+	border-spacing: 0;
+    list-style-type: none;
+    vertical-align: top;
+    background-color: DarkSlateGrey;
+    color: white;
+    padding: 0 5px;
+    border-radius: 5px;
+}
+.toolbox form{
+    margin: 0;
+}
+.toolbox fieldset {
+    padding: 5px;
+}
+.toolbox fieldset input {
+    background-color: DarkSlateGrey;
+    border-radius: 5px;
+    color: white;
+    font-size: large;
+    padding: 0 5px;
+    width: 100%;
+}
+.toolbox button {
+    border-radius: 5px 5px 5px 5px;
+    border-style: solid;
+    border-width: medium;
+    color: white;
+    margin-bottom: 3px;
+    background-color: DarkSlateGray;
+    padding: 2px 6px;
+}
+.toolbox .remove {
+    background-color: DarkRed;
+}
+.toolbox .add {
+    background-color: DarkSlateGray;
+}
+.toolboxheader select{
+	min-width: 100px;
+}
+.toolboxheader{
+	background-color: Gainsboro;
+    padding: 5px;
+    padding-top: 0px;
+}
+.toolboxheader h1{
+    font-size: 14pt;
+    font-variant: small-caps;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+.toolboxfooter{
+//	position: absolute;
+//	bottom: 0;
+	background-color: Gainsboro;
+}
+.pages{
+    float: right;
+    width: auto;
+}
+.properties{
+	width: 58%;
+	max-width: none;
+}
+.add 
+.remove
+.layers 
+.components
+
+button
+

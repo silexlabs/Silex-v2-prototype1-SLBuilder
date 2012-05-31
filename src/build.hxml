@@ -1,5 +1,3 @@
--main MainJs
--cp src
-#--no-traces
--js ../bin/App.js
--lib extjs
+-js ../bin/SLPlayer.js
+-main slplayer.core.SLPlayer
+-cmd cp index.html ../bin/

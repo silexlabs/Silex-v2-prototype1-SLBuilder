@@ -29,29 +29,26 @@ class ComponentsWidget extends ListWidget<Component> {
 	public var parentId:Id;
 	/**
 	 * init the widget
-	 */
-	override public function new(parent:HtmlDom, panel:ext.form.Panel){
-		super(parent, panel, "Components");
-	}
-	/**
 	 * get elements by class names 
 	 * initializes the process of refreshing the list
 	 */
-	override private function initDomReferences() {
-		super.initDomReferences();
+	override public dynamic function init(?args:Hash<String>) : Void { 
+		super.init(args);
 	}
 	/**
 	 * refresh the list, i.e. arrayStore.loadData( ... )
 	 * to be overriden to handle the model
 	 */
 	override public function refresh() {
-		if (parentId != null){
-			var components = SLBuilder.getInstance().getComponents(parentId);
-			var arraArray:ext.Array<Dynamic> = ext.Array.from(components);
-			arrayStore.loadData(arraArray);
+		// refreh list data
+		if (parentId!=null){
+			dataProvider = SLBuilder.getInstance().getComponents(parentId);
 		}
-		else
-			arrayStore.removeAll();
+		else{
+			dataProvider = new Array();
+		}
+
+		// refresh the list
 		super.refresh();
 	}
 	/**
@@ -69,21 +66,7 @@ class ComponentsWidget extends ListWidget<Component> {
 	 */
 	override private function remove(e:js.Event) {
 		//Utils.inspectTrace(grid.selModel.selected.items[0].data);
-		SLBuilder.getInstance().removeComponent(grid.selModel.selected.items[0].data.id);
+		SLBuilder.getInstance().removeComponent(selectedItem.id);
 		super.remove(e);
-	}
-	/**
-	 * handle a selection change
-	 * call onChange if defined
-	 */
-	override private function onSelectionChanged(model:Dynamic, records:Array<Dynamic>) {
-		super.onSelectionChanged(model, records);
-	}
-
-	/**
-	 * init the extjs list 
-	 */
-	override private function initExtJsUi(){
-		super.initExtJsUi();
 	}
 }

@@ -6,6 +6,7 @@ import slbuilder.core.SLBuilder;
 import slbuilder.core.Template;
 import slbuilder.core.Config;
 import slbuilder.core.Utils;
+import slbuilder.data.Page;
 import slbuilder.data.Layer;
 import slbuilder.data.Types;
 import slbuilder.ui.ListWidget;
@@ -19,45 +20,72 @@ import slbuilder.ui.ListWidget;
  * - zorder in current page / all pages
  * - move to page?
  * - navigate vs edit in place
+ * 
+ * display the Pages in a list
+ * - list
+ * - create/delete
  */
 class LayersWidget extends ListWidget<Layer> {
 	/**
 	 * ID of the page of which we display the layers
 	 */
 	public var parentId:Id;
-/*
-	public var parentId(setParentId,default):Id;
-	private function setParentId(newParentId:Id):Id{
-		refresh();
-		return newParentId;
-	}
-*/	/**
-	 * init the widget
-	 */
-	override public function new(parent:HtmlDom, panel:ext.form.Panel){
-		super(parent, panel, "Layers");
-	}
 	/**
+	 * pages selector
+	 */
+	public var pagesDropDown:HtmlDom;
+	/**
+	 * pages selector template
+	 */
+	public var pagesDropDownTemplate:String;
+	/**
+	 * page change callback
+	 */
+	public var onPageChange:Page->Void;
+	/**
+	 * init the widget
 	 * get elements by class names 
 	 * initializes the process of refreshing the list
 	 */
-	override private function initDomReferences() {
-		super.initDomReferences();
+	override public dynamic function init(?args:Hash<String>) : Void { 
+		super.init(args);
+		pagesDropDown = Utils.getElementsByClassName(rootElement, "dropdown")[0];
+		pagesDropDownTemplate = pagesDropDown.innerHTML;
+		untyped ("pagesDropDown.onchange = onPageClick");
+	}
+	/**
+	 * handle page selection change
+	 */
+	private function onPageClick(e:js.Event) {
+		var idx:Int = -1;
+		untyped("idx = pagesDropDown.selectedIndex");
+		var dataProviderPages = SLBuilder.getInstance().getPages();
+		parentId = dataProviderPages[idx].id;
+		refresh();
 	}
 	/**
 	 * refresh the list, i.e. arrayStore.loadData( ... )
 	 * to be overriden to handle the model
 	 */
 	override public function refresh() {
+		// REFRESH PAGE LIST
+		var dataProviderPages = SLBuilder.getInstance().getPages();
+		var listInnerHtml:String = "";
+		var t = new haxe.Template(pagesDropDownTemplate);
+		for (elem in dataProviderPages){
+			listInnerHtml += t.execute(elem);
+		}
+		pagesDropDown.innerHTML = listInnerHtml;
+
+		// refreh list data
 		if (parentId!=null){
-			var layers = SLBuilder.getInstance().getLayers(parentId);
-			var arraArray:ext.Array<Dynamic> = ext.Array.from(layers);
-			arrayStore.loadData(arraArray);
+			dataProvider = SLBuilder.getInstance().getLayers(parentId);
 		}
 		else{
-			// empty selection
-			arrayStore.removeAll();
+			dataProvider = new Array();
 		}
+
+		// refresh the list
 		super.refresh();
 	}
 	/**
@@ -75,21 +103,7 @@ class LayersWidget extends ListWidget<Layer> {
 	 */
 	override private function remove(e:js.Event) {
 		//Utils.inspectTrace(grid.selModel.selected.items[0].data);
-		SLBuilder.getInstance().removeLayer(grid.selModel.selected.items[0].data.id);
+		SLBuilder.getInstance().removeLayer(selectedItem.id);
 		super.remove(e);
-	}
-	/**
-	 * handle a selection change
-	 * call onChange if defined
-	 */
-	override private function onSelectionChanged(model:Dynamic, records:Array<Dynamic>) {
-		super.onSelectionChanged(model, records);
-	}
-
-	/**
-	 * init the extjs list 
-	 */
-	override private function initExtJsUi(){
-		super.initExtJsUi();
 	}
 }

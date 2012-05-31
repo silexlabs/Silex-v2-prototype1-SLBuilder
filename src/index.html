@@ -1,0 +1,74 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="styles/slbuilder.css" />
+		<link rel="stylesheet" type="text/css" href="styles/slbuilder_demo.css" />
+		<script src="SLPlayer.js"></script>
+		<script data-slp-use="slbuilder.ui.ToolBoxes"></script>
+		<script data-slp-use="slbuilder.ui.LayersWidget"></script>
+		<script data-slp-use="slbuilder.ui.ComponentsWidget"></script>
+	</head>
+	<body>
+		<div class="">
+			<div class="ToolBoxes">
+				<div class="layers toolbox LayersWidget">
+					<div class="toolboxheader">
+						<div class="pages">
+							<select class="dropdown">
+								<option value="page1"> page1 </option>
+								<option value="page2"> page2 </option>
+							</select>
+							<button class="add">+</button>
+							<button class="remove">-</button>
+						</div>
+						<h1>Layers</h1>
+					</div>
+					<ul class="list">
+						<li>::displayName::</li>
+					</ul>
+					<div class="toolboxfooter">
+						<button class="add">+</button>
+						<button class="remove">-</button>
+					</div>
+				</div>
+				<div class="components toolbox ComponentsWidget">
+					<div class="toolboxheader">
+						<h1>Components</h1>
+					</div>
+					<ul class="list">
+						<li>::displayName::</li>
+					</ul>
+					<div class="toolboxfooter">
+						<button class="add">+</button>
+						<button class="remove">-</button>
+					</div>
+				</div>
+				<div class="properties toolbox">
+					<div class="toolboxheader">
+						<h1>Properties</h1>
+					</div>
+					<form action="javascript:alert('test');">
+						<fieldset>
+							<label>position</label>
+							<input type="text" value="relative"/>
+						</fieldset>
+						<fieldset>
+							<label>text-align</label>
+							<input type="text" value="left" />
+						</fieldset>
+						<fieldset>
+							<label>position</label>
+							<input type="text" value="relative"/>
+						</fieldset>
+						<fieldset>
+							<label>text-align</label>
+							<input type="text" value="left" />
+						</fieldset>
+						<div class="toolboxfooter">
+							<button type="submit">Revert</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

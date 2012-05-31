@@ -4,6 +4,34 @@
 		"selected_items":
 		[
 			[
+				"la",
+				"layersWidget	var"
+			],
+			[
+				"components",
+				"componentsWidget	var"
+			],
+			[
+				"bo",
+				"bodySize	var"
+			],
+			[
+				"cl",
+				"clientHeight"
+			],
+			[
+				"Html",
+				"HtmlDom"
+			],
+			[
+				"tr",
+				"inspectTrace"
+			],
+			[
+				"La",
+				"LayersWidget"
+			],
+			[
 				"max",
 				"max-width"
 			],
@@ -66,10 +94,6 @@
 			[
 				"get",
 				"getLayers"
-			],
-			[
-				"bo",
-				"border	border-bottom-style: style"
 			],
 			[
 				"bac",
@@ -159,129 +183,8 @@
 	},
 	"buffers":
 	[
-		{
-			"contents": "<select class=\"form-dropdown\" style=\"width:150px\" id=\"input_1\" name=\"q1_clickTo\">\n	<option value=\"Monday\"> Monday </option>\n	<option value=\"Tuesday\"> Tuesday </option>\n	<option value=\"Wednesday\"> Wednesday </option>\n	<option value=\"Thursday\"> Thursday </option>\n	<option value=\"Friday\"> Friday </option>\n	<option value=\"Saturday\"> Saturday </option>\n	<option value=\"Sunday\"> Sunday </option>\n</select>",
-			"settings":
-			{
-				"buffer_size": 401,
-				"line_ending": "Unix",
-				"name": "<select class=\"form-dropdown\" style=\"width:150px\""
-			}
-		},
-		{
-			"file": "src/demo/SLBuilderBridge.hx",
-			"settings":
-			{
-				"buffer_size": 8511,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/slbuilder/core/ISLBuilderBridge.hx",
-			"settings":
-			{
-				"buffer_size": 3987,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/data/Page.hx",
-			"settings":
-			{
-				"buffer_size": 400,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/slbuilder/data/Types.hx",
-			"settings":
-			{
-				"buffer_size": 507,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/slbuilder/core/SLBuilder.hx",
-			"settings":
-			{
-				"buffer_size": 10503,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/ui/ComponentsWidget.hx",
-			"settings":
-			{
-				"buffer_size": 2377,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/ui/PagesWidget.hx",
-			"settings":
-			{
-				"buffer_size": 2021,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/slbuilder/ui/LayersWidget.hx",
-			"settings":
-			{
-				"buffer_size": 2422,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/demo/Application.hx",
-			"settings":
-			{
-				"buffer_size": 385,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/ui/ListWidget.hx",
-			"settings":
-			{
-				"buffer_size": 6002,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "bin/index.html",
-			"settings":
-			{
-				"buffer_size": 2165,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/home/lexa/Dropbox/test.html",
-			"settings":
-			{
-				"buffer_size": 1776,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/home/lexa/Dropbox/test.css",
-			"settings":
-			{
-				"buffer_size": 1810,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/core/Utils.hx",
-			"settings":
-			{
-				"buffer_size": 838,
-				"line_ending": "Unix"
-			}
-		}
 	],
-	"build_system": "",
+	"build_system": "Packages/HaXe/Hxml.sublime-build",
 	"command_palette":
 	{
 		"height": 390.0,
@@ -313,25 +216,50 @@
 	},
 	"file_history":
 	[
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/index.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/index-slplayer-demo.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slplayer/macro/AppBuilder.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slplayer/core/SLPlayer.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/slbuilder.css",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/demo/discover_slplayer/src/slplayer/prototype/player/BasicPlayerControl.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/demo/discover_slplayer/src/slplayer/prototype/player/ImagePlayer.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/demo/discover_slplayer/index.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/LayersWidget.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/ListWidget.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Utils.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/readme.txt",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/ToolBox.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/ToolBoxes",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/SLBuilderBridge.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/build.hxml",
+		"/home/lexa/Dropbox/fdt-workspace/SLPlayer/index.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/SLPlayer.js",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/SLPlayer.js",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/SLBuilder.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Template.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/index-extjs-OLD.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/index.html",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/demo/build.hxml",
+		"/home/lexa/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/lib/slplayer/core/SLPlayer.hx",
+		"/home/lexa/Dropbox/test.css",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Application.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/PagesWidget.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/ComponentsWidget.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/data/Types.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/data/Page.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/ISLBuilderBridge.hx",
+		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/SLBuilderBridge.hx",
+		"/home/lexa/Dropbox/test.html",
 		"/home/lexa/Documents/test.html",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/ext-all-access-debug.css",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/MainJs.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Application.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/SLBuilder.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Utils.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/libs/test.js",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/slbuilder.css",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/layers-widget.css",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/SLBuilderBridge.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/ComponentsWidget.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/LayersWidget.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/SLBuilder.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/ListWidget.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/Menu.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/build.hxml",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/templates/ViewMenu.html",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/templates/LayersWidget.html",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/index.html",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/ext-js-dark.css",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/mainPannel/SLBuilerPannel/app/view/Viewport.js",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/mainPannel/SLBuilerPannel/app.js",
@@ -341,7 +269,6 @@
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Config.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/templates/PropertiesList.html",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/data/Property.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/data/Types.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Descriptor.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Descriptor"
 	],
@@ -361,6 +288,13 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"header",
+			"slbuilder",
+			"unkno",
+			"AutoPlayer",
+			"BasicPlayerControl",
+			"new",
+			"src",
 			"darkSlateGrey",
 			"						</",
 			"}",
@@ -470,422 +404,8 @@
 	"groups":
 	[
 		{
-			"selected": 12,
 			"sheets":
 			[
-				{
-					"buffer": 0,
-					"settings":
-					{
-						"buffer_size": 401,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								401
-							]
-						],
-						"settings":
-						{
-							"auto_name": "<select class=\"form-dropdown\" style=\"width:150px\"",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/demo/SLBuilderBridge.hx",
-					"settings":
-					{
-						"buffer_size": 8511,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2811,
-								2840
-							]
-						],
-						"settings":
-						{
-							"haxe-build-id": 0,
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1345.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/slbuilder/core/ISLBuilderBridge.hx",
-					"settings":
-					{
-						"buffer_size": 3987,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2180,
-								2180
-							]
-						],
-						"settings":
-						{
-							"haxe-build-id": 0,
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 767.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/slbuilder/data/Page.hx",
-					"settings":
-					{
-						"buffer_size": 400,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								337,
-								337
-							]
-						],
-						"settings":
-						{
-							"haxe-build-id": 0,
-							"syntax": "Packages/HaXe/HaXe.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "src/slbuilder/data/Types.hx",
-					"settings":
-					{
-						"buffer_size": 507,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								204,
-								204
-							]
-						],
-						"settings":
-						{
-							"haxe-build-id": 0,
-							"syntax": "Packages/HaXe/HaXe.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/slbuilder/core/SLBuilder.hx",
-					"settings":
-					{
-						"buffer_size": 10503,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6186,
-								6186
-							]
-						],
-						"settings":
-						{
-							"haxe-build-id": 0,
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 3077.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "src/slbuilder/ui/ComponentsWidget.hx",
-					"settings":
-					{
-						"buffer_size": 2377,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								827,
-								827
-							]
-						],
-						"settings":
-						{
-							"haxe-build-id": 0,
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 185.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "src/slbuilder/ui/PagesWidget.hx",
-					"settings":
-					{
-						"buffer_size": 2021,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1554,
-								1559
-							]
-						],
-						"settings":
-						{
-							"haxe-build-id": 0,
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 657.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "src/slbuilder/ui/LayersWidget.hx",
-					"settings":
-					{
-						"buffer_size": 2422,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1207,
-								1207
-							]
-						],
-						"settings":
-						{
-							"haxe-build-id": 0,
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 714.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "src/demo/Application.hx",
-					"settings":
-					{
-						"buffer_size": 385,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								365,
-								365
-							]
-						],
-						"settings":
-						{
-							"haxe-build-id": 0,
-							"syntax": "Packages/HaXe/HaXe.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "src/slbuilder/ui/ListWidget.hx",
-					"settings":
-					{
-						"buffer_size": 6002,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2901,
-								2901
-							]
-						],
-						"settings":
-						{
-							"haxe-build-id": 0,
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1952.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "bin/index.html",
-					"settings":
-					{
-						"buffer_size": 2165,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								477,
-								553
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "/home/lexa/Dropbox/test.html",
-					"settings":
-					{
-						"buffer_size": 1776,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1624,
-								1624
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 566.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "/home/lexa/Dropbox/test.css",
-					"settings":
-					{
-						"buffer_size": 1810,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								126,
-								126
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CSS/CSS.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "src/slbuilder/core/Utils.hx",
-					"settings":
-					{
-						"buffer_size": 838,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								173,
-								173
-							]
-						],
-						"settings":
-						{
-							"haxe-build-id": 0,
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
 			]
 		}
 	],
