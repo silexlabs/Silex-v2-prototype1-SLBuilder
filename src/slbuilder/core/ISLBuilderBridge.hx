@@ -4,14 +4,12 @@ import js.Lib;
 import js.Dom;
 import slbuilder.core.Config;
 import slbuilder.core.Utils;
-import slbuilder.ui.Menu;
 import slbuilder.ui.LayersWidget;
 import slbuilder.ui.ComponentsWidget;
 import slbuilder.data.Types;
 import slbuilder.data.Property;
 import slbuilder.data.Component;
 import slbuilder.data.Layer;
-import slbuilder.core.Template;
 import slbuilder.data.Page;
 
 /**

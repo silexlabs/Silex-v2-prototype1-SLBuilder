@@ -11,7 +11,7 @@ import slplayer.ui.DisplayObject;
  * with the AppBuilder building macro.
  * @author Thomas Fétiveau
  */
-@:build(slplayer.macro.AppBuilder.buildFromHtml('index.html')) class SLPlayer 
+@:build(slplayer.macro.AppBuilder.buildFromHtml()) class SLPlayer 
 {
 	/**
 	 * A Hash keeping all component instances indexed by node slplayer id.
@@ -22,12 +22,23 @@ import slplayer.ui.DisplayObject;
 	 */
 	static private var SLPID_ATTR_NAME = "slpid";
 	
+	/**
+	 * A collection of the <script> declared components with the optionnal data- args passed on the <script> tag.
+	 */
+	var registeredComponents : Hash<Null<Hash<String>>>;
+	
 	public function new() 
 	{
 		//Set the body HTML content if not js
 		#if !js
 			Lib.document.body.innerHTML = _htmlBody;
+		#else
+			#if embedHtml
+				js.Lib.alert('embedHtml defined');
+			#end
 		#end
+		
+		registeredComponents = new Hash();
 	}
 	
 	/**
@@ -38,65 +49,156 @@ import slplayer.ui.DisplayObject;
 		var mySLPlayerApp = new SLPlayer();
 		
 		#if js
-			Lib.window.onload = function (e:Event) { mySLPlayerApp.initDisplayObjects(); };
+			Lib.window.onload = function (e:Event) 	{
+														mySLPlayerApp.registerComponentsforInit();
+														mySLPlayerApp.initComponents();
+													};
 		#else
-			mySLPlayerApp.initDisplayObjects();
+			mySLPlayerApp.registerComponentsforInit();
+			mySLPlayerApp.initComponents();
 		#end
 	}
 
 	/**
 	 * This function is filled in by the AppBuilder macro.
 	 */
-	private function initDisplayObjects() { }
+	private function registerComponentsforInit() { }
+	
+	private function registerComponent(componentClassName : String , ?args:Hash<String>)
+	{
+		registeredComponents.set(componentClassName, args);
+	}
+
+	/**
+	 * This function.
+	 */
+	private function initComponents()
+	{
+		var registeredComponentsClassNames = registeredComponents.keys();
+		
+		//Create the components instances
+		while (registeredComponentsClassNames.hasNext())
+		{
+			var registeredComponentsClassName = registeredComponentsClassNames.next();
+			
+			createComponentsOfType(registeredComponentsClassName, registeredComponents.get(registeredComponentsClassName));
+		}
+		
+		//call init on each component instances
+		callInitOnComponents();
+	}
 	
 	/**
-	 * This is a kind of factory method for all kinds of components. This may need some cleanup...
+	 * This is a kind of factory method for all kinds of components (DisplayObjects and no DisplayObjects).
 	 * 
-	 * TODO determine if it wouldn't be better to pass directly the Class. We would however loose the benefit of resolving it. but we could try catch the exceptions...
-	 * 
-	 * @param	displayObjectClassName the full component class name (with packages, for example : slplayer.ui.player.ImagePlayer)
+	 * @param	componentClassName the full component class name (with packages, for example : slplayer.ui.player.ImagePlayer)
 	 */
-	private function initDisplayObjectsOfType(displayObjectClassName : String , ?args:Hash<String>)
+	private function createComponentsOfType(componentClassName : String , ?args:Hash<String>)
 	{
-trace("initDisplayObjectsOfType called with displayObjectClassName="+displayObjectClassName);
+		var componentClass = Type.resolveClass(componentClassName);
 		
-		var displayObjectClass = Type.resolveClass(displayObjectClassName);
-		
-		if (displayObjectClass != null) // case DisplayObject component
+		if (componentClass == null)
 		{
-			var tagClassName = Reflect.field(displayObjectClass, "className");
-			
-trace(displayObjectClassName+" class resolved and its tag classname is "+tagClassName);
-			
-			if (tagClassName != null)
+			trace("WARNING cannot resolve "+componentClassName);
+			return;
+		}
+//trace(componentClassName+" class resolved ");
+		if (isDisplayObject(componentClass)) // case DisplayObject component
+		{
+			var classTag = getUnconflictedClassTag(componentClassName);
+
+			var taggedNodes : Array<HtmlDom> = new Array();
+//trace("searching now for class tag = "+classTag);
+			var taggedNodesCollection : HtmlCollection<HtmlDom> = untyped Lib.document.getElementsByClassName(classTag);
+			for (nodeCnt in 0...taggedNodesCollection.length)
 			{
-				var taggedNodes : Array<HtmlDom> = untyped Lib.document.getElementsByClassName(tagClassName);
-trace("taggedNodes = "+taggedNodes.length);
-				for (nodeCnt in 0...taggedNodes.length)
+				taggedNodes.push(taggedNodesCollection[nodeCnt]);
+			}
+			if (componentClassName != classTag)
+			{
+//trace("searching now for class tag = "+componentClassName);
+				taggedNodesCollection = untyped Lib.document.getElementsByClassName(componentClassName);
+				for (nodeCnt in 0...taggedNodesCollection.length)
 				{
-					var newDisplayObject;
-					
-					try
-					{
-						newDisplayObject = Type.createInstance( displayObjectClass, [taggedNodes[nodeCnt]] );
-					
-						newDisplayObject.init(args);
-					}
-					catch(unknown : Dynamic ) { trace(Std.string(unknown));}
+					taggedNodes.push(taggedNodesCollection[nodeCnt]);
 				}
 			}
-			else //case of non-visual component: we just try to create an instance, no call on init()
+//trace("taggedNodes = "+taggedNodes.length);
+			for (node in taggedNodes)
 			{
+				var newDisplayObject;
+				
 				try
 				{
-					if (args != null)
-						Type.createInstance( displayObjectClass, [args] );
-					else
-						Type.createInstance( displayObjectClass, [] );
+					newDisplayObject = Type.createInstance( componentClass, [node] );
+				
+					//newDisplayObject.init(args);
 				}
 				catch(unknown : Dynamic ) { trace(Std.string(unknown));}
 			}
 		}
+		else //case of non-visual component: we just try to create an instance, no call on init()
+		{
+			try
+			{
+				if (args != null)
+					Type.createInstance( componentClass, [args] );
+				else
+					Type.createInstance( componentClass, [] );
+			}
+			catch(unknown : Dynamic ) { trace(Std.string(unknown));}
+		}
+	}
+	
+	private function callInitOnComponents()
+	{
+		for (l in nodeToCmpInstances)
+		{
+			for (c in l)
+			{
+				c.init();
+			}
+		}
+	}
+	
+	/**
+	 * Determine the class tag value for a component.
+	 * @param	displayObjectClassName
+	 * @return	a tag class value for the given component class name that will not conflict with other
+	 * components classnames / class tags.
+	 */
+	private function getUnconflictedClassTag(displayObjectClassName : String) : String
+	{
+		var classTag = displayObjectClassName;
+		
+		if (classTag.indexOf(".") != -1)
+			classTag = classTag.substr(classTag.lastIndexOf(".") + 1);
+		
+		var registeredComponentsClassNames = registeredComponents.keys();
+		while (registeredComponentsClassNames.hasNext())
+		{
+			var registeredComponentClassName = registeredComponentsClassNames.next();
+			
+			if (classTag == registeredComponentClassName.substr(classTag.lastIndexOf(".") + 1))
+				return displayObjectClassName;
+		}
+		return classTag;
+	}
+	
+	/**
+	 * Tells if a given class is a DisplayObject.
+	 * @param	cmpClass
+	 * @return	Bool
+	 */
+	private function isDisplayObject(cmpClass : Class<Dynamic>):Bool
+	{
+		if (cmpClass == Type.resolveClass("slplayer.ui.DisplayObject"))
+			return true;
+		
+		if (Type.getSuperClass(cmpClass) != null)
+			return isDisplayObject(Type.getSuperClass(cmpClass));
+		
+		return false;
 	}
 	
 	/**
@@ -106,7 +208,6 @@ trace("taggedNodes = "+taggedNodes.length);
 	 */
 	public static function addAssociatedComponent(node : HtmlDom, cmp : DisplayObject) : Void
 	{
-trace("addAssociatedComponent("+node+", "+cmp+")");
 		var nodeId = node.getAttribute("data-" + SLPID_ATTR_NAME);
 		
 		var associatedCmps : List<DisplayObject>;

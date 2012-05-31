@@ -3,7 +3,6 @@ package slbuilder.ui;
 import js.Lib;
 import js.Dom;
 import slbuilder.core.SLBuilder;
-import slbuilder.core.Template;
 import slbuilder.core.Config;
 import slbuilder.core.Utils;
 import slbuilder.data.Page;

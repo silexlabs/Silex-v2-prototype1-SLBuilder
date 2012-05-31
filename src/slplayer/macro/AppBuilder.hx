@@ -1,30 +1,37 @@
 package slplayer.macro;
 
 import sys.FileSystem;
+
 import haxe.macro.Expr;
 
 /**
+ * The Builder macro of any SLPlayer application.
+ * What this macro do is basically : parse the application HTML file, add the necessary components import and init calls,
+ * cut the body part of the page and set it as the application contents.
  * 
-	  une macro split la page html en deux : body et head
-
-		. prend le contenu de <body> comme une chaine de caractère et génère 
-		js.Lib.document.body.innerHTML = "... la chaine ..."; 
-
-		. parse puis interprete le contenu de <head> comme la config de l'appli SLPlayer (par exemple taille de l'appli dans la balise meta viewport)
-
-		. interprete <script src="classes/Galery.js" /> comme ceci :
-		génère un "import classes.Galery;" (le dev doit avoir ajouté le bon class path pour qu on le trouve)
-		génère un "new Galery();" pour qu il soit executé dès le lancement de l appli
-	 
  * @author Thomas Fétiveau
  */
-
 class AppBuilder 
 {
 	/**
 	 * The data- attribute set by the slplayer on the HTML elements associated with one or more component.
 	 */
 	static public var SLP_USE_ATTR_NAME = "slp-use";
+	/**
+	 * The path to the application HTML source page.
+	 */
+	static public var htmlSourcePage = "index.html";
+	
+	/**
+	 * Sets the html page from the compile command line.
+	 * @param	key
+	 * @param	value
+	 */
+	@:macro static public function setHtmlSourcePage(value:String)
+	{
+        htmlSourcePage = value;
+        return null;
+    }
 	
 	/**
 	 * Builds an SLPlayer application from an HTML file.
@@ -32,26 +39,23 @@ class AppBuilder
 	 * The header part is used to configure the application. It also includes the components which may be used by the application.
 	 * The body part is the content and layout of the application.
 	 * @param	fileName
-	 * @return
+	 * @return	the updated SLPlayer class fields 
 	 */
-	@:macro static function buildFromHtml( fileName : String ) :  Array<Field>
+	@:macro static function buildFromHtml() :  Array<Field>
 	{
 		var fields = haxe.macro.Context.getBuildFields();
 		var pos;
 		
 		//First read the HTML file
-		if (!FileSystem.exists(fileName))
-			throw fileName + " not found !";
+		if (!FileSystem.exists(htmlSourcePage))
+			throw htmlSourcePage + " not found !";
 		
-		var rowHtmlContent = neko.io.File.getContent(fileName);
-		
-		//ignore first line if <!DOCTYPE html>
-		//TODO
+		var rowHtmlContent = neko.io.File.getContent(htmlSourcePage);
 		
 		//HTML content parsing
-		var htmlContent : Xml = Xml.parse(rowHtmlContent);
+		var htmlContent : Xml = haxe.xml.Parser.parse(rowHtmlContent);
 
-		for ( elt in htmlContent.firstChild().elements() )
+		for ( elt in htmlContent.firstElement().elements() )
 		{
 			switch(elt.nodeName.toLowerCase())
 			{
@@ -64,7 +68,7 @@ class AppBuilder
 							case "script":
 								
 								var cmpClassName = headElt.get("data-"+SLP_USE_ATTR_NAME);
-								
+//trace("found script "+cmpClassName);
 								if (cmpClassName == null)
 								{
 									/*
@@ -91,7 +95,7 @@ class AppBuilder
 									switch (fields[fc].kind)
 									{
 										case FFun(f) :
-											if (fields[fc].name != "initDisplayObjects")
+											if (fields[fc].name != "registerComponentsforInit")
 											{
 												continue;
 											}
@@ -120,23 +124,23 @@ class AppBuilder
 															if (StringTools.startsWith( initArgElt , "data-" ) && initArgElt != "data-"+SLP_USE_ATTR_NAME)
 																exprs.push( { expr : ECall( { expr : EField( { expr : EConst(CIdent(shortCmpClassName + "Args")), pos : pos }, "set"), pos : pos }, [ { expr : EConst(CString(initArgElt)), pos : pos }, { expr : EConst(CString(headElt.get(initArgElt))), pos : pos } ]), pos : pos } );
 														}
-														//generate call to initDisplayObjectsOfType with additionnal arguments
-														exprs.push( { expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(shortCmpClassName+"Args")), pos : pos } ]), pos : pos } );
+														//generate call to registerComponent with additionnal arguments
+														exprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos }, { expr : EConst(CIdent(shortCmpClassName+"Args")), pos : pos } ]), pos : pos } );
 													}
 													else
 													{
-														//generate call to initDisplayObjectsOfType with no additionnal arguments
-														exprs.push( { expr : ECall( { expr : EConst(CIdent("initDisplayObjectsOfType")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
+														//generate call to registerComponent with no additionnal arguments
+														exprs.push( { expr : ECall( { expr : EConst(CIdent("registerComponent")), pos : pos }, [ { expr : EConst(CString(cmpClassName)), pos : pos } ] ) , pos : pos } );
 													}
-//trace("added call to initDisplayObjectsOfType("+cmpClassName+")");
+//trace("added call to registerComponent("+cmpClassName+")");
 													break;
 												
 												default :
-													trace("expr type ignored for field initDisplayObjects.");
+													//trace("expr type ignored for field initDisplayObjects.");
 											}
 										
 										default :
-											trace("field "+fields[fc].name+" ignored.");
+											//trace("field "+fields[fc].name+" ignored.");
 									}
 								}
 								
@@ -144,7 +148,7 @@ class AppBuilder
 								//TODO
 								
 							default:
-								trace("Application configuration node "+headElt.nodeName+" ignored.");
+								//trace("Application configuration node "+headElt.nodeName+" ignored.");
 						}
 					}
 					
@@ -169,10 +173,11 @@ class AppBuilder
 		return fields;
 	}
 	
-	/*
-	{ expr => EType({ expr => EConst(CIdent(debug)), pos  : pos },DebugNodes), pos  : pos }
-	{ expr => EType({ expr => EField({ expr => EConst(CIdent(silexlabs)), pos : pos },slplayer), pos : pos },DebugNodes), pos : pos }
-	*/
+	/**
+	 * Generate an import expression for a given class.
+	 * @param	full classname (with packages)
+	 * @return	an import Expr
+	 */
 	static function generateImport(classname : String) : Expr
 	{
 		var splitedClassName = classname.split(".");
@@ -182,10 +187,14 @@ class AppBuilder
 		{
 			return { expr : EType( generateImportPackagePath(splitedClassName) , realClassName), pos : haxe.macro.Context.currentPos() };
 		}
-		
 		return { expr : EConst(CType(classname)), pos : haxe.macro.Context.currentPos() };
 	}
 	
+	/**
+	 * Generates the package part of an import Expr.
+	 * @param	path
+	 * @return	an part of an import Expr
+	 */
 	static function generateImportPackagePath(path : Array<String>) : Expr
 	{
 		if (path.length > 1)
