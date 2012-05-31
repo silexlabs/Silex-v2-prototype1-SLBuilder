@@ -14,6 +14,7 @@ import slplayer.ui.DisplayObject;
  * this class has to be overriden
  */
 class ListWidget<ElementClass> extends DisplayObject{
+	private var _isInit:Bool;
 	/**
 	 * list
 	 */
@@ -44,35 +45,43 @@ class ListWidget<ElementClass> extends DisplayObject{
 	 * button
 	 */
 	private var removeBtn:HtmlDom;
-
+	public function new(d:HtmlDom) {
+		_isInit = false;
+		super(d);
+	}
 	/**
 	 * init the widget
 	 * get elements by class names 
 	 * initializes the process of refreshing the list
 	 */
-	override public dynamic function init(?args:Hash<String>) : Void { 
-		super.init(args);
-		//haxe.Firebug.redirectTraces(); 
-		selectedItem = null;
+	override public dynamic function init() : Void { 
+		trace("LIST INIT ");
+		super.init();
 
-		addBtn = Utils.getElementsByClassName(rootElement, "addBtn")[0];
+		addBtn = Utils.getElementsByClassName(rootElement, "add")[0];
+		if (addBtn == null) throw("element not found in index.html");
 		addBtn.onclick = add;
 
-		removeBtn = Utils.getElementsByClassName(rootElement, "removeBtn")[0];
+		removeBtn = Utils.getElementsByClassName(rootElement, "remove")[0];
+		if (removeBtn == null) throw("element not found in index.html");
 		removeBtn.onclick = remove;
 
 		// list and list template
 		list = Utils.getElementsByClassName(rootElement, "list")[0];
-		trace("LIST FOUND "+list);
+		if (list == null) throw("element not found in index.html");
 		listTemplate = list.innerHTML;
-
-		refresh();
+		trace("List template: "+listTemplate);
+		_isInit = true;
 	}
 	/**
 	 * refresh the list, i.e. reload the dataProvider( ... )
 	 * to be overriden to handle the model
 	 */
 	public function refresh() {
+		if (_isInit == false)
+			return;
+
+		trace("LIST REFRESH "+list+" - "+listTemplate);
 		var listInnerHtml:String = "";
 		var t = new haxe.Template(listTemplate);
 		for (elem in dataProvider){
@@ -81,14 +90,6 @@ class ListWidget<ElementClass> extends DisplayObject{
 		list.innerHTML = listInnerHtml;
 		attachListEvents();
 		selectedItem = null;
-	}
-	function getSelectedItem():Null<ElementClass> {
-		return _selectedItem;
-	}
-	function setSelectedItem(selected:Null<ElementClass>):Null<ElementClass> {
-		_selectedItem = selected;
-		onSelectionChanged([selected]);
-		return selected;
 	}
 	/**
 	 * attach mouse events to the list and the items
@@ -136,4 +137,22 @@ class ListWidget<ElementClass> extends DisplayObject{
 			onChange(selected);
 		}
 	}
+	////////////////////////////////////////////////////////////
+	// setter / getter
+	////////////////////////////////////////////////////////////
+	/**
+	 * getter/setter
+	 */
+	function getSelectedItem():Null<ElementClass> {
+		return _selectedItem;
+	}
+	/**
+	 * getter/setter
+	 */
+	function setSelectedItem(selected:Null<ElementClass>):Null<ElementClass> {
+		_selectedItem = selected;
+		onSelectionChanged([selected]);
+		return selected;
+	}
+
 }

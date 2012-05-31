@@ -38,7 +38,7 @@ class ToolBoxes extends DisplayObject
 	/**
 	 * init the application
 	 */
-	override public dynamic function init(?args:Hash<String>) : Void { 
+	override public dynamic function init() : Void { 
 		//haxe.Firebug.redirectTraces(); 
 		trace("ToolBoxes init");
 		initUis();
@@ -49,15 +49,15 @@ class ToolBoxes extends DisplayObject
 	private function initUis(){
 		var domElem;
 		domElem = Utils.getElementsByClassName(rootElement, "layers")[0];
+		if (domElem == null) throw("element not found in index.html");
 		layersWidget = cast(SLPlayer.getAssociatedComponents(domElem).first());
 		layersWidget.onChange = onLayerChange;
 		layersWidget.onPageChange = onPageChange;
 
 		domElem = Utils.getElementsByClassName(rootElement, "components")[0];
+		if (domElem == null) throw("element not found in index.html");
 		componentsWidget = cast(SLPlayer.getAssociatedComponents(domElem).first());
 		componentsWidget.onChange = onComponentChange;
-
-		layersWidget.refresh();
 	}
 	private function onPageChange(page:Page) {
 	}

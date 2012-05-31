@@ -17,5 +17,6 @@ class Application {
 	public function new(){
 		slBuilderBridge = new SLBuilderBridge();
 		SLBuilder.getInstance().slBuilderBridge = slBuilderBridge;
+		trace("Demo Application stated ");
 	}
 }

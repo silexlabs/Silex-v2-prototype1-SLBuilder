@@ -40,7 +40,8 @@ class SLBuilderBridge implements ISLBuilderBridge{
 		res.setAttribute("name", deeplink);
 		res.style.verticalAlign = "top";
 
-		var parent = Lib.document.getElementById("main");
+		var parent = Lib.document.getElementById("root_element_for_demo");
+		if (parent == null) throw("element not found in index.html");
 		parent.appendChild(res);
 
 		return {
@@ -70,7 +71,9 @@ class SLBuilderBridge implements ISLBuilderBridge{
 	 * When the SLBuilder calls this callback, you are supposed to return a list of pages
 	 */
 	public function getPages():Array<Page> {
-		var parent:HtmlDom = Lib.document.getElementById("main");
+		var parent:HtmlDom = Lib.document.getElementById("root_element_for_demo");
+		if (parent == null) throw("element not found in index.html");
+
 		var pages:HtmlCollection<HtmlDom> = untyped(parent.getElementsByClassName("page"));
 
 		var res:Array<Page> = [];
@@ -132,11 +135,8 @@ class SLBuilderBridge implements ISLBuilderBridge{
 	 * When the SLBuilder calls this callback, you are supposed to return a list of layers
 	 */
 	public function getLayers(parentId:Id):Array<Layer> {
-		var parent:HtmlDom;
-		if (parentId == null)
-			parent = Lib.document.getElementById("main");
-		else 
-			parent = Lib.document.getElementById(parentId.seed);
+		var parent:HtmlDom = Lib.document.getElementById(parentId.seed);
+		if (parent == null) throw("element not found in index.html");
 
 		var layers:HtmlCollection<HtmlDom> = untyped(parent.getElementsByClassName("layer"));
 

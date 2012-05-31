@@ -3,22 +3,24 @@
 		<link rel="stylesheet" type="text/css" href="styles/slbuilder.css" />
 		<link rel="stylesheet" type="text/css" href="styles/slbuilder_demo.css" />
 		<script src="SLPlayer.js"></script>
+		<script data-slp-use="demo.Application"></script>
 		<script data-slp-use="slbuilder.ui.ToolBoxes"></script>
 		<script data-slp-use="slbuilder.ui.LayersWidget"></script>
 		<script data-slp-use="slbuilder.ui.ComponentsWidget"></script>
 	</head>
 	<body>
-		<div class="">
+		<div id="root_element_for_demo">
+		</div>
+		<div class="slbuilder_root">
 			<div class="ToolBoxes">
 				<div class="layers toolbox LayersWidget">
 					<div class="toolboxheader">
 						<div class="pages">
 							<select class="dropdown">
-								<option value="page1"> page1 </option>
-								<option value="page2"> page2 </option>
+								<option value="::id::"> ::displayName:: </option>
 							</select>
-							<button class="add">+</button>
-							<button class="remove">-</button>
+							<button class="addPage">+</button>
+							<button class="removePage">-</button>
 						</div>
 						<h1>Layers</h1>
 					</div>

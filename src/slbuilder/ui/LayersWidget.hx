@@ -38,6 +38,14 @@ class LayersWidget extends ListWidget<Layer> {
 	 */
 	public var pagesDropDownTemplate:String;
 	/**
+	 * button
+	 */
+	private var addPageBtn:HtmlDom;
+	/**
+	 * button
+	 */
+	private var removePageBtn:HtmlDom;
+	/**
 	 * page change callback
 	 */
 	public var onPageChange:Page->Void;
@@ -46,20 +54,37 @@ class LayersWidget extends ListWidget<Layer> {
 	 * get elements by class names 
 	 * initializes the process of refreshing the list
 	 */
-	override public dynamic function init(?args:Hash<String>) : Void { 
-		super.init(args);
+	override public dynamic function init() : Void { 
+		trace("LAYERS WIDGET INIT ");
 		pagesDropDown = Utils.getElementsByClassName(rootElement, "dropdown")[0];
+		if (pagesDropDown == null) throw("element not found in index.html");
 		pagesDropDownTemplate = pagesDropDown.innerHTML;
-		untyped ("pagesDropDown.onchange = onPageClick");
+		trace(pagesDropDown);
+		var _this_ = this;
+		untyped __js__ ("_this_.pagesDropDown.onchange = function(e){_this_.onPageClick(e)}");
+
+		addPageBtn = Utils.getElementsByClassName(rootElement, "addPage")[0];
+		if (addPageBtn == null) throw("element not found in index.html");
+		addPageBtn.onclick = addPage;
+
+		removePageBtn = Utils.getElementsByClassName(rootElement, "removePage")[0];
+		if (removePageBtn == null) throw("element not found in index.html");
+		removePageBtn.onclick = removePage;
+
+		super.init();
+
+		refresh();
 	}
 	/**
 	 * handle page selection change
 	 */
 	private function onPageClick(e:js.Event) {
 		var idx:Int = -1;
-		untyped("idx = pagesDropDown.selectedIndex");
+		var _this_ = this;
+		idx = untyped __js__("_this_.pagesDropDown.selectedIndex");
 		var dataProviderPages = SLBuilder.getInstance().getPages();
 		parentId = dataProviderPages[idx].id;
+		trace("PAGE SELECTED : "+parentId);
 		refresh();
 	}
 	/**
@@ -67,14 +92,29 @@ class LayersWidget extends ListWidget<Layer> {
 	 * to be overriden to handle the model
 	 */
 	override public function refresh() {
+		if (_isInit == false)
+			return;
+
 		// REFRESH PAGE LIST
+		// keep selected index
+		var _this_ = this;
+		var oldIdx:Int = untyped __js__("_this_.pagesDropDown.selectedIndex");
+		// the first time, oldIdx will be -1
+		if (oldIdx <=0) oldIdx = 0;
+
+		// get data provider
 		var dataProviderPages = SLBuilder.getInstance().getPages();
+
+		// redraw content
 		var listInnerHtml:String = "";
 		var t = new haxe.Template(pagesDropDownTemplate);
 		for (elem in dataProviderPages){
 			listInnerHtml += t.execute(elem);
 		}
 		pagesDropDown.innerHTML = listInnerHtml;
+
+		// keep selected index
+		untyped __js__("_this_.pagesDropDown.selectedIndex = oldIdx");
 
 		// refreh list data
 		if (parentId!=null){
@@ -104,5 +144,22 @@ class LayersWidget extends ListWidget<Layer> {
 		//Utils.inspectTrace(grid.selModel.selected.items[0].data);
 		SLBuilder.getInstance().removeLayer(selectedItem.id);
 		super.remove(e);
+	}
+	/**
+	 * add an element to the model and refresh the list
+	 */
+	private function addPage(e:js.Event) {
+		var deeplink:String = js.Lib.window.prompt("Deeplink for the new page");
+		if (deeplink != ""){
+			var page = SLBuilder.getInstance().createPage(deeplink);
+			SLBuilder.getInstance().setProperty(page.id, "displayName", deeplink);
+			refresh();
+		}
+	}
+	/**
+	 * remove an element from the model and refresh the list
+	 */
+	private function removePage(e:js.Event) {
+		refresh();
 	}
 }

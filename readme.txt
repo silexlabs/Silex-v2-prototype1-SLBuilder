@@ -9,8 +9,6 @@ Screenshots and description
 - http://www.youtube.com/watch?v=EYeCGEyhzxg
 
 Remarks about SLPlayer
-- index.html as a compilation flag
-- error message should give a solution: "slplayer/macro/AppBuilder.hx:44: characters 3-8 : index.html not found !"
-- maybe put "discoverUIElts" in DisplayObject or simplify the process of creation of a component
-- pass the root node of the component in init() ?
+- pass the root node of the component in init() ? Or better : no init, only the constructor
+- no #if js in SLPlayer::main(), an embed system in flash and js wich will put the slplayer at the right place
 - 

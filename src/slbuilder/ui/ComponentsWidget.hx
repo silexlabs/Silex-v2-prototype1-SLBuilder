@@ -31,14 +31,18 @@ class ComponentsWidget extends ListWidget<Component> {
 	 * get elements by class names 
 	 * initializes the process of refreshing the list
 	 */
-	override public dynamic function init(?args:Hash<String>) : Void { 
-		super.init(args);
+	override public dynamic function init() : Void { 
+		trace("COMPONENTS WIDGET INIT ");
+		super.init();
 	}
 	/**
 	 * refresh the list, i.e. arrayStore.loadData( ... )
 	 * to be overriden to handle the model
 	 */
 	override public function refresh() {
+		if (_isInit == false)
+			return;
+
 		// refreh list data
 		if (parentId!=null){
 			dataProvider = SLBuilder.getInstance().getComponents(parentId);
