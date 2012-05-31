@@ -1812,8 +1812,10 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 	,onChange: null
 	,addBtn: null
 	,removeBtn: null
+	,header: null
+	,footer: null
 	,init: function() {
-		haxe.Log.trace("LIST INIT ",{ fileName : "ListWidget.hx", lineNumber : 58, className : "slbuilder.ui.ListWidget", methodName : "init"});
+		haxe.Log.trace("LIST INIT ",{ fileName : "ListWidget.hx", lineNumber : 69, className : "slbuilder.ui.ListWidget", methodName : "init"});
 		slplayer.ui.DisplayObject.prototype.init.call(this);
 		this.addBtn = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"add")[0];
 		if(this.addBtn == null) throw "element not found in index.html";
@@ -1821,15 +1823,21 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 		this.removeBtn = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"remove")[0];
 		if(this.removeBtn == null) throw "element not found in index.html";
 		this.removeBtn.onclick = this.remove.$bind(this);
+		this.footer = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"toolboxfooter")[0];
+		if(this.footer == null) throw "element not found in index.html";
+		this.header = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"toolboxheader")[0];
+		if(this.header == null) throw "element not found in index.html";
+		var _this_ = this;
+		window.addEventListener('resize', _this_.refresh);;
 		this.list = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"list")[0];
 		if(this.list == null) throw "element not found in index.html";
 		this.listTemplate = this.list.innerHTML;
-		haxe.Log.trace("List template: " + this.listTemplate,{ fileName : "ListWidget.hx", lineNumber : 73, className : "slbuilder.ui.ListWidget", methodName : "init"});
+		haxe.Log.trace("List template: " + this.listTemplate,{ fileName : "ListWidget.hx", lineNumber : 97, className : "slbuilder.ui.ListWidget", methodName : "init"});
 		this._isInit = true;
+		this.refresh();
 	}
 	,refresh: function() {
 		if(this._isInit == false) return;
-		haxe.Log.trace("LIST REFRESH " + this.list + " - " + this.listTemplate,{ fileName : "ListWidget.hx", lineNumber : 84, className : "slbuilder.ui.ListWidget", methodName : "refresh"});
 		var listInnerHtml = "";
 		var t = new haxe.Template(this.listTemplate);
 		var _g = 0, _g1 = this.dataProvider;
@@ -1841,6 +1849,11 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 		this.list.innerHTML = listInnerHtml;
 		this.attachListEvents();
 		this.setSelectedItem(null);
+		var availableHeight = this.rootElement.parentNode.clientHeight;
+		haxe.Log.trace("parent height " + availableHeight,{ fileName : "ListWidget.hx", lineNumber : 122, className : "slbuilder.ui.ListWidget", methodName : "refresh"});
+		availableHeight -= this.header.clientHeight;
+		availableHeight -= this.footer.clientHeight;
+		this.list.style.height = availableHeight + "px";
 	}
 	,attachListEvents: function() {
 		var _g1 = 0, _g = this.list.childNodes.length;
@@ -1852,7 +1865,7 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 	}
 	,onClick: function(e) {
 		var idx = Std.parseInt(Reflect.field(e.target,"data-listwidgetitemidx"));
-		this.onSelectionChanged([this.dataProvider[idx]]);
+		this.setSelectedItem(this.dataProvider[idx]);
 	}
 	,add: function(e) {
 		this.refresh();
@@ -1861,16 +1874,16 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 		this.refresh();
 	}
 	,onSelectionChanged: function(selection) {
-		var selected = null;
-		if(selection.length > 0) selected = selection[0];
-		if(this.onChange != null) this.onChange(selected);
+		if(this.onChange != null) this.onChange(this._selectedItem);
 	}
 	,getSelectedItem: function() {
 		return this._selectedItem;
 	}
 	,setSelectedItem: function(selected) {
-		this._selectedItem = selected;
-		this.onSelectionChanged([selected]);
+		if(selected != this._selectedItem) {
+			this._selectedItem = selected;
+			this.onSelectionChanged([selected]);
+		}
 		return selected;
 	}
 	,__class__: slbuilder.ui.ListWidget
@@ -1931,6 +1944,7 @@ slbuilder.ui.LayersWidget.prototype = $extend(slbuilder.ui.ListWidget.prototype,
 		this.removePageBtn.onclick = this.removePage.$bind(this);
 		slbuilder.ui.ListWidget.prototype.init.call(this);
 		this.refresh();
+		this.onPageClick();
 	}
 	,onPageClick: function(e) {
 		var idx = -1;
@@ -1938,14 +1952,13 @@ slbuilder.ui.LayersWidget.prototype = $extend(slbuilder.ui.ListWidget.prototype,
 		idx = _this_.pagesDropDown.selectedIndex;
 		var dataProviderPages = slbuilder.core.SLBuilder.getInstance().getPages();
 		this.parentId = dataProviderPages[idx].id;
-		haxe.Log.trace("PAGE SELECTED : " + this.parentId,{ fileName : "LayersWidget.hx", lineNumber : 87, className : "slbuilder.ui.LayersWidget", methodName : "onPageClick"});
+		haxe.Log.trace("PAGE SELECTED : " + this.parentId,{ fileName : "LayersWidget.hx", lineNumber : 88, className : "slbuilder.ui.LayersWidget", methodName : "onPageClick"});
 		this.refresh();
 	}
 	,refresh: function() {
 		if(this._isInit == false) return;
 		var _this_ = this;
 		var oldIdx = _this_.pagesDropDown.selectedIndex;
-		haxe.Log.trace("++++ " + oldIdx,{ fileName : "LayersWidget.hx", lineNumber : 102, className : "slbuilder.ui.LayersWidget", methodName : "refresh"});
 		if(oldIdx <= 0) oldIdx = 0;
 		var dataProviderPages = slbuilder.core.SLBuilder.getInstance().getPages();
 		var listInnerHtml = "";
@@ -1972,14 +1985,16 @@ slbuilder.ui.LayersWidget.prototype = $extend(slbuilder.ui.ListWidget.prototype,
 	}
 	,addPage: function(e) {
 		var deeplink = js.Lib.window.prompt("Deeplink for the new page");
-		if(deeplink != "") {
+		if(deeplink != null && deeplink != "") {
 			var page = slbuilder.core.SLBuilder.getInstance().createPage(deeplink);
 			slbuilder.core.SLBuilder.getInstance().setProperty(page.id,"displayName",deeplink);
 			this.refresh();
 		}
 	}
 	,removePage: function(e) {
+		slbuilder.core.SLBuilder.getInstance().removePage(this.parentId);
 		this.refresh();
+		this.onPageClick();
 	}
 	,__class__: slbuilder.ui.LayersWidget
 });

@@ -29,6 +29,7 @@
 .toolbox ul{
 	padding: 0px;
 	margin: 0px;
+    overflow: auto;
 }
 .toolbox li{
     border-width: 1px 0;

@@ -74,11 +74,12 @@ class LayersWidget extends ListWidget<Layer> {
 		super.init();
 
 		refresh();
+		onPageClick();
 	}
 	/**
 	 * handle page selection change
 	 */
-	private function onPageClick(e:js.Event) {
+	private function onPageClick(e:js.Event = null) {
 		var idx:Int = -1;
 		var _this_ = this;
 		idx = untyped __js__("_this_.pagesDropDown.selectedIndex");
@@ -150,7 +151,7 @@ class LayersWidget extends ListWidget<Layer> {
 	 */
 	private function addPage(e:js.Event) {
 		var deeplink:String = js.Lib.window.prompt("Deeplink for the new page");
-		if (deeplink != ""){
+		if (deeplink != null && deeplink != ""){
 			var page = SLBuilder.getInstance().createPage(deeplink);
 			SLBuilder.getInstance().setProperty(page.id, "displayName", deeplink);
 			refresh();
@@ -160,6 +161,8 @@ class LayersWidget extends ListWidget<Layer> {
 	 * remove an element from the model and refresh the list
 	 */
 	private function removePage(e:js.Event) {
+		SLBuilder.getInstance().removePage(parentId);
 		refresh();
+		onPageClick();
 	}
 }
