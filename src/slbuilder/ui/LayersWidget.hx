@@ -55,11 +55,9 @@ class LayersWidget extends ListWidget<Layer> {
 	 * initializes the process of refreshing the list
 	 */
 	override public dynamic function init() : Void { 
-		trace("LAYERS WIDGET INIT ");
 		pagesDropDown = Utils.getElementsByClassName(rootElement, "dropdown")[0];
 		if (pagesDropDown == null) throw("element not found in index.html");
 		pagesDropDownTemplate = pagesDropDown.innerHTML;
-		trace(pagesDropDown);
 		var _this_ = this;
 		untyped __js__ ("_this_.pagesDropDown.onchange = function(e){_this_.onPageClick(e)}");
 

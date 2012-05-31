@@ -7,6 +7,7 @@
 		<script data-slp-use="slbuilder.ui.ToolBoxes"></script>
 		<script data-slp-use="slbuilder.ui.LayersWidget"></script>
 		<script data-slp-use="slbuilder.ui.ComponentsWidget"></script>
+		<script data-slp-use="slbuilder.ui.PropertiesWidget"></script>
 	</head>
 	<body>
 		<div id="root_element_for_demo">
@@ -45,31 +46,19 @@
 						<button class="remove">-</button>
 					</div>
 				</div>
-				<div class="properties toolbox">
+				<div class="properties toolbox PropertiesWidget">
 					<div class="toolboxheader">
 						<h1>Properties</h1>
 					</div>
-					<form action="javascript:alert('test');">
+					<form class="list">
 						<fieldset>
-							<label>position</label>
-							<input type="text" value="relative"/>
+							<label>::displayName::</label>
+							<input class="input" type="text" value="::value::"/>
 						</fieldset>
-						<fieldset>
-							<label>text-align</label>
-							<input type="text" value="left" />
-						</fieldset>
-						<fieldset>
-							<label>position</label>
-							<input type="text" value="relative"/>
-						</fieldset>
-						<fieldset>
-							<label>text-align</label>
-							<input type="text" value="left" />
-						</fieldset>
-						<div class="toolboxfooter">
-							<button type="submit">Revert</button>
-						</div>
 					</form>
+					<div class="toolboxfooter">
+						<button class="submit">Submit</button>
+					</div>
 				</div>
 			</div>
 		</div>

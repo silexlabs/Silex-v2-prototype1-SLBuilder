@@ -66,18 +66,17 @@ class ListWidget<ElementClass> extends DisplayObject{
 	 * initializes the process of refreshing the list
 	 */
 	override public dynamic function init() : Void { 
-		trace("LIST INIT ");
 		super.init();
 
 		// button
 		addBtn = Utils.getElementsByClassName(rootElement, "add")[0];
-		if (addBtn == null) throw("element not found in index.html");
-		addBtn.onclick = add;
+		if (addBtn != null)
+			addBtn.onclick = add;
 
 		// button
 		removeBtn = Utils.getElementsByClassName(rootElement, "remove")[0];
-		if (removeBtn == null) throw("element not found in index.html");
-		removeBtn.onclick = remove;
+		if (removeBtn != null)
+			removeBtn.onclick = remove;
 
 		// footer
 		footer = Utils.getElementsByClassName(rootElement, "toolboxfooter")[0];
@@ -94,7 +93,6 @@ class ListWidget<ElementClass> extends DisplayObject{
 		list = Utils.getElementsByClassName(rootElement, "list")[0];
 		if (list == null) throw("element not found in index.html");
 		listTemplate = list.innerHTML;
-		trace("List template: "+listTemplate);
 		_isInit = true;
 		refresh();
 	}
@@ -119,7 +117,6 @@ class ListWidget<ElementClass> extends DisplayObject{
 
 		// set the height of the list to match available space
 		var availableHeight:Int = rootElement.parentNode.clientHeight;
-		trace("parent height "+availableHeight);
 		availableHeight -= header.clientHeight;
 		availableHeight -= footer.clientHeight;
 

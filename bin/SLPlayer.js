@@ -1815,14 +1815,11 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 	,header: null
 	,footer: null
 	,init: function() {
-		haxe.Log.trace("LIST INIT ",{ fileName : "ListWidget.hx", lineNumber : 69, className : "slbuilder.ui.ListWidget", methodName : "init"});
 		slplayer.ui.DisplayObject.prototype.init.call(this);
 		this.addBtn = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"add")[0];
-		if(this.addBtn == null) throw "element not found in index.html";
-		this.addBtn.onclick = this.add.$bind(this);
+		if(this.addBtn != null) this.addBtn.onclick = this.add.$bind(this);
 		this.removeBtn = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"remove")[0];
-		if(this.removeBtn == null) throw "element not found in index.html";
-		this.removeBtn.onclick = this.remove.$bind(this);
+		if(this.removeBtn != null) this.removeBtn.onclick = this.remove.$bind(this);
 		this.footer = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"toolboxfooter")[0];
 		if(this.footer == null) throw "element not found in index.html";
 		this.header = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"toolboxheader")[0];
@@ -1832,7 +1829,6 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 		this.list = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"list")[0];
 		if(this.list == null) throw "element not found in index.html";
 		this.listTemplate = this.list.innerHTML;
-		haxe.Log.trace("List template: " + this.listTemplate,{ fileName : "ListWidget.hx", lineNumber : 97, className : "slbuilder.ui.ListWidget", methodName : "init"});
 		this._isInit = true;
 		this.refresh();
 	}
@@ -1850,7 +1846,6 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 		this.attachListEvents();
 		this.setSelectedItem(null);
 		var availableHeight = this.rootElement.parentNode.clientHeight;
-		haxe.Log.trace("parent height " + availableHeight,{ fileName : "ListWidget.hx", lineNumber : 122, className : "slbuilder.ui.ListWidget", methodName : "refresh"});
 		availableHeight -= this.header.clientHeight;
 		availableHeight -= this.footer.clientHeight;
 		this.list.style.height = availableHeight + "px";
@@ -1929,11 +1924,9 @@ slbuilder.ui.LayersWidget.prototype = $extend(slbuilder.ui.ListWidget.prototype,
 	,removePageBtn: null
 	,onPageChange: null
 	,init: function() {
-		haxe.Log.trace("LAYERS WIDGET INIT ",{ fileName : "LayersWidget.hx", lineNumber : 58, className : "slbuilder.ui.LayersWidget", methodName : "init"});
 		this.pagesDropDown = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"dropdown")[0];
 		if(this.pagesDropDown == null) throw "element not found in index.html";
 		this.pagesDropDownTemplate = this.pagesDropDown.innerHTML;
-		haxe.Log.trace(this.pagesDropDown,{ fileName : "LayersWidget.hx", lineNumber : 62, className : "slbuilder.ui.LayersWidget", methodName : "init"});
 		var _this_ = this;
 		_this_.pagesDropDown.onchange = function(e){_this_.onPageClick(e)}
 		this.addPageBtn = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"addPage")[0];
@@ -1952,7 +1945,7 @@ slbuilder.ui.LayersWidget.prototype = $extend(slbuilder.ui.ListWidget.prototype,
 		idx = _this_.pagesDropDown.selectedIndex;
 		var dataProviderPages = slbuilder.core.SLBuilder.getInstance().getPages();
 		this.parentId = dataProviderPages[idx].id;
-		haxe.Log.trace("PAGE SELECTED : " + this.parentId,{ fileName : "LayersWidget.hx", lineNumber : 88, className : "slbuilder.ui.LayersWidget", methodName : "onPageClick"});
+		haxe.Log.trace("PAGE SELECTED : " + this.parentId,{ fileName : "LayersWidget.hx", lineNumber : 86, className : "slbuilder.ui.LayersWidget", methodName : "onPageClick"});
 		this.refresh();
 	}
 	,refresh: function() {
@@ -1998,6 +1991,44 @@ slbuilder.ui.LayersWidget.prototype = $extend(slbuilder.ui.ListWidget.prototype,
 	}
 	,__class__: slbuilder.ui.LayersWidget
 });
+slbuilder.ui.PropertiesWidget = $hxClasses["slbuilder.ui.PropertiesWidget"] = function(d) {
+	slbuilder.ui.ListWidget.call(this,d);
+};
+slbuilder.ui.PropertiesWidget.__name__ = ["slbuilder","ui","PropertiesWidget"];
+slbuilder.ui.PropertiesWidget.__super__ = slbuilder.ui.ListWidget;
+slbuilder.ui.PropertiesWidget.prototype = $extend(slbuilder.ui.ListWidget.prototype,{
+	parentId: null
+	,submitBtn: null
+	,init: function() {
+		var me = this;
+		slbuilder.ui.ListWidget.prototype.init.call(this);
+		this.submitBtn = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"submit")[0];
+		if(this.submitBtn == null) throw "element not found in index.html";
+		this.submitBtn.onclick = this.onSubmit.$bind(this);
+		this.list.onkeydown = function(e) {
+			if(e.keyCode == 13) me.onSubmit(e);
+		};
+	}
+	,onSubmit: function(e) {
+		haxe.Log.trace("onSubmit",{ fileName : "PropertiesWidget.hx", lineNumber : 48, className : "slbuilder.ui.PropertiesWidget", methodName : "onSubmit"});
+		var inputs = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"input");
+		var _g1 = 0, _g = this.dataProvider.length;
+		while(_g1 < _g) {
+			var idx = _g1++;
+			haxe.Log.trace(idx,{ fileName : "PropertiesWidget.hx", lineNumber : 51, className : "slbuilder.ui.PropertiesWidget", methodName : "onSubmit"});
+			this.dataProvider[idx].value = Reflect.field(inputs[idx],"value");
+			slbuilder.core.SLBuilder.getInstance().setProperty(this.parentId,this.dataProvider[idx].name,this.dataProvider[idx].value);
+		}
+	}
+	,refresh: function() {
+		if(this._isInit == false) return;
+		if(this.parentId != null) this.dataProvider = slbuilder.core.SLBuilder.getInstance().getProperties(this.parentId); else this.dataProvider = new Array();
+		slbuilder.ui.ListWidget.prototype.refresh.call(this);
+	}
+	,onSelectionChanged: function(selection) {
+	}
+	,__class__: slbuilder.ui.PropertiesWidget
+});
 slbuilder.ui.ToolBoxes = $hxClasses["slbuilder.ui.ToolBoxes"] = function(rootElement) {
 	slplayer.ui.DisplayObject.call(this,rootElement);
 };
@@ -2006,21 +2037,26 @@ slbuilder.ui.ToolBoxes.__super__ = slplayer.ui.DisplayObject;
 slbuilder.ui.ToolBoxes.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	layersWidget: null
 	,componentsWidget: null
+	,propertiesWidget: null
 	,init: function() {
-		haxe.Log.trace("ToolBoxes init",{ fileName : "ToolBoxes.hx", lineNumber : 43, className : "slbuilder.ui.ToolBoxes", methodName : "init"});
+		haxe.Log.trace("ToolBoxes init",{ fileName : "ToolBoxes.hx", lineNumber : 48, className : "slbuilder.ui.ToolBoxes", methodName : "init"});
 		this.initUis();
 	}
 	,initUis: function() {
 		var domElem;
-		domElem = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"layers")[0];
+		domElem = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"LayersWidget")[0];
 		if(domElem == null) throw "element not found in index.html";
 		this.layersWidget = slplayer.core.SLPlayer.getAssociatedComponents(domElem).first();
 		this.layersWidget.onChange = this.onLayerChange.$bind(this);
 		this.layersWidget.onPageChange = this.onPageChange.$bind(this);
-		domElem = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"components")[0];
+		domElem = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"ComponentsWidget")[0];
 		if(domElem == null) throw "element not found in index.html";
 		this.componentsWidget = slplayer.core.SLPlayer.getAssociatedComponents(domElem).first();
 		this.componentsWidget.onChange = this.onComponentChange.$bind(this);
+		domElem = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"PropertiesWidget")[0];
+		if(domElem == null) throw "element not found in index.html";
+		this.propertiesWidget = slplayer.core.SLPlayer.getAssociatedComponents(domElem).first();
+		this.propertiesWidget.onChange = this.onPropertyChange.$bind(this);
 	}
 	,onPageChange: function(page) {
 	}
@@ -2031,12 +2067,19 @@ slbuilder.ui.ToolBoxes.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 			this.componentsWidget.parentId = layer.id;
 		} else this.componentsWidget.parentId = null;
 		this.componentsWidget.refresh();
-		haxe.Log.trace("Layer selected: " + displayName,{ fileName : "ToolBoxes.hx", lineNumber : 74, className : "slbuilder.ui.ToolBoxes", methodName : "onLayerChange"});
+		haxe.Log.trace("Layer selected: " + displayName,{ fileName : "ToolBoxes.hx", lineNumber : 84, className : "slbuilder.ui.ToolBoxes", methodName : "onLayerChange"});
 	}
 	,onComponentChange: function(component) {
 		var displayName = "none";
-		if(component != null) displayName = component.displayName;
-		haxe.Log.trace("Component selected: " + displayName,{ fileName : "ToolBoxes.hx", lineNumber : 82, className : "slbuilder.ui.ToolBoxes", methodName : "onComponentChange"});
+		if(component != null) {
+			displayName = component.displayName;
+			this.propertiesWidget.parentId = component.id;
+		} else this.propertiesWidget.parentId = null;
+		this.propertiesWidget.refresh();
+		haxe.Log.trace("Component selected: " + displayName,{ fileName : "ToolBoxes.hx", lineNumber : 97, className : "slbuilder.ui.ToolBoxes", methodName : "onComponentChange"});
+	}
+	,onPropertyChange: function(property) {
+		haxe.Log.trace("Property change: " + property.displayName + " = " + property.value,{ fileName : "ToolBoxes.hx", lineNumber : 100, className : "slbuilder.ui.ToolBoxes", methodName : "onPropertyChange"});
 	}
 	,__class__: slbuilder.ui.ToolBoxes
 });
@@ -2079,6 +2122,8 @@ slplayer.core.SLPlayer.prototype = {
 		this.registerComponent("slbuilder.ui.LayersWidget");
 		slbuilder.ui.ComponentsWidget;
 		this.registerComponent("slbuilder.ui.ComponentsWidget");
+		slbuilder.ui.PropertiesWidget;
+		this.registerComponent("slbuilder.ui.PropertiesWidget");
 	}
 	,registerComponent: function(componentClassName,args) {
 		this.registeredComponents.set(componentClassName,args);
@@ -2244,7 +2289,7 @@ js.Boot.__init();
 		};
 	}
 }
-demo.Descriptor.div = [{ name : "style.position", displayName : "css position", parentId : null, value : null, defaultValue : "relative", canBeNull : false, description : "CSS style postions (absolute, relative, ...)"},{ name : "style.top", displayName : "css top", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style top (y position)"},{ name : "style.bottom", displayName : "css bottom", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style bottom (y position)"},{ name : "style.left", displayName : "css left", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style left (y position)"},{ name : "style.right", displayName : "css right", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style right (y position)"},{ name : "style.width", displayName : "css width", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style width (y position)"},{ name : "style.height", displayName : "css height", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style height (y position)"}];
+demo.Descriptor.div = [{ name : "style.display", displayName : "css display", parentId : null, value : null, defaultValue : "block", canBeNull : false, description : "CSS style postions (absolute, relative, ...)"},{ name : "style.position", displayName : "css position", parentId : null, value : null, defaultValue : "relative", canBeNull : false, description : "CSS style postions (absolute, relative, ...)"},{ name : "style.top", displayName : "css top", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style top (y position)"},{ name : "style.bottom", displayName : "css bottom", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style bottom (y position)"},{ name : "style.left", displayName : "css left", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style left (y position)"},{ name : "style.right", displayName : "css right", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style right (y position)"},{ name : "style.width", displayName : "css width", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style width (y position)"},{ name : "style.height", displayName : "css height", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style height (y position)"}];
 haxe.Template.splitter = new EReg("(::[A-Za-z0-9_ ()&|!+=/><*.\"-]+::|\\$\\$([A-Za-z0-9_-]+)\\()","");
 haxe.Template.expr_splitter = new EReg("(\\(|\\)|[ \r\n\t]*\"[^\"]*\"[ \r\n\t]*|[!+=/><*.&|-]+)","");
 haxe.Template.expr_trim = new EReg("^[ ]*([^ ]+)[ ]*$","");

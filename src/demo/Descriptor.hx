@@ -5,6 +5,15 @@ import slbuilder.data.Property;
 class Descriptor {	
 	public static inline var div:Array<Property> = [
 		{
+			name:"style.display",
+			displayName:"css display",
+			parentId:null,
+			value:null,
+			defaultValue:"block",
+			canBeNull:false,
+			description:"CSS style postions (absolute, relative, ...)",
+		},
+		{
 			name:"style.position",
 			displayName:"css position",
 			parentId:null,

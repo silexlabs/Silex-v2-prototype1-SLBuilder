@@ -6,6 +6,7 @@ import slbuilder.core.Config;
 import slbuilder.core.Utils;
 import slbuilder.ui.LayersWidget;
 import slbuilder.ui.ComponentsWidget;
+import slbuilder.ui.PropertiesWidget;
 import slbuilder.data.Types;
 import slbuilder.data.Property;
 import slbuilder.data.Component;
@@ -32,6 +33,10 @@ class ToolBoxes extends DisplayObject
 	 * widget
 	 */
 	private var componentsWidget:ComponentsWidget;
+	/**
+	 * widget
+	 */
+	private var propertiesWidget:PropertiesWidget;
 	/////////////////////////////////////////////////////////////////
 	// tool boxes
 	/////////////////////////////////////////////////////////////////
@@ -48,16 +53,21 @@ class ToolBoxes extends DisplayObject
 	 */
 	private function initUis(){
 		var domElem;
-		domElem = Utils.getElementsByClassName(rootElement, "layers")[0];
+		domElem = Utils.getElementsByClassName(rootElement, "LayersWidget")[0];
 		if (domElem == null) throw("element not found in index.html");
 		layersWidget = cast(SLPlayer.getAssociatedComponents(domElem).first());
 		layersWidget.onChange = onLayerChange;
 		layersWidget.onPageChange = onPageChange;
 
-		domElem = Utils.getElementsByClassName(rootElement, "components")[0];
+		domElem = Utils.getElementsByClassName(rootElement, "ComponentsWidget")[0];
 		if (domElem == null) throw("element not found in index.html");
 		componentsWidget = cast(SLPlayer.getAssociatedComponents(domElem).first());
 		componentsWidget.onChange = onComponentChange;
+
+		domElem = Utils.getElementsByClassName(rootElement, "PropertiesWidget")[0];
+		if (domElem == null) throw("element not found in index.html");
+		propertiesWidget = cast(SLPlayer.getAssociatedComponents(domElem).first());
+		propertiesWidget.onChange = onPropertyChange;
 	}
 	private function onPageChange(page:Page) {
 	}
@@ -77,8 +87,16 @@ class ToolBoxes extends DisplayObject
 		var displayName = "none";
 		if (component != null){
 			displayName = component.displayName;
+			propertiesWidget.parentId = component.id;
+		}
+		else{
+			propertiesWidget.parentId = null;
 		}
 
+		propertiesWidget.refresh();
 		trace ("Component selected: "+displayName);
+	}
+	private function onPropertyChange(property:Property) {
+		trace ("Property change: "+property.displayName +" = "+property.value);
 	}
 }

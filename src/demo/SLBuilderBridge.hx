@@ -236,6 +236,7 @@ class SLBuilderBridge implements ISLBuilderBridge{
 			var propArray:Array<String> = property.name.split(".");
 			var propObject:Dynamic = Reflect.field(parent, propArray.shift());
 			for (propertyName in propArray){
+				//Utils.inspectTrace(propObject);
 				propObject = Reflect.field(propObject, propertyName);
 			}
 			property.value = propObject;
