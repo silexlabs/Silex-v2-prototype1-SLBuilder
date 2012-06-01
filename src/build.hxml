@@ -1,3 +1,4 @@
 -js ../bin/SLPlayer.js
 -main slplayer.core.SLPlayer
 -cmd cp index.html ../bin/
+#--no-traces

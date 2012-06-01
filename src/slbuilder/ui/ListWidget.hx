@@ -14,6 +14,8 @@ import slplayer.ui.DisplayObject;
  * this class has to be overriden
  */
 class ListWidget<ElementClass> extends DisplayObject{
+	public static inline var LIST_SELECTED_ITEM_CSS_CLASS:String = "listSelectedItem";
+
 	private var _isInit:Bool;
 	/**
 	 * list
@@ -126,9 +128,11 @@ class ListWidget<ElementClass> extends DisplayObject{
 	 * attach mouse events to the list and the items
 	 */
 	private function attachListEvents(){
-		for (idx in 0...list.childNodes.length){
-			Reflect.setField(list.childNodes[idx], "data-listwidgetitemidx", Std.string(idx));
-			list.childNodes[idx].onclick = onClick;
+		var children = Utils.getElementsByClassName(list, "listItem");
+		for (idx in 0...children.length){
+			Reflect.setField(children[idx], "data-listwidgetitemidx", Std.string(idx));
+			children[idx].onclick = onClick;
+			children[idx].style.cursor = 'pointer';
 		}
 	}
 	/**
@@ -160,6 +164,48 @@ class ListWidget<ElementClass> extends DisplayObject{
 	 * TODO: multiple selection
 	 */
 	private function onSelectionChanged(selection:Array<ElementClass>) {
+		trace("-selection changed-");
+
+		// handle the selected style 
+		var children = Utils.getElementsByClassName(list, "listItem");
+		for (idx in 0...children.length){
+			var idxElem:Int = Std.parseInt(Reflect.field(children[idx], "data-listwidgetitemidx"));
+			if (idxElem >= 0){
+				var found = false;
+				for (elem in selection){
+					if (elem == dataProvider[idxElem]){
+						found = true;
+						break;
+					}
+				}
+				if (children[idx] == null){
+					// workaround
+					trace("--workaround--" + idx +"- "+children[idx]);
+					continue;
+				}
+
+				var className = "";
+//				if (children[idx].className != null)
+					className = children[idx].className;
+				
+				if (found){
+					trace("element selected "+idx+": "+children[idx]);
+					if (className.indexOf(LIST_SELECTED_ITEM_CSS_CLASS)<0)
+						className += " "+LIST_SELECTED_ITEM_CSS_CLASS;
+				}
+				else{
+					var pos = className.indexOf(LIST_SELECTED_ITEM_CSS_CLASS);
+					trace("element "+idx+" not selected : "+className+" - "+pos);
+					if (pos>=0){
+						// remove the spaces
+						var tmp = className;
+						className = StringTools.trim(className.substr(0, pos));
+						className += " "+StringTools.trim(tmp.substr(pos+LIST_SELECTED_ITEM_CSS_CLASS.length));
+					}
+				}
+				children[idx].className = className;
+			}
+		}
 		if (onChange != null){
 			onChange(_selectedItem);
 		}

@@ -502,6 +502,95 @@ StringBuf.prototype = {
 	,b: null
 	,__class__: StringBuf
 }
+var StringTools = $hxClasses["StringTools"] = function() { }
+StringTools.__name__ = ["StringTools"];
+StringTools.urlEncode = function(s) {
+	return encodeURIComponent(s);
+}
+StringTools.urlDecode = function(s) {
+	return decodeURIComponent(s.split("+").join(" "));
+}
+StringTools.htmlEscape = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+}
+StringTools.htmlUnescape = function(s) {
+	return s.split("&gt;").join(">").split("&lt;").join("<").split("&amp;").join("&");
+}
+StringTools.startsWith = function(s,start) {
+	return s.length >= start.length && s.substr(0,start.length) == start;
+}
+StringTools.endsWith = function(s,end) {
+	var elen = end.length;
+	var slen = s.length;
+	return slen >= elen && s.substr(slen - elen,elen) == end;
+}
+StringTools.isSpace = function(s,pos) {
+	var c = s.charCodeAt(pos);
+	return c >= 9 && c <= 13 || c == 32;
+}
+StringTools.ltrim = function(s) {
+	var l = s.length;
+	var r = 0;
+	while(r < l && StringTools.isSpace(s,r)) r++;
+	if(r > 0) return s.substr(r,l - r); else return s;
+}
+StringTools.rtrim = function(s) {
+	var l = s.length;
+	var r = 0;
+	while(r < l && StringTools.isSpace(s,l - r - 1)) r++;
+	if(r > 0) return s.substr(0,l - r); else return s;
+}
+StringTools.trim = function(s) {
+	return StringTools.ltrim(StringTools.rtrim(s));
+}
+StringTools.rpad = function(s,c,l) {
+	var sl = s.length;
+	var cl = c.length;
+	while(sl < l) if(l - sl < cl) {
+		s += c.substr(0,l - sl);
+		sl = l;
+	} else {
+		s += c;
+		sl += cl;
+	}
+	return s;
+}
+StringTools.lpad = function(s,c,l) {
+	var ns = "";
+	var sl = s.length;
+	if(sl >= l) return s;
+	var cl = c.length;
+	while(sl < l) if(l - sl < cl) {
+		ns += c.substr(0,l - sl);
+		sl = l;
+	} else {
+		ns += c;
+		sl += cl;
+	}
+	return ns + s;
+}
+StringTools.replace = function(s,sub,by) {
+	return s.split(sub).join(by);
+}
+StringTools.hex = function(n,digits) {
+	var s = "";
+	var hexChars = "0123456789ABCDEF";
+	do {
+		s = hexChars.charAt(n & 15) + s;
+		n >>>= 4;
+	} while(n > 0);
+	if(digits != null) while(s.length < digits) s = "0" + s;
+	return s;
+}
+StringTools.fastCodeAt = function(s,index) {
+	return s.cca(index);
+}
+StringTools.isEOF = function(c) {
+	return c != c;
+}
+StringTools.prototype = {
+	__class__: StringTools
+}
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] }
 ValueType.TNull = ["TNull",0];
 ValueType.TNull.toString = $estr;
@@ -1851,11 +1940,13 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 		this.list.style.height = availableHeight + "px";
 	}
 	,attachListEvents: function() {
-		var _g1 = 0, _g = this.list.childNodes.length;
+		var children = slbuilder.core.Utils.getElementsByClassName(this.list,"listItem");
+		var _g1 = 0, _g = children.length;
 		while(_g1 < _g) {
 			var idx = _g1++;
-			this.list.childNodes[idx]["data-listwidgetitemidx"] = Std.string(idx);
-			this.list.childNodes[idx].onclick = this.onClick.$bind(this);
+			children[idx]["data-listwidgetitemidx"] = Std.string(idx);
+			children[idx].onclick = this.onClick.$bind(this);
+			children[idx].style.cursor = "pointer";
 		}
 	}
 	,onClick: function(e) {
@@ -1869,6 +1960,44 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 		this.refresh();
 	}
 	,onSelectionChanged: function(selection) {
+		haxe.Log.trace("-selection changed-",{ fileName : "ListWidget.hx", lineNumber : 167, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
+		var children = slbuilder.core.Utils.getElementsByClassName(this.list,"listItem");
+		var _g1 = 0, _g = children.length;
+		while(_g1 < _g) {
+			var idx = _g1++;
+			var idxElem = Std.parseInt(Reflect.field(children[idx],"data-listwidgetitemidx"));
+			if(idxElem >= 0) {
+				var found = false;
+				var _g2 = 0;
+				while(_g2 < selection.length) {
+					var elem = selection[_g2];
+					++_g2;
+					if(elem == this.dataProvider[idxElem]) {
+						found = true;
+						break;
+					}
+				}
+				if(children[idx] == null) {
+					haxe.Log.trace("--workaround--" + idx + "- " + children[idx],{ fileName : "ListWidget.hx", lineNumber : 183, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
+					continue;
+				}
+				var className = "";
+				className = children[idx].className;
+				if(found) {
+					haxe.Log.trace("element selected " + idx + ": " + children[idx],{ fileName : "ListWidget.hx", lineNumber : 192, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
+					if(className.indexOf("listSelectedItem") < 0) className += " " + "listSelectedItem";
+				} else {
+					var pos = className.indexOf("listSelectedItem");
+					haxe.Log.trace("element " + idx + " not selected : " + className + " - " + pos,{ fileName : "ListWidget.hx", lineNumber : 198, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
+					if(pos >= 0) {
+						var tmp = className;
+						className = StringTools.trim(className.substr(0,pos));
+						className += " " + StringTools.trim(tmp.substr(pos + "listSelectedItem".length));
+					}
+				}
+				children[idx].className = className;
+			}
+		}
 		if(this.onChange != null) this.onChange(this._selectedItem);
 	}
 	,getSelectedItem: function() {
@@ -2299,6 +2428,7 @@ haxe.Template.globals = { };
 js.Lib.onerror = null;
 slbuilder.core.Config.VIEW_MENU_HEIGHT = "20px";
 slplayer.ui.DisplayObject.rootElementNameFilter = Lambda.list([]);
+slbuilder.ui.ListWidget.LIST_SELECTED_ITEM_CSS_CLASS = "listSelectedItem";
 slplayer.core.SLPlayer.nodeToCmpInstances = new Hash();
 slplayer.core.SLPlayer.SLPID_ATTR_NAME = "slpid";
 slplayer.core.SLPlayer._htmlBody = "\n\t\t";
