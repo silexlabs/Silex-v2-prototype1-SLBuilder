@@ -36,14 +36,13 @@ class ComponentsWidget extends ListWidget<Component> {
 		super.init();
 	}
 	/**
-	 * refresh the list, i.e. arrayStore.loadData( ... )
+	 * refreh list data, but do not refresh display
 	 * to be overriden to handle the model
 	 */
-	override public function refresh() {
+	override public function reloadData() {
 		if (_isInit == false)
 			return;
 
-		// refreh list data
 		if (parentId!=null){
 			dataProvider = SLBuilder.getInstance().getComponents(parentId);
 		}
@@ -52,7 +51,7 @@ class ComponentsWidget extends ListWidget<Component> {
 		}
 
 		// refresh the list
-		super.refresh();
+		super.reloadData();
 	}
 	/**
 	 * add an element to the model and refresh the list

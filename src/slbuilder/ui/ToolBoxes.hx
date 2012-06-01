@@ -103,5 +103,7 @@ class ToolBoxes extends DisplayObject
 	}
 	private function onPropertyChange(property:Property) {
 		trace ("Property change: "+property.displayName +" = "+property.value);
+		componentsWidget.reloadData();
+		SLBuilder.getInstance().selection.setSelection([componentsWidget.selectedItem]);
 	}
 }

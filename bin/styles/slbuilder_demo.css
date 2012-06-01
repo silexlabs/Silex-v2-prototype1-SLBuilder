@@ -2,14 +2,19 @@
 	display: inline-block;
 	width: 100px;
 	height: 100px;
-	background-color: grey;
+	background-color: Gainsboro;
 	border-style: dotted;
+	margin: 2px;
+	padding: 2px;
+    opacity: 0.5;
 }
 .component{
 	display: inline-block;
 	width: 10px;
 	height: 10px;
-	background-color: black;
+	background-color: grey;
+	margin: 2px;
+    opacity: 0.8;
 }
 body{
 	margin : 0px; 

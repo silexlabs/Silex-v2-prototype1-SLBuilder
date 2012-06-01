@@ -824,7 +824,7 @@ demo.SLBuilderBridge.prototype = {
 		while(element != null && !Math.isNaN(element.offsetLeft)) {
 			component.x += element.offsetLeft - element.scrollLeft;
 			component.y += element.offsetTop - element.scrollTop;
-			element = element.parentNode;
+			element = element.offsetParent;
 		}
 		return component;
 	}
@@ -2025,6 +2025,7 @@ slplayer.ui.DisplayObject.prototype = {
 if(!slbuilder.ui) slbuilder.ui = {}
 slbuilder.ui.ListWidget = $hxClasses["slbuilder.ui.ListWidget"] = function(d) {
 	this._isInit = false;
+	this._selectedIndex = -1;
 	slplayer.ui.DisplayObject.call(this,d);
 };
 slbuilder.ui.ListWidget.__name__ = ["slbuilder","ui","ListWidget"];
@@ -2035,7 +2036,7 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 	,listTemplate: null
 	,dataProvider: null
 	,selectedItem: null
-	,_selectedItem: null
+	,_selectedIndex: null
 	,onChange: null
 	,onRollOver: null
 	,addBtn: null
@@ -2062,6 +2063,7 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 	}
 	,refresh: function() {
 		if(this._isInit == false) return;
+		this.reloadData();
 		var listInnerHtml = "";
 		var t = new haxe.Template(this.listTemplate);
 		var _g = 0, _g1 = this.dataProvider;
@@ -2077,6 +2079,9 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 		availableHeight -= this.header.clientHeight;
 		availableHeight -= this.footer.clientHeight;
 		this.list.style.height = availableHeight + "px";
+	}
+	,reloadData: function() {
+		if(this._isInit == false) return;
 	}
 	,attachListEvents: function() {
 		var children = slbuilder.core.Utils.getElementsByClassName(this.list,"listItem");
@@ -2106,7 +2111,7 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 		this.refresh();
 	}
 	,onSelectionChanged: function(selection) {
-		haxe.Log.trace("-selection changed-",{ fileName : "ListWidget.hx", lineNumber : 180, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
+		haxe.Log.trace("-selection changed-",{ fileName : "ListWidget.hx", lineNumber : 191, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
 		var children = slbuilder.core.Utils.getElementsByClassName(this.list,"listItem");
 		var _g1 = 0, _g = children.length;
 		while(_g1 < _g) {
@@ -2124,17 +2129,17 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 					}
 				}
 				if(children[idx] == null) {
-					haxe.Log.trace("--workaround--" + idx + "- " + children[idx],{ fileName : "ListWidget.hx", lineNumber : 196, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
+					haxe.Log.trace("--workaround--" + idx + "- " + children[idx],{ fileName : "ListWidget.hx", lineNumber : 207, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
 					continue;
 				}
 				var className = "";
 				className = children[idx].className;
 				if(found) {
-					haxe.Log.trace("element selected " + idx + ": " + children[idx],{ fileName : "ListWidget.hx", lineNumber : 205, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
+					haxe.Log.trace("element selected " + idx + ": " + children[idx],{ fileName : "ListWidget.hx", lineNumber : 216, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
 					if(className.indexOf("listSelectedItem") < 0) className += " " + "listSelectedItem";
 				} else {
 					var pos = className.indexOf("listSelectedItem");
-					haxe.Log.trace("element " + idx + " not selected : " + className + " - " + pos,{ fileName : "ListWidget.hx", lineNumber : 211, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
+					haxe.Log.trace("element " + idx + " not selected : " + className + " - " + pos,{ fileName : "ListWidget.hx", lineNumber : 222, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
 					if(pos >= 0) {
 						var tmp = className;
 						className = StringTools.trim(className.substr(0,pos));
@@ -2144,14 +2149,18 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 				children[idx].className = className;
 			}
 		}
-		if(this.onChange != null) this.onChange(this._selectedItem);
+		if(this.onChange != null) this.onChange(this.getSelectedItem());
 	}
 	,getSelectedItem: function() {
-		return this._selectedItem;
+		return this.dataProvider[this._selectedIndex];
 	}
 	,setSelectedItem: function(selected) {
-		if(selected != this._selectedItem) {
-			this._selectedItem = selected;
+		if(selected != this.getSelectedItem()) {
+			var _g1 = 0, _g = this.dataProvider.length;
+			while(_g1 < _g) {
+				var idx = _g1++;
+				if(this.dataProvider[idx] == selected) this._selectedIndex = idx;
+			}
 			this.onSelectionChanged([selected]);
 		}
 		return selected;
@@ -2170,10 +2179,10 @@ slbuilder.ui.ComponentsWidget.prototype = $extend(slbuilder.ui.ListWidget.protot
 		haxe.Log.trace("COMPONENTS WIDGET INIT ",{ fileName : "ComponentsWidget.hx", lineNumber : 35, className : "slbuilder.ui.ComponentsWidget", methodName : "init"});
 		slbuilder.ui.ListWidget.prototype.init.call(this);
 	}
-	,refresh: function() {
+	,reloadData: function() {
 		if(this._isInit == false) return;
 		if(this.parentId != null) this.dataProvider = slbuilder.core.SLBuilder.getInstance().getComponents(this.parentId); else this.dataProvider = new Array();
-		slbuilder.ui.ListWidget.prototype.refresh.call(this);
+		slbuilder.ui.ListWidget.prototype.reloadData.call(this);
 	}
 	,add: function(e) {
 		var component = slbuilder.core.SLBuilder.getInstance().createComponent("basicComponent",this.parentId);
@@ -2239,8 +2248,12 @@ slbuilder.ui.LayersWidget.prototype = $extend(slbuilder.ui.ListWidget.prototype,
 		}
 		this.pagesDropDown.innerHTML = listInnerHtml;
 		_this_.pagesDropDown.selectedIndex = oldIdx;
-		if(this.parentId != null) this.dataProvider = slbuilder.core.SLBuilder.getInstance().getLayers(this.parentId); else this.dataProvider = new Array();
 		slbuilder.ui.ListWidget.prototype.refresh.call(this);
+	}
+	,reloadData: function() {
+		if(this._isInit == false) return;
+		if(this.parentId != null) this.dataProvider = slbuilder.core.SLBuilder.getInstance().getLayers(this.parentId); else this.dataProvider = new Array();
+		slbuilder.ui.ListWidget.prototype.reloadData.call(this);
 	}
 	,add: function(e) {
 		var layer = slbuilder.core.SLBuilder.getInstance().createLayer("basicLayer",this.parentId);
@@ -2295,14 +2308,14 @@ slbuilder.ui.PropertiesWidget.prototype = $extend(slbuilder.ui.ListWidget.protot
 			slbuilder.core.SLBuilder.getInstance().setProperty(this.parentId,this.dataProvider[idx].name,this.dataProvider[idx].value);
 			slbuilder.core.SLBuilder.getInstance().selection.refresh();
 		}
+		if(this.onChange != null) this.onChange(this.dataProvider[0]);
 	}
-	,refresh: function() {
+	,reloadData: function() {
 		if(this._isInit == false) return;
 		if(this.parentId != null) this.dataProvider = slbuilder.core.SLBuilder.getInstance().getProperties(this.parentId); else this.dataProvider = new Array();
-		slbuilder.ui.ListWidget.prototype.refresh.call(this);
+		slbuilder.ui.ListWidget.prototype.reloadData.call(this);
 	}
 	,onSelectionChanged: function(selection) {
-		if(this.onChange != null) this.onChange(selection[0]);
 	}
 	,__class__: slbuilder.ui.PropertiesWidget
 });
@@ -2358,6 +2371,8 @@ slbuilder.ui.ToolBoxes.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	}
 	,onPropertyChange: function(property) {
 		haxe.Log.trace("Property change: " + property.displayName + " = " + property.value,{ fileName : "ToolBoxes.hx", lineNumber : 105, className : "slbuilder.ui.ToolBoxes", methodName : "onPropertyChange"});
+		this.componentsWidget.reloadData();
+		slbuilder.core.SLBuilder.getInstance().selection.setSelection([this.componentsWidget.getSelectedItem()]);
 	}
 	,__class__: slbuilder.ui.ToolBoxes
 });

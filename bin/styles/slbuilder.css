@@ -8,10 +8,9 @@
 .region{
     margin: 0;
     padding: 0;
-    opacity: 0.5;
+    opacity: 0.8;
 }
 .regiondisplay{
-    background-color: DarkRed;
 }
 .regionedit{
     background-color: DarkRed;

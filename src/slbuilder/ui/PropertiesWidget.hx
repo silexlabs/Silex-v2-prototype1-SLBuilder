@@ -53,17 +53,19 @@ class PropertiesWidget extends ListWidget<Property> {
 			SLBuilder.getInstance().setProperty(parentId, dataProvider[idx].name, dataProvider[idx].value);
 			SLBuilder.getInstance().selection.refresh();
 		}
+		if (onChange != null){
+			onChange(dataProvider[0]);
+		}
 		//Utils.inspectTrace(dataProvider);
 	}
 	/**
-	 * refresh the list, i.e. arrayStore.loadData( ... )
+	 * refreh list data, but do not refresh display
 	 * to be overriden to handle the model
 	 */
-	override public function refresh() {
+	override public function reloadData() {
 		if (_isInit == false)
 			return;
 
-		// refreh list data
 		if (parentId!=null){
 			dataProvider = SLBuilder.getInstance().getProperties(parentId);
 		}
@@ -72,14 +74,11 @@ class PropertiesWidget extends ListWidget<Property> {
 		}
 
 		// refresh the list
-		super.refresh();
+		super.reloadData();
 	}
 	/**
 	 * prevent this behavior
 	 */
 	override private function onSelectionChanged(selection:Array<Property>) {
-		if (onChange != null){
-			onChange(selection[0]);
-		}
 	}
 }

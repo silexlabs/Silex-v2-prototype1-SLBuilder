@@ -42,7 +42,7 @@ class SLBuilderBridge implements ISLBuilderBridge{
 	    while(element != null && !Math.isNaN(element.offsetLeft)) {
 			component.x += element.offsetLeft - element.scrollLeft;
 			component.y += element.offsetTop - element.scrollTop;
-			element = element.parentNode;
+			element = element.offsetParent;
 	    }
 	    return component;
 	}

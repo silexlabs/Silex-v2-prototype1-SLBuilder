@@ -34,7 +34,7 @@ class ListWidget<ElementClass> extends DisplayObject{
 	 * selected item if any
 	 */
 	public var selectedItem(getSelectedItem, setSelectedItem):Null<ElementClass>;
-	private var _selectedItem:Null<ElementClass>;
+	private var _selectedIndex:Int;
 	/**
 	 * on change callback
 	 */
@@ -64,6 +64,7 @@ class ListWidget<ElementClass> extends DisplayObject{
 	 */
 	public function new(d:HtmlDom) {
 		_isInit = false;
+		_selectedIndex = -1;
 		super(d);
 	}
 	/**
@@ -105,11 +106,13 @@ class ListWidget<ElementClass> extends DisplayObject{
 	/**
 	 * refresh the list, i.e. reload the dataProvider( ... )
 	 * set the height of the list to match available space
-	 * to be overriden to handle the model
 	 */
 	public function refresh() {
 		if (_isInit == false)
 			return;
+
+		// refreh list data
+		reloadData();
 
 		// refresh list content
 		var listInnerHtml:String = "";
@@ -127,6 +130,14 @@ class ListWidget<ElementClass> extends DisplayObject{
 		availableHeight -= footer.clientHeight;
 
 		list.style.height = availableHeight + "px";
+	}
+	/**
+	 * refreh list data, but do not refresh display
+	 * to be overriden to handle the model
+	 */
+	public function reloadData() {
+		if (_isInit == false)
+			return;
 	}
 	/**
 	 * attach mouse events to the list and the items
@@ -220,7 +231,7 @@ class ListWidget<ElementClass> extends DisplayObject{
 			}
 		}
 		if (onChange != null){
-			onChange(_selectedItem);
+			onChange(selectedItem);
 		}
 	}
 	////////////////////////////////////////////////////////////
@@ -230,14 +241,17 @@ class ListWidget<ElementClass> extends DisplayObject{
 	 * getter/setter
 	 */
 	function getSelectedItem():Null<ElementClass> {
-		return _selectedItem;
+		return dataProvider[_selectedIndex];
 	}
 	/**
 	 * getter/setter
 	 */
 	function setSelectedItem(selected:Null<ElementClass>):Null<ElementClass> {
-		if (selected != _selectedItem){
-			_selectedItem = selected;
+		if (selected != selectedItem){
+			for (idx in 0...dataProvider.length){
+				if (dataProvider[idx] == selected)
+					_selectedIndex = idx;
+			}
 			onSelectionChanged([selected]);
 		}
 		return selected;

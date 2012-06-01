@@ -87,8 +87,7 @@ class LayersWidget extends ListWidget<Layer> {
 		refresh();
 	}
 	/**
-	 * refresh the list, i.e. arrayStore.loadData( ... )
-	 * to be overriden to handle the model
+	 * refresh the list
 	 */
 	override public function refresh() {
 		if (_isInit == false)
@@ -115,7 +114,17 @@ class LayersWidget extends ListWidget<Layer> {
 		// keep selected index
 		untyped __js__("_this_.pagesDropDown.selectedIndex = oldIdx");
 
-		// refreh list data
+		// refresh the list
+		super.refresh();
+	}
+	/**
+	 * refreh list data, but do not refresh display
+	 * to be overriden to handle the model
+	 */
+	override public function reloadData() {
+		if (_isInit == false)
+			return;
+
 		if (parentId!=null){
 			dataProvider = SLBuilder.getInstance().getLayers(parentId);
 		}
@@ -124,7 +133,7 @@ class LayersWidget extends ListWidget<Layer> {
 		}
 
 		// refresh the list
-		super.refresh();
+		super.reloadData();
 	}
 	/**
 	 * add an element to the model and refresh the list
