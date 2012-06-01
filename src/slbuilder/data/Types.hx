@@ -19,8 +19,7 @@ typedef Deeplink = String;
  * the types of elements, as explained here 
  * https://github.com/silexlabs/SLBuilder/wiki/Specifications
  */
-enum ElementType 
-{
+enum ElementType{
 	page;
 	layer;
 	component;

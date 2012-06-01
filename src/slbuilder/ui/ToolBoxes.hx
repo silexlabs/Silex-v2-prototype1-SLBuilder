@@ -13,6 +13,7 @@ import slbuilder.data.Component;
 import slbuilder.data.Layer;
 import slbuilder.data.Page;
 import slbuilder.core.ISLBuilderBridge;
+import slbuilder.core.SLBuilder;
 
 import slplayer.ui.DisplayObject;
 import slplayer.core.SLPlayer;
@@ -93,6 +94,10 @@ class ToolBoxes extends DisplayObject
 			propertiesWidget.parentId = null;
 		}
 
+		// update in-place editors
+		SLBuilder.getInstance().selection.setSelection([component]);
+
+		// update properties widget
 		propertiesWidget.refresh();
 		trace ("Component selected: "+displayName);
 	}

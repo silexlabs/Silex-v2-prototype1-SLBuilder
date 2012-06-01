@@ -30,6 +30,11 @@ interface ISLBuilderBridge {
 	// These must be provided to the SLBuilder application, so that it can interact with your object model
 	/////////////////////////////////////////////////////////////////////
 	/**
+	 * Returns the main container for components (or layers or pages)
+	 */
+	public function getMainContainer():HtmlDom;
+
+	/**
 	 * When the SLBuilder application calls this callback, you are supposed to create a container (e.g. a div in html) 
 	 * which will be associated with a page
 	 * Returns the id of the new page on success
@@ -72,7 +77,7 @@ interface ISLBuilderBridge {
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to return a list of components, which are contained in the layer with the provided ID.
 	 */
-	public function getComponents(parentId:Id):Array<Component>;
+	public function getComponents(parentId:Null<Id>):Array<Component>;
 
 
 	/**
@@ -92,18 +97,13 @@ interface ISLBuilderBridge {
 	// your application must use to notify the SLBuilder application of a change in your object model, 
 	// or of an event which you want to be related to the selection.
 	///////////////////////////////////////////////////////////////////////////////////
-	/*
-	 * Your application is in charge of calling this method when your object model has changed.
-	 */
-	public function domChanged(layerId:Id):Void;
-
 	/**
-	 * Call this method when your want the selection to change.
+	 * This method is called when a component has been locked or unlocked components.
 	 */
 	public function slectionChanged(componentsIds:Array<Id>):Void;
 
 	/**
-	 * Call this method when your want to lock or unlock components.
+	 * This method is called when the selection has changeed.
 	 */
-	public function slectionLockChanged(componentsIds:Array<Id>):Void;
+	public function selectionLockChanged(componentsIds:Array<Id>):Void;
 }

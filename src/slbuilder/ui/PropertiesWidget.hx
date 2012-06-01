@@ -51,6 +51,7 @@ class PropertiesWidget extends ListWidget<Property> {
 			trace(idx);
 			dataProvider[idx].value = Reflect.field(inputs[idx], "value");
 			SLBuilder.getInstance().setProperty(parentId, dataProvider[idx].name, dataProvider[idx].value);
+			SLBuilder.getInstance().selection.refresh();
 		}
 		//Utils.inspectTrace(dataProvider);
 	}
@@ -77,5 +78,8 @@ class PropertiesWidget extends ListWidget<Property> {
 	 * prevent this behavior
 	 */
 	override private function onSelectionChanged(selection:Array<Property>) {
+		if (onChange != null){
+			onChange(selection[0]);
+		}
 	}
 }

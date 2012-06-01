@@ -22,10 +22,40 @@ class SLBuilderBridge implements ISLBuilderBridge{
 	 */
 	public function new(){
 	}
+	private function getComponentFromDom(element:HtmlDom):Component{
+		var component:Component = {
+			parentId : {
+				type:component,
+				seed:element.parentNode.id
+			}, 
+			id : {
+				type:component,
+				seed:element.id
+			}, 
+			displayName : element.id,
+			x: 0,
+			y: 0,
+			width: element.clientWidth,
+			height: element.clientHeight,
+			rotation: 0.0 //untyped __js__ ("element.style.rotation")
+		};
+	    while(element != null && !Math.isNaN(element.offsetLeft)) {
+			component.x += element.offsetLeft - element.scrollLeft;
+			component.y += element.offsetTop - element.scrollTop;
+			element = element.parentNode;
+	    }
+	    return component;
+	}
 	/////////////////////////////////////////////////////////////////////
 	// Callbacks
 	// These must be provided to the SLBuilder application, so that it can interact with your object model
 	/////////////////////////////////////////////////////////////////////
+	/**
+	 * Returns the main container for components (or layers or pages)
+	 */
+	public function getMainContainer():HtmlDom{
+		return Lib.document.getElementById("root_element_for_demo");
+	}
 	/**
 	 * When the SLBuilder application calls this callback, you are supposed to create a container (e.g. a div in html) 
 	 * which will be associated with a page
@@ -173,11 +203,7 @@ class SLBuilderBridge implements ISLBuilderBridge{
 		var parent:HtmlDom = Lib.document.getElementById(parentId.seed);
 		parent.appendChild(res);
 
-		return {
-			parentId : parentId, 
-			id : id, 
-			displayName : id.seed
-		};
+		return getComponentFromDom(res);
 	}
 	/**
 	 * Remove the corresponding component and return true on success
@@ -196,31 +222,24 @@ class SLBuilderBridge implements ISLBuilderBridge{
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to return a list of components, which are contained in the layer with the provided ID.
 	 */
-	public function getComponents(parentId:Id):Array<Component>{
-		var parent:HtmlDom = Lib.document.getElementById(parentId.seed);
+	public function getComponents(parentId:Null<Id>):Array<Component>{
+		var parent:HtmlDom;
+		if (parentId==null)
+			parent = Lib.document.body;
+		else
+			parent = Lib.document.getElementById(parentId.seed);
 
 		var components:HtmlCollection<HtmlDom> = untyped(parent.getElementsByClassName("component"));
 
 		var res:Array<Component> = [];
 		for (elementIdx in 0...components.length){
 			var element:HtmlDom = Reflect.field(components, Std.string(elementIdx));
-			var component:Component = {
-				parentId : {
-					type:component,
-					seed:element.parentNode.id
-				}, 
-				id : {
-					type:component,
-					seed:element.id
-				}, 
-				displayName : element.id
-			};
+			var component:Component = getComponentFromDom(element);
 			res.push(component);
 		}
 
 		return res;
 	}
-
 
 	/**
 	 * Use class name like the slplayer does to retrieve the class name and path, then instanciate the class. Then look for the getProperties method or use reflexion.
@@ -266,21 +285,17 @@ class SLBuilderBridge implements ISLBuilderBridge{
 	// your application must use to notify the SLBuilder application of a change in your object model, 
 	// or of an event which you want to be related to the selection.
 	///////////////////////////////////////////////////////////////////////////////////
-	/*
-	 * Your application is in charge of calling this method when your object model has changed.
-	 */
-	public function domChanged(layerId:Id):Void{
-	}
-
 	/**
-	 * Call this method when your want the selection to change.
+	 * This method is called when a component has been locked or unlocked components.
 	 */
 	public function slectionChanged(componentsIds:Array<Id>):Void{
+		throw("not implemented");
 	}
 
 	/**
-	 * Call this method when your want to lock or unlock components.
+	 * This method is called when the selection has changeed.
 	 */
-	public function slectionLockChanged(componentsIds:Array<Id>):Void{
+	public function selectionLockChanged(componentsIds:Array<Id>):Void{
+		throw("not implemented");
 	}
 }

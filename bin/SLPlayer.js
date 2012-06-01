@@ -780,7 +780,8 @@ var demo = demo || {}
 demo.Application = $hxClasses["demo.Application"] = function() {
 	this.slBuilderBridge = new demo.SLBuilderBridge();
 	slbuilder.core.SLBuilder.getInstance().slBuilderBridge = this.slBuilderBridge;
-	haxe.Log.trace("Demo Application stated ",{ fileName : "Application.hx", lineNumber : 20, className : "demo.Application", methodName : "new"});
+	slbuilder.core.SLBuilder.getInstance().init();
+	haxe.Log.trace("Demo Application stated ",{ fileName : "Application.hx", lineNumber : 21, className : "demo.Application", methodName : "new"});
 };
 demo.Application.__name__ = ["demo","Application"];
 demo.Application.prototype = {
@@ -797,7 +798,8 @@ if(!slbuilder.core) slbuilder.core = {}
 slbuilder.core.ISLBuilderBridge = $hxClasses["slbuilder.core.ISLBuilderBridge"] = function() { }
 slbuilder.core.ISLBuilderBridge.__name__ = ["slbuilder","core","ISLBuilderBridge"];
 slbuilder.core.ISLBuilderBridge.prototype = {
-	createPage: null
+	getMainContainer: null
+	,createPage: null
 	,removePage: null
 	,getPages: null
 	,createLayer: null
@@ -808,9 +810,8 @@ slbuilder.core.ISLBuilderBridge.prototype = {
 	,getComponents: null
 	,getProperties: null
 	,setProperty: null
-	,domChanged: null
 	,slectionChanged: null
-	,slectionLockChanged: null
+	,selectionLockChanged: null
 	,__class__: slbuilder.core.ISLBuilderBridge
 }
 demo.SLBuilderBridge = $hxClasses["demo.SLBuilderBridge"] = function() {
@@ -818,7 +819,19 @@ demo.SLBuilderBridge = $hxClasses["demo.SLBuilderBridge"] = function() {
 demo.SLBuilderBridge.__name__ = ["demo","SLBuilderBridge"];
 demo.SLBuilderBridge.__interfaces__ = [slbuilder.core.ISLBuilderBridge];
 demo.SLBuilderBridge.prototype = {
-	createPage: function(deeplink) {
+	getComponentFromDom: function(element) {
+		var component = { parentId : { type : slbuilder.data.ElementType.component, seed : element.parentNode.id}, id : { type : slbuilder.data.ElementType.component, seed : element.id}, displayName : element.id, x : 0, y : 0, width : element.clientWidth, height : element.clientHeight, rotation : 0.0};
+		while(element != null && !Math.isNaN(element.offsetLeft)) {
+			component.x += element.offsetLeft - element.scrollLeft;
+			component.y += element.offsetTop - element.scrollTop;
+			element = element.parentNode;
+		}
+		return component;
+	}
+	,getMainContainer: function() {
+		return js.Lib.document.getElementById("root_element_for_demo");
+	}
+	,createPage: function(deeplink) {
 		var id = slbuilder.core.Utils.toId(slbuilder.data.ElementType.page,deeplink);
 		var res = js.Lib.document.createElement("a");
 		res.className = "slbuilder page";
@@ -831,7 +844,7 @@ demo.SLBuilderBridge.prototype = {
 		return { id : id, displayName : id.seed, deeplink : deeplink};
 	}
 	,removePage: function(id) {
-		haxe.Log.trace("removePage(" + id.seed,{ fileName : "SLBuilderBridge.hx", lineNumber : 58, className : "demo.SLBuilderBridge", methodName : "removePage"});
+		haxe.Log.trace("removePage(" + id.seed,{ fileName : "SLBuilderBridge.hx", lineNumber : 88, className : "demo.SLBuilderBridge", methodName : "removePage"});
 		if(id.type != slbuilder.data.ElementType.page) throw "Error: trying to remove a page, but the ID is the ID of a " + Std.string(id.type);
 		var element = js.Lib.document.getElementById(id.seed);
 		if(element != null) {
@@ -896,7 +909,7 @@ demo.SLBuilderBridge.prototype = {
 		res.id = id.seed;
 		var parent = js.Lib.document.getElementById(parentId.seed);
 		parent.appendChild(res);
-		return { parentId : parentId, id : id, displayName : id.seed};
+		return this.getComponentFromDom(res);
 	}
 	,removeComponent: function(id) {
 		if(id.type != slbuilder.data.ElementType.component) {
@@ -910,23 +923,24 @@ demo.SLBuilderBridge.prototype = {
 		return false;
 	}
 	,getComponents: function(parentId) {
-		var parent = js.Lib.document.getElementById(parentId.seed);
+		var parent;
+		if(parentId == null) parent = js.Lib.document.body; else parent = js.Lib.document.getElementById(parentId.seed);
 		var components = parent.getElementsByClassName("component");
 		var res = [];
 		var _g1 = 0, _g = components.length;
 		while(_g1 < _g) {
 			var elementIdx = _g1++;
 			var element = Reflect.field(components,Std.string(elementIdx));
-			var component = { parentId : { type : slbuilder.data.ElementType.component, seed : element.parentNode.id}, id : { type : slbuilder.data.ElementType.component, seed : element.id}, displayName : element.id};
+			var component = this.getComponentFromDom(element);
 			res.push(component);
 		}
 		return res;
 	}
 	,getProperties: function(parentId) {
 		var parent = js.Lib.document.getElementById(parentId.seed);
-		haxe.Log.trace("getProperties " + parentId + " => " + parent,{ fileName : "SLBuilderBridge.hx", lineNumber : 230, className : "demo.SLBuilderBridge", methodName : "getProperties"});
+		haxe.Log.trace("getProperties " + parentId + " => " + parent,{ fileName : "SLBuilderBridge.hx", lineNumber : 249, className : "demo.SLBuilderBridge", methodName : "getProperties"});
 		var properties = Reflect.field(demo.Descriptor,parent.nodeName.toLowerCase());
-		haxe.Log.trace("getProperties " + parent.nodeName + " => " + properties,{ fileName : "SLBuilderBridge.hx", lineNumber : 232, className : "demo.SLBuilderBridge", methodName : "getProperties"});
+		haxe.Log.trace("getProperties " + parent.nodeName + " => " + properties,{ fileName : "SLBuilderBridge.hx", lineNumber : 251, className : "demo.SLBuilderBridge", methodName : "getProperties"});
 		var _g = 0;
 		while(_g < properties.length) {
 			var property = properties[_g];
@@ -956,11 +970,11 @@ demo.SLBuilderBridge.prototype = {
 		}
 		propObject[propNameNoDot] = propValue;
 	}
-	,domChanged: function(layerId) {
-	}
 	,slectionChanged: function(componentsIds) {
+		throw "not implemented";
 	}
-	,slectionLockChanged: function(componentsIds) {
+	,selectionLockChanged: function(componentsIds) {
+		throw "not implemented";
 	}
 	,__class__: demo.SLBuilderBridge
 }
@@ -1764,69 +1778,95 @@ slbuilder.core.Config.prototype = {
 }
 slbuilder.core.SLBuilder = $hxClasses["slbuilder.core.SLBuilder"] = function() {
 	haxe.Firebug.redirectTraces();
+	slbuilder.core.SLBuilder.isInitOk = false;
 };
 slbuilder.core.SLBuilder.__name__ = ["slbuilder","core","SLBuilder"];
 slbuilder.core.SLBuilder.__interfaces__ = [slbuilder.core.ISLBuilderBridge];
+slbuilder.core.SLBuilder.isInitOk = null;
 slbuilder.core.SLBuilder.instance = null;
 slbuilder.core.SLBuilder.getInstance = function() {
 	if(slbuilder.core.SLBuilder.instance == null) slbuilder.core.SLBuilder.instance = new slbuilder.core.SLBuilder();
 	return slbuilder.core.SLBuilder.instance;
 }
 slbuilder.core.SLBuilder.prototype = {
-	slBuilderBridge: null
+	selection: null
+	,slBuilderBridge: null
+	,init: function() {
+		haxe.Log.trace("SLBuilder init",{ fileName : "SLBuilder.hx", lineNumber : 49, className : "slbuilder.core.SLBuilder", methodName : "init"});
+		if(slbuilder.core.SLBuilder.isInitOk) throw "You are supposed to call SLBuilder.getInstance().init() only once";
+		slbuilder.core.SLBuilder.isInitOk = true;
+		this.selection = new slbuilder.selection.Selection();
+	}
+	,domChanged: function(id) {
+		throw "not implemented";
+	}
+	,getMainContainer: function() {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
+		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
+		return this.slBuilderBridge.getMainContainer();
+	}
 	,createPage: function(deeplink) {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 		return this.slBuilderBridge.createPage(deeplink);
 	}
 	,removePage: function(id) {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 		return this.slBuilderBridge.removePage(id);
 	}
 	,getPages: function() {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 		return this.slBuilderBridge.getPages();
 	}
 	,createLayer: function(c,id) {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 		return this.slBuilderBridge.createLayer(c,id);
 	}
 	,removeLayer: function(id) {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 		return this.slBuilderBridge.removeLayer(id);
 	}
 	,getLayers: function(id) {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 		return this.slBuilderBridge.getLayers(id);
 	}
 	,createComponent: function(c,id) {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 		return this.slBuilderBridge.createComponent(c,id);
 	}
 	,removeComponent: function(id) {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 		return this.slBuilderBridge.removeComponent(id);
 	}
 	,getComponents: function(id) {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 		return this.slBuilderBridge.getComponents(id);
 	}
 	,getProperties: function(id) {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 		return this.slBuilderBridge.getProperties(id);
 	}
 	,setProperty: function(id,p,v) {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 		return this.slBuilderBridge.setProperty(id,p,v);
 	}
-	,domChanged: function(id) {
-		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
-		return this.slBuilderBridge.domChanged(id);
-	}
 	,slectionChanged: function(ids) {
-		throw "not implemented";
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
+		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 	}
-	,slectionLockChanged: function(ids) {
-		throw "not implemented";
+	,selectionLockChanged: function(ids) {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
+		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 	}
 	,__class__: slbuilder.core.SLBuilder
 }
@@ -1861,6 +1901,104 @@ slbuilder.data.ElementType.layer.__enum__ = slbuilder.data.ElementType;
 slbuilder.data.ElementType.component = ["component",2];
 slbuilder.data.ElementType.component.toString = $estr;
 slbuilder.data.ElementType.component.__enum__ = slbuilder.data.ElementType;
+if(!slbuilder.selection) slbuilder.selection = {}
+slbuilder.selection.Region = $hxClasses["slbuilder.selection.Region"] = function(component,container) {
+	this.dom = js.Lib.document.createElement("div");
+	this.dom.style.position = "absolute";
+	this.dom.style.left = component.x + "px";
+	this.dom.style.top = component.y + "px";
+	this.dom.style.width = component.width + "px";
+	this.dom.style.height = component.height + "px";
+	container.appendChild(this.dom);
+	this.init();
+};
+slbuilder.selection.Region.__name__ = ["slbuilder","selection","Region"];
+slbuilder.selection.Region.prototype = {
+	dom: null
+	,component: null
+	,init: function() {
+	}
+	,remove: function() {
+		this.dom.parentNode.removeChild(this.dom);
+		this.dom = null;
+	}
+	,__class__: slbuilder.selection.Region
+}
+slbuilder.selection.RegionDisplay = $hxClasses["slbuilder.selection.RegionDisplay"] = function(component,container) {
+	slbuilder.selection.Region.call(this,component,container);
+	this.dom.className = "region regiondisplay";
+};
+slbuilder.selection.RegionDisplay.__name__ = ["slbuilder","selection","RegionDisplay"];
+slbuilder.selection.RegionDisplay.__super__ = slbuilder.selection.Region;
+slbuilder.selection.RegionDisplay.prototype = $extend(slbuilder.selection.Region.prototype,{
+	init: function() {
+		slbuilder.selection.Region.prototype.init.call(this);
+	}
+	,__class__: slbuilder.selection.RegionDisplay
+});
+slbuilder.selection.RegionEdit = $hxClasses["slbuilder.selection.RegionEdit"] = function(component,container) {
+	slbuilder.selection.Region.call(this,component,container);
+	this.dom.className = "region regionedit";
+};
+slbuilder.selection.RegionEdit.__name__ = ["slbuilder","selection","RegionEdit"];
+slbuilder.selection.RegionEdit.__super__ = slbuilder.selection.Region;
+slbuilder.selection.RegionEdit.prototype = $extend(slbuilder.selection.Region.prototype,{
+	init: function() {
+		slbuilder.selection.Region.prototype.init.call(this);
+	}
+	,__class__: slbuilder.selection.RegionEdit
+});
+slbuilder.selection.Selection = $hxClasses["slbuilder.selection.Selection"] = function() {
+	haxe.Log.trace("Selection init",{ fileName : "Selection.hx", lineNumber : 36, className : "slbuilder.selection.Selection", methodName : "new"});
+	this.container = js.Lib.document.createElement("div");
+	this.container.id = "slBuilderRegionContainer";
+	js.Lib.document.body.appendChild(this.container);
+	this.regions = new Array();
+	this.selectedComponents = new Array();
+	this.refresh();
+};
+slbuilder.selection.Selection.__name__ = ["slbuilder","selection","Selection"];
+slbuilder.selection.Selection.prototype = {
+	regions: null
+	,container: null
+	,selectedComponents: null
+	,setSelection: function(components) {
+		this.selectedComponents = components;
+		this.refresh();
+	}
+	,getSelection: function() {
+		return this.selectedComponents;
+	}
+	,refresh: function() {
+		var selectableComponents = slbuilder.core.SLBuilder.getInstance().getComponents(null);
+		var _g = 0, _g1 = this.regions;
+		while(_g < _g1.length) {
+			var region = _g1[_g];
+			++_g;
+			region.remove();
+		}
+		this.regions = new Array();
+		var _g = 0, _g1 = this.selectedComponents;
+		while(_g < _g1.length) {
+			var component = _g1[_g];
+			++_g;
+			this.displaySelected(component);
+		}
+		var _g = 0;
+		while(_g < selectableComponents.length) {
+			var component = selectableComponents[_g];
+			++_g;
+			this.displaySelectable(component);
+		}
+	}
+	,displaySelected: function(component) {
+		this.regions.push(new slbuilder.selection.RegionEdit(component,this.container));
+	}
+	,displaySelectable: function(component) {
+		this.regions.push(new slbuilder.selection.RegionDisplay(component,this.container));
+	}
+	,__class__: slbuilder.selection.Selection
+}
 var slplayer = slplayer || {}
 if(!slplayer.ui) slplayer.ui = {}
 slplayer.ui.DisplayObject = $hxClasses["slplayer.ui.DisplayObject"] = function(rootElement) {
@@ -1899,6 +2037,7 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 	,selectedItem: null
 	,_selectedItem: null
 	,onChange: null
+	,onRollOver: null
 	,addBtn: null
 	,removeBtn: null
 	,header: null
@@ -1946,12 +2085,19 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 			var idx = _g1++;
 			children[idx]["data-listwidgetitemidx"] = Std.string(idx);
 			children[idx].onclick = this.onClick.$bind(this);
+			children[idx].onmouseover = this._onRollOver.$bind(this);
 			children[idx].style.cursor = "pointer";
 		}
 	}
 	,onClick: function(e) {
 		var idx = Std.parseInt(Reflect.field(e.target,"data-listwidgetitemidx"));
 		this.setSelectedItem(this.dataProvider[idx]);
+	}
+	,_onRollOver: function(e) {
+		if(this.onRollOver != null) {
+			var idx = Std.parseInt(Reflect.field(e.target,"data-listwidgetitemidx"));
+			this.onRollOver(this.dataProvider[idx]);
+		}
 	}
 	,add: function(e) {
 		this.refresh();
@@ -1960,7 +2106,7 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 		this.refresh();
 	}
 	,onSelectionChanged: function(selection) {
-		haxe.Log.trace("-selection changed-",{ fileName : "ListWidget.hx", lineNumber : 167, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
+		haxe.Log.trace("-selection changed-",{ fileName : "ListWidget.hx", lineNumber : 180, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
 		var children = slbuilder.core.Utils.getElementsByClassName(this.list,"listItem");
 		var _g1 = 0, _g = children.length;
 		while(_g1 < _g) {
@@ -1978,17 +2124,17 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 					}
 				}
 				if(children[idx] == null) {
-					haxe.Log.trace("--workaround--" + idx + "- " + children[idx],{ fileName : "ListWidget.hx", lineNumber : 183, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
+					haxe.Log.trace("--workaround--" + idx + "- " + children[idx],{ fileName : "ListWidget.hx", lineNumber : 196, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
 					continue;
 				}
 				var className = "";
 				className = children[idx].className;
 				if(found) {
-					haxe.Log.trace("element selected " + idx + ": " + children[idx],{ fileName : "ListWidget.hx", lineNumber : 192, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
+					haxe.Log.trace("element selected " + idx + ": " + children[idx],{ fileName : "ListWidget.hx", lineNumber : 205, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
 					if(className.indexOf("listSelectedItem") < 0) className += " " + "listSelectedItem";
 				} else {
 					var pos = className.indexOf("listSelectedItem");
-					haxe.Log.trace("element " + idx + " not selected : " + className + " - " + pos,{ fileName : "ListWidget.hx", lineNumber : 198, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
+					haxe.Log.trace("element " + idx + " not selected : " + className + " - " + pos,{ fileName : "ListWidget.hx", lineNumber : 211, className : "slbuilder.ui.ListWidget", methodName : "onSelectionChanged"});
 					if(pos >= 0) {
 						var tmp = className;
 						className = StringTools.trim(className.substr(0,pos));
@@ -2147,6 +2293,7 @@ slbuilder.ui.PropertiesWidget.prototype = $extend(slbuilder.ui.ListWidget.protot
 			haxe.Log.trace(idx,{ fileName : "PropertiesWidget.hx", lineNumber : 51, className : "slbuilder.ui.PropertiesWidget", methodName : "onSubmit"});
 			this.dataProvider[idx].value = Reflect.field(inputs[idx],"value");
 			slbuilder.core.SLBuilder.getInstance().setProperty(this.parentId,this.dataProvider[idx].name,this.dataProvider[idx].value);
+			slbuilder.core.SLBuilder.getInstance().selection.refresh();
 		}
 	}
 	,refresh: function() {
@@ -2155,6 +2302,7 @@ slbuilder.ui.PropertiesWidget.prototype = $extend(slbuilder.ui.ListWidget.protot
 		slbuilder.ui.ListWidget.prototype.refresh.call(this);
 	}
 	,onSelectionChanged: function(selection) {
+		if(this.onChange != null) this.onChange(selection[0]);
 	}
 	,__class__: slbuilder.ui.PropertiesWidget
 });
@@ -2168,7 +2316,7 @@ slbuilder.ui.ToolBoxes.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	,componentsWidget: null
 	,propertiesWidget: null
 	,init: function() {
-		haxe.Log.trace("ToolBoxes init",{ fileName : "ToolBoxes.hx", lineNumber : 48, className : "slbuilder.ui.ToolBoxes", methodName : "init"});
+		haxe.Log.trace("ToolBoxes init",{ fileName : "ToolBoxes.hx", lineNumber : 49, className : "slbuilder.ui.ToolBoxes", methodName : "init"});
 		this.initUis();
 	}
 	,initUis: function() {
@@ -2196,7 +2344,7 @@ slbuilder.ui.ToolBoxes.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 			this.componentsWidget.parentId = layer.id;
 		} else this.componentsWidget.parentId = null;
 		this.componentsWidget.refresh();
-		haxe.Log.trace("Layer selected: " + displayName,{ fileName : "ToolBoxes.hx", lineNumber : 84, className : "slbuilder.ui.ToolBoxes", methodName : "onLayerChange"});
+		haxe.Log.trace("Layer selected: " + displayName,{ fileName : "ToolBoxes.hx", lineNumber : 85, className : "slbuilder.ui.ToolBoxes", methodName : "onLayerChange"});
 	}
 	,onComponentChange: function(component) {
 		var displayName = "none";
@@ -2204,11 +2352,12 @@ slbuilder.ui.ToolBoxes.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 			displayName = component.displayName;
 			this.propertiesWidget.parentId = component.id;
 		} else this.propertiesWidget.parentId = null;
+		slbuilder.core.SLBuilder.getInstance().selection.setSelection([component]);
 		this.propertiesWidget.refresh();
-		haxe.Log.trace("Component selected: " + displayName,{ fileName : "ToolBoxes.hx", lineNumber : 97, className : "slbuilder.ui.ToolBoxes", methodName : "onComponentChange"});
+		haxe.Log.trace("Component selected: " + displayName,{ fileName : "ToolBoxes.hx", lineNumber : 102, className : "slbuilder.ui.ToolBoxes", methodName : "onComponentChange"});
 	}
 	,onPropertyChange: function(property) {
-		haxe.Log.trace("Property change: " + property.displayName + " = " + property.value,{ fileName : "ToolBoxes.hx", lineNumber : 100, className : "slbuilder.ui.ToolBoxes", methodName : "onPropertyChange"});
+		haxe.Log.trace("Property change: " + property.displayName + " = " + property.value,{ fileName : "ToolBoxes.hx", lineNumber : 105, className : "slbuilder.ui.ToolBoxes", methodName : "onPropertyChange"});
 	}
 	,__class__: slbuilder.ui.ToolBoxes
 });

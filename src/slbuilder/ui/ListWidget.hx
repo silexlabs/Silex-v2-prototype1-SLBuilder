@@ -40,6 +40,10 @@ class ListWidget<ElementClass> extends DisplayObject{
 	 */
 	public var onChange:ElementClass->Void;
 	/**
+	 * on roll over callback
+	 */
+	public var onRollOver:ElementClass->Void;
+	/**
 	 * button
 	 */
 	private var addBtn:HtmlDom;
@@ -132,6 +136,7 @@ class ListWidget<ElementClass> extends DisplayObject{
 		for (idx in 0...children.length){
 			Reflect.setField(children[idx], "data-listwidgetitemidx", Std.string(idx));
 			children[idx].onclick = onClick;
+			children[idx].onmouseover = _onRollOver;
 			children[idx].style.cursor = 'pointer';
 		}
 	}
@@ -142,7 +147,15 @@ class ListWidget<ElementClass> extends DisplayObject{
 	private function onClick(e:js.Event) {
 		var idx:Int = Std.parseInt(Reflect.field(e.target, "data-listwidgetitemidx"));
 		selectedItem = dataProvider[idx];
-		//onSelectionChanged([dataProvider[idx]]);
+	}
+	/**
+	 * handle roll over
+	 */
+	private function _onRollOver(e:js.Event) {
+		if (onRollOver != null){
+			var idx:Int = Std.parseInt(Reflect.field(e.target, "data-listwidgetitemidx"));
+			onRollOver(dataProvider[idx]);
+		}
 	}
 	/**
 	 * add an element to the model and refresh the list
