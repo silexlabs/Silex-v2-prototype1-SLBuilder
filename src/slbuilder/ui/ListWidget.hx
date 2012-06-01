@@ -248,6 +248,7 @@ class ListWidget<ElementClass> extends DisplayObject{
 	 */
 	function setSelectedItem(selected:Null<ElementClass>):Null<ElementClass> {
 		if (selected != selectedItem){
+			_selectedIndex = -1;
 			for (idx in 0...dataProvider.length){
 				if (dataProvider[idx] == selected)
 					_selectedIndex = idx;

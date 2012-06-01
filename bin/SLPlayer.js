@@ -2156,6 +2156,7 @@ slbuilder.ui.ListWidget.prototype = $extend(slplayer.ui.DisplayObject.prototype,
 	}
 	,setSelectedItem: function(selected) {
 		if(selected != this.getSelectedItem()) {
+			this._selectedIndex = -1;
 			var _g1 = 0, _g = this.dataProvider.length;
 			while(_g1 < _g) {
 				var idx = _g1++;
