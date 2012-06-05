@@ -40,16 +40,18 @@ interface ISLBuilderBridge {
 	 * Returns the id of the new page on success
 	 */
 	public function createPage(deeplink:Deeplink):Page;
-
 	/**
 	 * Remove the corresponding page and return true on success
 	 */
 	public function removePage(id:Id):Bool;
-
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to return a list of pages
 	 */
 	public function getPages():Array<Page>;
+	/**
+	 * @return the object corresponding to the Id
+	 */
+	public function getPage(id:Id):Page;
 
 	/**
 	 * When the SLBuilder application calls this callback, you are supposed to create a container (e.g. a div in html) which will be associated with a layer.
@@ -60,11 +62,14 @@ interface ISLBuilderBridge {
 	 * Remove the corresponding layer and return true on success
 	 */
 	public function removeLayer(id:Id):Bool;
-
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to return a list of layers
 	 */
 	public function getLayers(parentId:Id):Array<Layer>;
+	/**
+	 * @return the object corresponding to the Id
+	 */
+	public function getLayer(id:Id):Layer;
 
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to create a component in your object model, with the ID layerId and of the type className
@@ -78,18 +83,23 @@ interface ISLBuilderBridge {
 	 * When the SLBuilder calls this callback, you are supposed to return a list of components, which are contained in the layer with the provided ID.
 	 */
 	public function getComponents(parentId:Null<Id>):Array<Component>;
-
+	/**
+	 * @return the object corresponding to the Id
+	 */
+	public function getComponent(id:Id):Component;
 
 	/**
 	 * Use class name like the slplayer does to retrieve the class name and path, then instanciate the class. Then look for the getProperties method or use reflexion.
 	 */
 	public function getProperties(parentId:Id):Array<Property>;
-
-
 	/**
 	 * Retrieve the component and set the property
 	 */
 	public function setProperty(parentId:Id, propName:String, propValue:Dynamic):Void;
+	/**
+	 * @return the object corresponding to the Id
+	 */
+	public function getProperty(parentId:Id, name:String):Property;
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// events
@@ -98,12 +108,12 @@ interface ISLBuilderBridge {
 	// or of an event which you want to be related to the selection.
 	///////////////////////////////////////////////////////////////////////////////////
 	/**
-	 * This method is called when a component has been locked or unlocked components.
+	 * This method is called when the selection has changeed.
 	 */
-	public function slectionChanged(componentsIds:Array<Id>):Void;
+	public function selectionChanged(componentsIds:Array<Id>):Void;
 
 	/**
-	 * This method is called when the selection has changeed.
+	 * This method is called when a component has been locked or unlocked components.
 	 */
 	public function selectionLockChanged(componentsIds:Array<Id>):Void;
 }

@@ -148,7 +148,7 @@ class ListWidget<ElementClass> extends DisplayObject{
 			Reflect.setField(children[idx], "data-listwidgetitemidx", Std.string(idx));
 			children[idx].onclick = onClick;
 			children[idx].onmouseover = _onRollOver;
-			children[idx].style.cursor = 'pointer';
+			children[idx].style.cursor = "pointer";
 		}
 	}
 	/**

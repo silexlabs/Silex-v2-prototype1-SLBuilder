@@ -17,6 +17,10 @@ import js.Dom;
 class Selection
 {
 	/**
+	 * callback for the SLBuilder singleton to catch a change in the selection
+	 */
+	public var onChange:Array<Component>->Void;
+	/**
 	 * list of editors and regions put over the components
 	 */
 	private var regions:Array<Region>;
@@ -46,10 +50,15 @@ class Selection
 	/**
 	 * change the selection
 	 * update the in-place editors
+	 * notify the SLBuilder class
 	 */
 	public function setSelection(components:Array<Component>){
 		selectedComponents = components;
+		// update display
 		refresh();
+		// notify the SLBuilder class
+		if (onChange != null)
+			onChange(selectedComponents);
 	}
 	/**
 	 * retrieve the selection

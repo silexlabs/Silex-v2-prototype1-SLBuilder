@@ -50,6 +50,12 @@ class ToolBoxes extends DisplayObject
 		initUis();
 	}
 	/**
+	 * called by SLBuilder::
+	 */
+	public function setSelection(pages:Array<Page>, layer:Array<Layer>, components:Array<Component>){
+		//layersWidget.pageSelectedIndex = ;
+	}
+	/**
 	 * retrieve references to the widgets
 	 */
 	private function initUis(){

@@ -4,16 +4,124 @@
 		"selected_items":
 		[
 			[
+				"selec",
+				"selected	var"
+			],
+			[
+				"data",
+				"dataProvider"
+			],
+			[
+				"bo",
+				"border	border-color: color"
+			],
+			[
+				"c",
+				"componentsWidget	var"
+			],
+			[
+				"off",
+				"offsetParent	js.HtmlDom"
+			],
+			[
+				"is",
+				"isNaN( f : Float )	Bool"
+			],
+			[
+				"elem",
+				"element	var"
+			],
+			[
+				"onm",
+				"onmouseover( js.Event )	Void"
+			],
+			[
+				"Dark",
+				"DarkSlateGrey"
+			],
+			[
+				"padd",
+				"padding	padding: all"
+			],
+			[
+				"mar",
+				"margin	margin: all"
+			],
+			[
+				"o",
+				"offsetLeft	Int"
+			],
+			[
+				"st",
+				"style"
+			],
+			[
+				"compo",
+				"component	var"
+			],
+			[
+				"sele",
+				"selectableComponents	var"
+			],
+			[
+				"se",
+				"selectedComponents	var"
+			],
+			[
+				"SL",
+				"SLBuilder"
+			],
+			[
+				"clas",
+				"className	String"
+			],
+			[
+				"get",
+				"getElementsByTagName(...)	js.HtmlCollection<js.HtmlDom>"
+			],
+			[
+				"D",
+				"DarkRed"
+			],
+			[
+				"fun",
+				"fun	Function (fun)"
+			],
+			[
+				"prop",
+				"property	var"
+			],
+			[
+				"pro",
+				"property	var"
+			],
+			[
+				"Pro",
+				"PropertiesWidget"
+			],
+			[
+				"Propert",
+				"Property"
+			],
+			[
+				"on",
+				"onPageChange	var"
+			],
+			[
+				"pages",
+				"pagesDropDown	var"
+			],
+			[
+				"add",
+				"addBtn	var"
+			],
+			[
 				"la",
 				"layersWidget	var"
 			],
 			[
 				"components",
 				"componentsWidget	var"
-			],
-			[
-				"bo",
-				"bodySize	var"
 			],
 			[
 				"cl",
@@ -56,20 +164,12 @@
 				"prompt(...)	String"
 			],
 			[
-				"pages",
-				"pagesWidget"
-			],
-			[
 				"pu",
 				"public"
 			],
 			[
 				"new",
 				"newParentId"
-			],
-			[
-				"fun",
-				"function"
 			],
 			[
 				"pr",
@@ -92,16 +192,8 @@
 				"ArrayStore"
 			],
 			[
-				"get",
-				"getLayers"
-			],
-			[
 				"bac",
 				"background	background-color: rgb"
-			],
-			[
-				"on",
-				"onclick"
 			],
 			[
 				"a",
@@ -120,10 +212,6 @@
 				"displayName"
 			],
 			[
-				"add",
-				"addBtn"
-			],
-			[
 				"L",
 				"Layer"
 			],
@@ -140,10 +228,6 @@
 				"property"
 			],
 			[
-				"pro",
-				"propArray"
-			],
-			[
 				"getC",
 				"getComponents"
 			],
@@ -158,10 +242,6 @@
 			[
 				"class",
 				"className"
-			],
-			[
-				"elem",
-				"elementIdx"
 			],
 			[
 				"Ht",
@@ -187,7 +267,7 @@
 	"build_system": "Packages/HaXe/Hxml.sublime-build",
 	"command_palette":
 	{
-		"height": 390.0,
+		"height": 367.0,
 		"selected_items":
 		[
 			[
@@ -216,6 +296,36 @@
 	},
 	"file_history":
 	[
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/data/Types.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/slbuilder_demo.css",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/data/Component.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/SLBuilderBridge.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/ISLBuilderBridge.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/SLBuilder.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/selection/RegionDisplay.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/selection/RegionEdit.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/selection/Region.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/selection/Selection.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Descriptor.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/slbuilder.css",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Application.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slplayer/core/SLPlayer.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/index.html",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/readme.txt",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/PropertiesWidget.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/ListWidget.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/ToolBoxes.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/LayersWidget.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/ComponentsWidget.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/bin/index.html",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/selection/SelectionUi.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/old.Template.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/build.hxml",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/old.SLBuilder.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/ui/old.Menu.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slplayer/macro/AppBuilder.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slplayer/ui/DisplayObject.hx",
+		"/Users/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Config.hx",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/index.html",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/index-slplayer-demo.html",
 		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slplayer/macro/AppBuilder.hx",
@@ -288,6 +398,24 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"_selectedItem",
+			"onch",
+			";",
+			"selection",
+			"comp",
+			"children[idx].",
+			"className",
+			"list.childNodes",
+			"trace",
+			"selectedItem",
+			"	/**\n	 * button\n	 */\n	private var addBtn:HtmlDom;\n	/**\n	 * button\n	 */\n	private var removeBtn:HtmlDom;\n",
+			"untyped",
+			"root_",
+			"byclass",
+			"main",
+			"header",
+			"getElementById",
+			"		<",
 			"header",
 			"slbuilder",
 			"unkno",
@@ -391,6 +519,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"		}",
 			"p",
 			"../assets/extjs",
 			"assets/extjs"

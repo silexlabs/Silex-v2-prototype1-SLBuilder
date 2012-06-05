@@ -5,6 +5,7 @@ import slbuilder.data.Property;
 import slbuilder.data.Component;
 import slbuilder.data.Layer;
 import slbuilder.data.Page;
+import slbuilder.ui.ToolBoxes;
 import slbuilder.core.ISLBuilderBridge;
 import slbuilder.selection.Selection;
 
@@ -32,6 +33,11 @@ class SLBuilder implements ISLBuilderBridge
 	public var selection:Selection;
 
 	/**
+	 * reference to the ToolBoxes object, used to manage the SLBuilder tool boxes
+	 */
+	public var toolBoxes:ToolBoxes;
+
+	/**
 	 * ISLBuilderBridge object used to interact with the dom
 	 * The implementation of ISLBuilderBridge which your application is to provide
 	 * so that the SLBuilder can interact with you DOM
@@ -52,7 +58,49 @@ class SLBuilder implements ISLBuilderBridge
 			throw("You are supposed to call SLBuilder.getInstance().init() only once");
 
 		isInitOk = true;
+		
+		// init selection
 		selection = new Selection();
+		selection.onChange = selectionChangedCallback;
+
+		// init tool boxes
+		var toolBoxesTag = Utils.getElementsByClassName(Lib.document.body, "toolboxes")[0];
+		toolBoxes = cast(slplayer.core.SLPlayer.getAssociatedComponents(toolBoxesTag))[0];
+	}
+	/**
+	 * called by the selection class when the selection has changed
+	 * call SLBuilder::selectionChanged with the list of ids
+	 * update the selection of the widgets also
+	 */
+	private function selectionChangedCallback(components:Array<Component>){
+		// retrieve the ids of the layers and components
+		var layers:Array<Layer> = [];
+		var layerIds:Array<Id> = [];
+		var pages:Array<Page> = [];
+		var pageIds:Array<Id> = [];
+		var ids:Array<Id> = [];
+		for(comp in components){
+			if (!Lambda.has(layerIds, comp.parentId)){
+				// store the id of the layer
+				layerIds.push(comp.parentId);
+				// store the corresponding layer
+				var layer = getLayer(comp.parentId);
+				layers.push(layer);
+				// store page
+				if (!Lambda.has(pageIds, layer.parentId)){
+					pageIds.push(layer.parentId);
+					pages.push(getPage(layer.parentId));
+				}
+			}
+			// store the component id
+			ids.push(comp.id);
+		}
+
+		// update the selection of the widgets
+		toolBoxes.setSelection(pages, layers, components);
+
+		// call SLBuilder::selectionChanged with the list of ids
+		selectionChanged(ids);
 	}
 	////////////////////////////////////////////////////////////////////
 	// Singleton pattern
@@ -144,6 +192,19 @@ class SLBuilder implements ISLBuilderBridge
 		return slBuilderBridge.getPages();
 	}
 	/**
+	 * @return the object corresponding to the Id
+	 */
+	public function getPage(id:Id):Page{
+		if (isInitOk == false)
+			throw("You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton");
+
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.getPage(id);
+	}
+
+	/**
 	 * When the SLBuilder application calls this callback, you are supposed to create a container (e.g. a div in html) which will be associated with a layer.
 	 * Returns the id of the new layer on success
 	 */
@@ -181,6 +242,18 @@ class SLBuilder implements ISLBuilderBridge
 			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
 
 		return slBuilderBridge.getLayers(id);
+	}
+	/**
+	 * @return the object corresponding to the Id
+	 */
+	public function getLayer(id:Id):Layer{
+		if (isInitOk == false)
+			throw("You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton");
+
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.getLayer(id);
 	}
 
 	/**
@@ -221,7 +294,18 @@ class SLBuilder implements ISLBuilderBridge
 
 		return slBuilderBridge.getComponents(id);
 	}
+	/**
+	 * @return the object corresponding to the Id
+	 */
+	public function getComponent(id:Id):Component{
+		if (isInitOk == false)
+			throw("You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton");
 
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.getComponent(id);
+	}
 
 	/**
 	 * Use class name like the slplayer does to retrieve the class name and path, then instanciate the class. Then look for the getProperties method or use reflexion.
@@ -236,7 +320,6 @@ class SLBuilder implements ISLBuilderBridge
 		return slBuilderBridge.getProperties(id);
 	}
 
-
 	/**
 	 * Retrieve the component and set the property
 	 */
@@ -249,6 +332,19 @@ class SLBuilder implements ISLBuilderBridge
 
 		return slBuilderBridge.setProperty(id, p, v);
 	}
+	/**
+	 * @return the object corresponding to the Id
+	 */
+	public function getProperty(parentId:Id, name:String):Property{
+		if (isInitOk == false)
+			throw("You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton");
+
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		return slBuilderBridge.getProperty(parentId, name);
+	}
+
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// events
@@ -260,7 +356,7 @@ class SLBuilder implements ISLBuilderBridge
 	 * This method is called when the selection has changeed.
 	 * @example		SLBuilder.getInstance().slectionChanged([id1,id2]);
 	 */
-	public function slectionChanged(ids:Array<Id>):Void{
+	public function selectionChanged(ids:Array<Id>):Void{
 		if (isInitOk == false)
 			throw("You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton");
 

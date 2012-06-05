@@ -122,6 +122,17 @@ class SLBuilderBridge implements ISLBuilderBridge{
 
 		return res;
 	}
+	/**
+	 * @return the object corresponding to the Id
+	 */
+	public function getPage(id:Id):Page{
+		var element:HtmlDom = Lib.document.getElementById(id.seed);
+		return {
+			id : id, 
+			displayName : element.id,
+			deeplink : element.getAttribute("name")
+		};
+	}
 
 	/**
 	 * When the SLBuilder application calls this callback, you are supposed to create a container (e.g. a div in html) which will be associated with a layer.
@@ -189,6 +200,21 @@ class SLBuilderBridge implements ISLBuilderBridge{
 
 		return res;
 	}
+	/**
+	 * @return the object corresponding to the Id
+	 */
+	public function getLayer(id:Id):Layer{
+		var element:HtmlDom = Lib.document.getElementById(id.seed);
+		if (element == null) throw("element not found in index.html");
+		return {
+			parentId : {
+				type:layer,
+				seed:element.parentNode.id
+			}, 
+			id : id, 
+			displayName : id.seed
+		};
+	}
 
 	/**
 	 * When the SLBuilder calls this callback, you are supposed to create a component in your object model, with the ID layerId and of the type className
@@ -240,6 +266,13 @@ class SLBuilderBridge implements ISLBuilderBridge{
 
 		return res;
 	}
+	/**
+	 * @return the object corresponding to the Id
+	 */
+	public function getComponent(id:Id):Component{
+		var res:HtmlDom = Lib.document.getElementById(id.seed);
+		return getComponentFromDom(res);
+	}
 
 	/**
 	 * Use class name like the slplayer does to retrieve the class name and path, then instanciate the class. Then look for the getProperties method or use reflexion.
@@ -263,7 +296,6 @@ class SLBuilderBridge implements ISLBuilderBridge{
 		return properties;
 	}
 
-
 	/**
 	 * Retrieve the component and set the property
 	 */
@@ -278,6 +310,44 @@ class SLBuilderBridge implements ISLBuilderBridge{
 		}
 		Reflect.setField(propObject, propNameNoDot, propValue);
 	}
+	/**
+	 * @return the object corresponding to the Id
+	 */
+	public function getProperty(parentId:Id, name:String):Property{
+		var res:Property = {
+			name: name,
+			displayName: null,
+			parentId: parentId,
+			value: null,
+			defaultValue: null,
+			canBeNull: true,
+			description: "",
+		};
+		var parent:HtmlDom = Lib.document.getElementById(parentId.seed);
+
+		// retrieve the value
+		var propArray:Array<String> = name.split(".");
+		var propNameNoDot:String = propArray.pop();
+		var propObject:Dynamic = parent;
+		for (propertyName in propArray){
+			propObject = Reflect.field(propObject, propertyName);
+		}
+		res.value = Reflect.field(propObject, propNameNoDot);
+
+		// retrieve the descriptor values
+		var properties:Array<Property> = Reflect.field(Descriptor, parent.nodeName.toLowerCase());
+		for (property in properties){
+			if (property.name == name){
+				res.displayName = property.displayName;
+				res.defaultValue = property.defaultValue;
+				res.canBeNull = property.canBeNull;
+				res.description = property.description;
+				break;
+			}
+		}
+
+		return res;
+	}
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// events
@@ -286,14 +356,14 @@ class SLBuilderBridge implements ISLBuilderBridge{
 	// or of an event which you want to be related to the selection.
 	///////////////////////////////////////////////////////////////////////////////////
 	/**
-	 * This method is called when a component has been locked or unlocked components.
+	 * This method is called when the selection has changeed.
 	 */
-	public function slectionChanged(componentsIds:Array<Id>):Void{
+	public function selectionChanged(componentsIds:Array<Id>):Void{
 		throw("not implemented");
 	}
 
 	/**
-	 * This method is called when the selection has changeed.
+	 * This method is called when a component has been locked or unlocked components.
 	 */
 	public function selectionLockChanged(componentsIds:Array<Id>):Void{
 		throw("not implemented");

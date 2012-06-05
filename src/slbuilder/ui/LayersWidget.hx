@@ -86,6 +86,16 @@ class LayersWidget extends ListWidget<Layer> {
 		trace("PAGE SELECTED : "+parentId);
 		refresh();
 	}
+	public var pageSelectedIndex(getPageSelectedIndex, setPageSelectedIndex):Int;
+	private function getPageSelectedIndex(): Int{
+		var _this_ = this;
+		return untyped __js__("_this_.pagesDropDown.selectedIndex");
+	}
+	private function setPageSelectedIndex(idx:Int): Int{
+		var _this_ = this;
+		untyped __js__("_this_.pagesDropDown.selectedIndex = _this_.pageSelectedIdx");
+		return untyped __js__("_this_.pagesDropDown.selectedIndex");
+	}
 	/**
 	 * refresh the list
 	 */
@@ -93,12 +103,11 @@ class LayersWidget extends ListWidget<Layer> {
 		if (_isInit == false)
 			return;
 
-		// REFRESH PAGE LIST
-		// keep selected index
-		var _this_ = this;
-		var oldIdx:Int = untyped __js__("_this_.pagesDropDown.selectedIndex");
-		// the first time, oldIdx will be -1
-		if (oldIdx <=0) oldIdx = 0;
+		var oldIdx = pageSelectedIndex;
+
+		// the first time, pageSelectedIndex will be -1
+		if (oldIdx <=0) 
+			oldIdx = 0;
 
 		// get data provider
 		var dataProviderPages = SLBuilder.getInstance().getPages();
@@ -112,7 +121,8 @@ class LayersWidget extends ListWidget<Layer> {
 		pagesDropDown.innerHTML = listInnerHtml;
 
 		// keep selected index
-		untyped __js__("_this_.pagesDropDown.selectedIndex = oldIdx");
+		var _this_ = this;
+		untyped __js__("_this_.pagesDropDown.selectedIndex = _this_.pageSelectedIdx");
 
 		// refresh the list
 		super.refresh();
