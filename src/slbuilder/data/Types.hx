@@ -3,6 +3,7 @@ package slbuilder.data;
 /**
  * unique id of components or layers
  * seed is type, className, nextId, random, concatenated with "_" as a separator 
+ * be careful when comparing two instances of Id, you should do "a.id.seed == b.id.seed"
  */
 typedef Id = 
 {

@@ -6,6 +6,7 @@ import slbuilder.core.SLBuilder;
 import slbuilder.core.Config;
 import slbuilder.core.Utils;
 import slbuilder.data.Property;
+import slbuilder.data.Component;
 import slbuilder.data.Types;
 import slbuilder.ui.ListWidget;
 
@@ -18,9 +19,21 @@ import slbuilder.ui.ListWidget;
  */
 class PropertiesWidget extends ListWidget<Property> {
 	/**
-	 * ID of the layer of which we display the components
+	 * ID of the component of which we display the properties
+	 * TODO: multi selection
 	 */
-	public var parentId:Id;
+	public var parentId(getParentId, null):Null<Id>;
+	/**
+	 * ID of the layer of which we display the components
+	 * TODO: multi selection
+	 */
+	private function getParentId():Null<Id>{
+		var selected = SLBuilder.getInstance().selection.getComponents();
+		if (selected.length > 0)
+			return selected[0].id;
+		else
+			return null;
+	}
 	/**
 	 * button
 	 */
@@ -31,6 +44,7 @@ class PropertiesWidget extends ListWidget<Property> {
 	 * initializes the process of refreshing the list
 	 */
 	override public dynamic function init() : Void { 
+		trace("PROPERTIES WIDGET INIT ");
 		super.init();
 
 		submitBtn = Utils.getElementsByClassName(rootElement, "submit")[0];
@@ -43,7 +57,18 @@ class PropertiesWidget extends ListWidget<Property> {
 			if (e.keyCode == 13)
 				onSubmit(e);
 		}		
+		SLBuilder.getInstance().selection.refreshPropertiesWidgetCallbak = onSelectionChange;
 	}
+	/**
+	 * callback for a change in the selection
+	 */
+	private function onSelectionChange(components:Array<Component>){
+		trace("onSelectionChange "+components);
+		refresh();
+	}
+	/**
+	 * called when the user presses submit button or hit enter on the keyboard
+	 */
 	private function onSubmit(e:js.Event) {
 		trace("onSubmit");
 		var inputs = Utils.getElementsByClassName(rootElement, "input");
@@ -51,7 +76,7 @@ class PropertiesWidget extends ListWidget<Property> {
 			trace(idx);
 			dataProvider[idx].value = Reflect.field(inputs[idx], "value");
 			SLBuilder.getInstance().setProperty(parentId, dataProvider[idx].name, dataProvider[idx].value);
-			SLBuilder.getInstance().selection.refresh();
+			SLBuilder.getInstance().selection.redraw();
 		}
 		if (onChange != null){
 			onChange(dataProvider[0]);
@@ -60,6 +85,7 @@ class PropertiesWidget extends ListWidget<Property> {
 	}
 	/**
 	 * refreh list data, but do not refresh display
+	 * handles the selection
 	 * to be overriden to handle the model
 	 */
 	override public function reloadData() {
@@ -79,6 +105,7 @@ class PropertiesWidget extends ListWidget<Property> {
 	/**
 	 * prevent this behavior
 	 */
-	override private function onSelectionChanged(selection:Array<Property>) {
+	override private function updateSelectionDisplay(selection:Array<Property>) {
+		//super.updateSelectionDisplay(selection);
 	}
 }

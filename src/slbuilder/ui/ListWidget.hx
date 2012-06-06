@@ -34,6 +34,10 @@ class ListWidget<ElementClass> extends DisplayObject{
 	 * selected item if any
 	 */
 	public var selectedItem(getSelectedItem, setSelectedItem):Null<ElementClass>;
+	/**
+	 * selected item index, in the dataProvider array, or -1 of there is no selected index
+	 */
+	public var selectedIndex(getSelectedIndex, setSelectedIndex):Int;
 	private var _selectedIndex:Int;
 	/**
 	 * on change callback
@@ -65,6 +69,7 @@ class ListWidget<ElementClass> extends DisplayObject{
 	public function new(d:HtmlDom) {
 		_isInit = false;
 		_selectedIndex = -1;
+		dataProvider = [];
 		super(d);
 	}
 	/**
@@ -100,6 +105,8 @@ class ListWidget<ElementClass> extends DisplayObject{
 		list = Utils.getElementsByClassName(rootElement, "list")[0];
 		if (list == null) throw("element not found in index.html");
 		listTemplate = list.innerHTML;
+
+		// end init
 		_isInit = true;
 		refresh();
 	}
@@ -110,6 +117,8 @@ class ListWidget<ElementClass> extends DisplayObject{
 	public function refresh() {
 		if (_isInit == false)
 			return;
+
+		trace("refresh "+" - "+Type.getClassName(Type.getClass(this)));
 
 		// refreh list data
 		reloadData();
@@ -122,7 +131,6 @@ class ListWidget<ElementClass> extends DisplayObject{
 		}
 		list.innerHTML = listInnerHtml;
 		attachListEvents();
-		selectedItem = null;
 
 		// set the height of the list to match available space
 		var availableHeight:Int = rootElement.parentNode.clientHeight;
@@ -130,6 +138,8 @@ class ListWidget<ElementClass> extends DisplayObject{
 		availableHeight -= footer.clientHeight;
 
 		list.style.height = availableHeight + "px";
+
+		updateSelectionDisplay([selectedItem]);
 	}
 	/**
 	 * refreh list data, but do not refresh display
@@ -138,6 +148,7 @@ class ListWidget<ElementClass> extends DisplayObject{
 	public function reloadData() {
 		if (_isInit == false)
 			return;
+		trace("reloadData "+" - "+Type.getClassName(Type.getClass(this)));
 	}
 	/**
 	 * attach mouse events to the list and the items
@@ -187,8 +198,8 @@ class ListWidget<ElementClass> extends DisplayObject{
 	 * call onChange if defined
 	 * TODO: multiple selection
 	 */
-	private function onSelectionChanged(selection:Array<ElementClass>) {
-		trace("-selection changed-");
+	private function updateSelectionDisplay(selection:Array<ElementClass>) {
+		trace("updateSelectionDisplay "+selection+" - "+Type.getClassName(Type.getClass(this)));
 
 		// handle the selected style 
 		var children = Utils.getElementsByClassName(list, "listItem");
@@ -213,13 +224,11 @@ class ListWidget<ElementClass> extends DisplayObject{
 					className = children[idx].className;
 				
 				if (found){
-					trace("element selected "+idx+": "+children[idx]);
 					if (className.indexOf(LIST_SELECTED_ITEM_CSS_CLASS)<0)
 						className += " "+LIST_SELECTED_ITEM_CSS_CLASS;
 				}
 				else{
 					var pos = className.indexOf(LIST_SELECTED_ITEM_CSS_CLASS);
-					trace("element "+idx+" not selected : "+className+" - "+pos);
 					if (pos>=0){
 						// remove the spaces
 						var tmp = className;
@@ -247,15 +256,44 @@ class ListWidget<ElementClass> extends DisplayObject{
 	 * getter/setter
 	 */
 	function setSelectedItem(selected:Null<ElementClass>):Null<ElementClass> {
+		trace("setSelectedItem "+selected+" - "+Type.getClassName(Type.getClass(this)));
+		Utils.inspectTrace(selected); 
 		if (selected != selectedItem){
-			_selectedIndex = -1;
-			for (idx in 0...dataProvider.length){
-				if (dataProvider[idx] == selected)
-					_selectedIndex = idx;
+			if (selected != null){
+				var tmpIdx:Int = -1;
+				for (idx in 0...dataProvider.length){
+					if (cast(dataProvider[idx]).id.seed == cast(selected).id.seed){
+						tmpIdx = idx;
+						break;
+					}
+				}
+				selectedIndex = tmpIdx;
 			}
-			onSelectionChanged([selected]);
+			else{
+				selectedIndex = -1;
+			}
 		}
 		return selected;
 	}
-
+	/**
+	 * getter/setter
+	 */
+	function getSelectedIndex():Int {
+		return _selectedIndex;
+	}
+	/**
+	 * getter/setter
+	 */
+	function setSelectedIndex(idx:Int):Int {
+		trace("setSelectedIndex "+idx+" - "+Type.getClassName(Type.getClass(this)));
+		if (idx != _selectedIndex){
+			if (idx >= 0 && dataProvider.length>idx && dataProvider[idx]!=null){
+				_selectedIndex = idx;
+			}
+			else{
+				_selectedIndex = -1;
+			}
+		}
+		return idx;
+	}
 }

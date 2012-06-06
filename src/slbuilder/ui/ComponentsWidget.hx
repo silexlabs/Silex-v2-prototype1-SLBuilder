@@ -24,8 +24,26 @@ import slbuilder.ui.ListWidget;
 class ComponentsWidget extends ListWidget<Component> {
 	/**
 	 * ID of the layer of which we display the components
+	 * TODO: multi selection
 	 */
-	public var parentId:Id;
+	public var parentId(getParentId, null):Null<Id>;
+	/**
+	 * ID of the layer of which we display the components
+	 * TODO: multi selection
+	 */
+	private function getParentId():Null<Id>{
+		var selected = SLBuilder.getInstance().selection.getLayers();
+		if (selected.length > 0)
+			return selected[0].id;
+		else
+			return null;
+	}
+	/**
+	 * constructor
+	 */
+	public function new(d:HtmlDom) {
+		super(d);
+	}
 	/**
 	 * init the widget
 	 * get elements by class names 
@@ -34,12 +52,38 @@ class ComponentsWidget extends ListWidget<Component> {
 	override public dynamic function init() : Void { 
 		trace("COMPONENTS WIDGET INIT ");
 		super.init();
+
+		SLBuilder.getInstance().selection.refreshComponentsWidgetCallbak = onSelectionChange;
+	}
+	/**
+	 * handle click in the list
+	 * TODO: multiple selection
+	 */
+	override private function onClick(e:js.Event) {
+		super.onClick(e);
+		SLBuilder.getInstance().selection.setComponents([selectedItem]);
+	}
+	/**
+	 * callback for a change in the selection
+	 */
+	private function onSelectionChange(components:Array<Component>){
+		trace("onSelectionChange ComponentsWidget "+components);
+		// handles selection
+		var selectedComponents = SLBuilder.getInstance().selection.getComponents();
+		if (selectedComponents.length > 0)
+			selectedItem = selectedComponents[0];
+		else
+			selectedItem = null;
+
+		refresh();
 	}
 	/**
 	 * refreh list data, but do not refresh display
 	 * to be overriden to handle the model
 	 */
 	override public function reloadData() {
+		trace("reloadData "+parentId);
+
 		if (_isInit == false)
 			return;
 
@@ -49,15 +93,24 @@ class ComponentsWidget extends ListWidget<Component> {
 		else{
 			dataProvider = new Array();
 		}
-
 		// refresh the list
 		super.reloadData();
+	}
+	/**
+	 * handle a selection change
+	 * call onChange if defined
+	 * TODO: multiple selection
+	 */
+	override private function updateSelectionDisplay(selection:Array<Component>) {
+		super.updateSelectionDisplay(selection);
 	}
 	/**
 	 * add an element to the model and refresh the list
 	 * to be overriden to handle the model
 	 */
 	override private function add(e:js.Event) {
+		if (parentId == null)
+			throw ("Can not create a component, no layer is selected");
 		var component = SLBuilder.getInstance().createComponent("basicComponent", parentId);
 		SLBuilder.getInstance().setProperty(component.id, "displayName", "New Component");
 		super.add(e);
@@ -67,7 +120,6 @@ class ComponentsWidget extends ListWidget<Component> {
 	 * to be overriden to handle the model
 	 */
 	override private function remove(e:js.Event) {
-		//Utils.inspectTrace(grid.selModel.selected.items[0].data);
 		SLBuilder.getInstance().removeComponent(selectedItem.id);
 		super.remove(e);
 	}

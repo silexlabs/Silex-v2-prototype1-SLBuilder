@@ -44,7 +44,7 @@ class ToolBoxes extends DisplayObject
 	/**
 	 * init the application
 	 */
-	override public dynamic function init() : Void { 
+/*	override public dynamic function init() : Void { 
 		//haxe.Firebug.redirectTraces(); 
 		trace("ToolBoxes init");
 		initUis();
@@ -52,12 +52,13 @@ class ToolBoxes extends DisplayObject
 	/**
 	 * called by SLBuilder::
 	 */
-	public function setSelection(pages:Array<Page>, layer:Array<Layer>, components:Array<Component>){
+/*	public function setSelection(pages:Array<Page>, layer:Array<Layer>, components:Array<Component>){
 		//layersWidget.pageSelectedIndex = ;
 	}
 	/**
 	 * retrieve references to the widgets
 	 */
+	/*
 	private function initUis(){
 		var domElem;
 		domElem = Utils.getElementsByClassName(rootElement, "LayersWidget")[0];
@@ -112,4 +113,5 @@ class ToolBoxes extends DisplayObject
 		componentsWidget.reloadData();
 		SLBuilder.getInstance().selection.setSelection([componentsWidget.selectedItem]);
 	}
+	*/
 }

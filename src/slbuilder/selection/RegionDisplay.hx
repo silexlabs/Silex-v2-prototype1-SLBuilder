@@ -10,6 +10,7 @@ class RegionDisplay extends Region
 {
 	public function new(component:Component, container:HtmlDom){
 		super(component, container);
+		trace("new RegionDisplay "+component);
 		dom.className = "region regiondisplay";
 		dom.style.cursor = "pointer";
 		dom.onclick = onClick;
@@ -18,6 +19,7 @@ class RegionDisplay extends Region
 		super.init();
 	}
 	private function onClick(e:js.Event){
-		SLBuilder.getInstance().selection.setSelection([component]);
+		trace("onClick "+component);
+		SLBuilder.getInstance().selection.setComponents([component]);
 	}
 }

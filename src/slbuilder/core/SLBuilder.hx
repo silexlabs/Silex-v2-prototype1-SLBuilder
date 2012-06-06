@@ -72,32 +72,13 @@ class SLBuilder implements ISLBuilderBridge
 	 * call SLBuilder::selectionChanged with the list of ids
 	 * update the selection of the widgets also
 	 */
-	private function selectionChangedCallback(components:Array<Component>){
-		// retrieve the ids of the layers and components
-		var layers:Array<Layer> = [];
-		var layerIds:Array<Id> = [];
-		var pages:Array<Page> = [];
-		var pageIds:Array<Id> = [];
+	private function selectionChangedCallback(){
+		// retrieve the ids of the components
 		var ids:Array<Id> = [];
-		for(comp in components){
-			if (!Lambda.has(layerIds, comp.parentId)){
-				// store the id of the layer
-				layerIds.push(comp.parentId);
-				// store the corresponding layer
-				var layer = getLayer(comp.parentId);
-				layers.push(layer);
-				// store page
-				if (!Lambda.has(pageIds, layer.parentId)){
-					pageIds.push(layer.parentId);
-					pages.push(getPage(layer.parentId));
-				}
-			}
+		for(comp in selection.getComponents()){
 			// store the component id
 			ids.push(comp.id);
 		}
-
-		// update the selection of the widgets
-		toolBoxes.setSelection(pages, layers, components);
 
 		// call SLBuilder::selectionChanged with the list of ids
 		selectionChanged(ids);

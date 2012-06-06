@@ -10,6 +10,9 @@ class Region
 	private var dom:HtmlDom;
 	private var component:Component;
 	function new(component:Component, container:HtmlDom){
+		// store the entities
+		this.component = component;
+
 		// create the regions
 		dom = Lib.document.createElement("div");
 		dom.style.position = "absolute";
