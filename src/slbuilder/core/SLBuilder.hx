@@ -5,7 +5,6 @@ import slbuilder.data.Property;
 import slbuilder.data.Component;
 import slbuilder.data.Layer;
 import slbuilder.data.Page;
-import slbuilder.ui.ToolBoxes;
 import slbuilder.core.ISLBuilderBridge;
 import slbuilder.selection.Selection;
 
@@ -33,11 +32,6 @@ class SLBuilder implements ISLBuilderBridge
 	public var selection:Selection;
 
 	/**
-	 * reference to the ToolBoxes object, used to manage the SLBuilder tool boxes
-	 */
-	public var toolBoxes:ToolBoxes;
-
-	/**
 	 * ISLBuilderBridge object used to interact with the dom
 	 * The implementation of ISLBuilderBridge which your application is to provide
 	 * so that the SLBuilder can interact with you DOM
@@ -62,10 +56,6 @@ class SLBuilder implements ISLBuilderBridge
 		// init selection
 		selection = new Selection();
 		selection.onChange = selectionChangedCallback;
-
-		// init tool boxes
-		var toolBoxesTag = Utils.getElementsByClassName(Lib.document.body, "toolboxes")[0];
-		toolBoxes = cast(slplayer.core.SLPlayer.getAssociatedComponents(toolBoxesTag))[0];
 	}
 	/**
 	 * called by the selection class when the selection has changed
@@ -144,7 +134,12 @@ class SLBuilder implements ISLBuilderBridge
 		if (slBuilderBridge == null)
 			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
 
-		return slBuilderBridge.createPage(deeplink);
+		var val = slBuilderBridge.createPage(deeplink);
+
+		// redraw the in place editors and selection markers
+		selection.invalidate();
+
+		return val;
 	}
 
 	/**
@@ -157,7 +152,12 @@ class SLBuilder implements ISLBuilderBridge
 		if (slBuilderBridge == null)
 			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
 
-		return slBuilderBridge.removePage(id);
+		var val = slBuilderBridge.removePage(id);
+
+		// redraw the in place editors and selection markers
+		selection.invalidate();
+
+		return val;
 	}
 
 	/**
@@ -196,7 +196,12 @@ class SLBuilder implements ISLBuilderBridge
 		if (slBuilderBridge == null)
 			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
 
-		return slBuilderBridge.createLayer(c, id);
+		var val = slBuilderBridge.createLayer(c, id);
+
+		// redraw the in place editors and selection markers
+		selection.invalidate();
+
+		return val;
 	}
 
 	/**
@@ -209,7 +214,12 @@ class SLBuilder implements ISLBuilderBridge
 		if (slBuilderBridge == null)
 			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
 
-		return slBuilderBridge.removeLayer(id);
+		var val = slBuilderBridge.removeLayer(id);
+
+		// redraw the in place editors and selection markers
+		selection.invalidate();
+
+		return val;
 	}
 
 	/**
@@ -247,7 +257,12 @@ class SLBuilder implements ISLBuilderBridge
 		if (slBuilderBridge == null)
 			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
 
-		return slBuilderBridge.createComponent(c, id);
+		var val = slBuilderBridge.createComponent(c, id);
+
+		// redraw the in place editors and selection markers
+		selection.invalidate();
+
+		return val;
 	}
 
 	/**
@@ -260,7 +275,12 @@ class SLBuilder implements ISLBuilderBridge
 		if (slBuilderBridge == null)
 			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
 
-		return slBuilderBridge.removeComponent(id);
+		var val = slBuilderBridge.removeComponent(id);
+
+		// redraw the in place editors and selection markers
+		selection.invalidate();
+
+		return val;
 	}
 
 	/**
@@ -287,6 +307,21 @@ class SLBuilder implements ISLBuilderBridge
 
 		return slBuilderBridge.getComponent(id);
 	}
+	/**
+	 * update a component based on its ID
+	 */
+	public function updateComponent(component:Component){
+		if (isInitOk == false)
+			throw("You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton");
+
+		if (slBuilderBridge == null)
+			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+
+		slBuilderBridge.updateComponent(component);
+
+		// redraw the in place editors and selection markers
+		selection.invalidate();
+	}
 
 	/**
 	 * Use class name like the slplayer does to retrieve the class name and path, then instanciate the class. Then look for the getProperties method or use reflexion.
@@ -311,7 +346,12 @@ class SLBuilder implements ISLBuilderBridge
 		if (slBuilderBridge == null)
 			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
 
-		return slBuilderBridge.setProperty(id, p, v);
+		var val = slBuilderBridge.setProperty(id, p, v);
+
+		// redraw the in place editors and selection markers
+		selection.invalidate();
+
+		return val;
 	}
 	/**
 	 * @return the object corresponding to the Id
@@ -341,8 +381,7 @@ class SLBuilder implements ISLBuilderBridge
 		if (isInitOk == false)
 			throw("You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton");
 
-		if (slBuilderBridge == null)
-			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+		selection.invalidate();
 	}
 
 	/**
@@ -353,7 +392,7 @@ class SLBuilder implements ISLBuilderBridge
 		if (isInitOk == false)
 			throw("You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton");
 
-		if (slBuilderBridge == null)
-			throw("SLBuilder error: the application did not provide a ISLBuilderBridge object");
+		// redraw the in place editors and selection markers
+		selection.invalidate();
 	}
 }

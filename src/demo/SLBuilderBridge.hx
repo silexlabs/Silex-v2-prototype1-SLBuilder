@@ -18,11 +18,27 @@ import js.Dom;
  */
 class SLBuilderBridge implements ISLBuilderBridge{
 	/**
-	 *
+	 * 
 	 */
 	public function new(){
 	}
+	/**
+	 * create an abstract component structure from the dom
+	 * this method is not part of SLBuilder API
+	 */
 	private function getComponentFromDom(element:HtmlDom):Component{
+		var rot:String = "rotate(0deg)";
+		untyped __js__ ("if (element.style.transform) rot=element.style.transform;");
+		untyped __js__ ("if (element.style.msTransform) rot=element.style.msTransform;");
+		untyped __js__ ("if (element.style.mozTransform) rot=element.style.mozTransform;");
+		untyped __js__ ("if (element.style.oTransform) rot=element.style.oTransform;");
+		untyped __js__ ("if (element.style.webkitTransform) rot=element.style.webkitTransform;");
+		// remove everything before "rotate("
+		rot = rot.substr(rot.indexOf("rotate(") + "rotate(".length);
+		rot = rot.substr(0, rot.indexOf("deg"));
+		var rotDeg:Int = Std.parseInt(rot);
+		var rotRad:Float = rotDeg*Math.PI/180;
+
 		var component:Component = {
 			parentId : {
 				type:component,
@@ -37,7 +53,7 @@ class SLBuilderBridge implements ISLBuilderBridge{
 			y: 0,
 			width: element.clientWidth,
 			height: element.clientHeight,
-			rotation: 0.0 //untyped __js__ ("element.style.rotation")
+			rotation: rotRad
 		};
 	    while(element != null && !Math.isNaN(element.offsetLeft)) {
 			component.x += element.offsetLeft - element.scrollLeft;
@@ -45,6 +61,37 @@ class SLBuilderBridge implements ISLBuilderBridge{
 			element = element.offsetParent;
 	    }
 	    return component;
+	}
+	/**
+	 * apply the properties of an abstract component to the dom
+	 * this method is not part of SLBuilder API
+	 */
+	private function setComponentToDom(element:HtmlDom, component:Component){
+
+/*		var tmpElement:HtmlDom = element;
+		var posX:Int = 0;
+		var posY:Int = 0;
+	    while(tmpElement != null && !Math.isNaN(tmpElement.offsetLeft)) {
+			posX += tmpElement.offsetLeft - tmpElement.scrollLeft;
+			posY += tmpElement.offsetTop - tmpElement.scrollTop;
+			tmpElement = tmpElement.offsetParent;
+	    }
+	    // apply the new coordiantes, taking the relative position of the html element into account
+	    //element.offsetLeft = component.x - posX;
+	    //element.offsetTop = component.y - posY;
+	    trace(component.x +" - "+ posX);
+*/
+//	    element.style.left = (component.x - element.offsetLeft) + "px";
+//	    element.style.top = (component.y - element.offsetTop) + "px";
+	    element.style.left = (component.x) + "px";
+	    element.style.top = (component.y) + "px";
+
+		var degRot:String = Math.round(180*component.rotation/Math.PI) + "deg";
+		untyped __js__ ("element.style.transform = 'rotate('+degRot+')';");
+		untyped __js__ ("element.style.msTransform = 'rotate('+degRot+')';");
+		untyped __js__ ("element.style.mozTransform = 'rotate('+degRot+')';");
+		untyped __js__ ("element.style.oTransform = 'rotate('+degRot+')';");
+		untyped __js__ ("element.style.webkitTransform = 'rotate('+degRot+')';");
 	}
 	/////////////////////////////////////////////////////////////////////
 	// Callbacks
@@ -272,6 +319,13 @@ class SLBuilderBridge implements ISLBuilderBridge{
 	public function getComponent(id:Id):Component{
 		var res:HtmlDom = Lib.document.getElementById(id.seed);
 		return getComponentFromDom(res);
+	}
+	/**
+	 * update a component based on its ID
+	 */
+	public function updateComponent(component:Component){
+		var dom:HtmlDom = Lib.document.getElementById(component.id.seed);
+		setComponentToDom(dom, component);
 	}
 
 	/**

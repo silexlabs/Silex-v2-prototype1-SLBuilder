@@ -66,8 +66,8 @@ class ComponentsWidget extends ListWidget<Component> {
 	/**
 	 * callback for a change in the selection
 	 */
-	private function onSelectionChange(components:Array<Component>){
-		trace("onSelectionChange ComponentsWidget "+components);
+	private function onSelectionChange(){
+		trace("onSelectionChange ComponentsWidget ");
 		// handles selection
 		var selectedComponents = SLBuilder.getInstance().selection.getComponents();
 		if (selectedComponents.length > 0)

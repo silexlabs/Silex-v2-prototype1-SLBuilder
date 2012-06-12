@@ -124,127 +124,18 @@
 	"buffers":
 	[
 		{
-			"file": "src/slbuilder/SLBuilder.hx",
+			"contents": "Author: lexoyo\nLisence: GPL\nCopyright: Silex Labs\n\nSLBuilder is an open source project supported by Silex Labs. \nIt is a WYSIWYG editor to be integrated into an existing template systems, in web applications or in AIR applications. It loads on top of your application and lets your users edit a design with drag and drops.\n\nScreenshots and description\n- http://www.youtube.com/watch?v=EYeCGEyhzxg\n\nTODO\n- widgets\n  . edit/create/delete a page (name, deeplink, seo, layers + list of layers of all pages to select?)\n  . edit/create/delete a layer (name, seo, pages)\n  . edit/create/delete a component (<=> properties but with editable name and type)\n- knob for manipulating elements, with a \"+\" on roll over at the bottom right, to open the widgets, to send to a layer, set as link to an existing page,...)\n- split the list component and the header/body/footer layout\n	<div class=\"toolbox\">\n		<ul>\n		</ul>\n	</div>\n- make it possible to skin the widgets (pages, layers, comp, prop) as tool boxes or combo boxes, encapsulating them in one another\n",
+			"file": "/home/lexa/Documents/repositories/fdt-workspace/SLBuilder/readme.txt",
+			"file_size": 997,
+			"file_write_time": 1339010393000000,
 			"settings":
 			{
-				"buffer_size": 0,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/ui/LayersWidget.hx",
-			"settings":
-			{
-				"buffer_size": 5023,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/slbuilder/ui/ComponentsWidget.hx",
-			"settings":
-			{
-				"buffer_size": 2237,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/ui/ListWidget.hx",
-			"settings":
-			{
-				"buffer_size": 6601,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/MainJs.hx",
-			"settings":
-			{
-				"buffer_size": 173,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/demo/SLBuilderBridge.hx",
-			"settings":
-			{
-				"buffer_size": 11212,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "bin/styles/layers-widget.css",
-			"settings":
-			{
-				"buffer_size": 697,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "bin/styles/slbuilder.css",
-			"settings":
-			{
-				"buffer_size": 2164,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "bin/libs/test.js",
-			"settings":
-			{
-				"buffer_size": 3962,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/core/Utils.hx",
-			"settings":
-			{
-				"buffer_size": 838,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/selection/Selection.hx",
-			"settings":
-			{
-				"buffer_size": 5861,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/selection/RegionDisplay.hx",
-			"settings":
-			{
-				"buffer_size": 548,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/core/SLBuilder.hx",
-			"settings":
-			{
-				"buffer_size": 12499,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/ui/ToolBoxes.hx",
-			"settings":
-			{
-				"buffer_size": 3473,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/slbuilder/ui/PropertiesWidget.hx",
-			"settings":
-			{
-				"buffer_size": 2074,
+				"buffer_size": 1043,
 				"line_ending": "Unix"
 			}
 		}
 	],
-	"build_system": "",
+	"build_system": "Packages/HaXe/Hxml.sublime-build",
 	"command_palette":
 	{
 		"height": 348.0,
@@ -272,31 +163,6 @@
 	},
 	"file_history":
 	[
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slplayer/macro/AppBuilder.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/templates/ViewMenu.html",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/templates/LayersWidget.html",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/index.html",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/build.hxml",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/ext-js-dark.css",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/libs/test.js",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/mainPannel/SLBuilerPannel/app/view/Viewport.js",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/mainPannel/SLBuilerPannel/app.js",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/mainPannel/SLBuilerPannel/app/view/MyWindow.js",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/mainPannel/jsClassNeedsToBeSet.ui.js",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/mainPannel/SLBuilerPannel/app.html",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/layers-widget.css",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/styles/slbuilder.css",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Utils.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/MainJs.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/core/Config.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/bin/templates/PropertiesList.html",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/data/Property.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/data/Types.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/SLBuilderBridge.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Descriptor.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/slbuilder/SLBuilder.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Application.hx",
-		"/home/lexa/Dropbox/fdt-workspace/SLBuilder/src/demo/Descriptor"
 	],
 	"find":
 	{
@@ -314,6 +180,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"height",
 			"layers",
 			"components",
 			"selectedComponents",
@@ -384,412 +251,31 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/slbuilder/SLBuilder.hx",
+					"file": "/home/lexa/Documents/repositories/fdt-workspace/SLBuilder/readme.txt",
 					"settings":
 					{
-						"buffer_size": 0,
+						"buffer_size": 1043,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								911,
+								911
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1828.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/slbuilder/ui/LayersWidget.hx",
-					"settings":
-					{
-						"buffer_size": 5023,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2819,
-								2793
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1683.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/slbuilder/ui/ComponentsWidget.hx",
-					"settings":
-					{
-						"buffer_size": 2237,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1029,
-								1029
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 476.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/slbuilder/ui/ListWidget.hx",
-					"settings":
-					{
-						"buffer_size": 6601,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3197,
-								3197
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 2025.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "src/MainJs.hx",
-					"settings":
-					{
-						"buffer_size": 173,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								173,
-								173
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage"
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/demo/SLBuilderBridge.hx",
-					"settings":
-					{
-						"buffer_size": 11212,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 837.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "bin/styles/layers-widget.css",
-					"settings":
-					{
-						"buffer_size": 697,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								592,
-								592
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CSS/CSS.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "bin/styles/slbuilder.css",
-					"settings":
-					{
-						"buffer_size": 2164,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CSS/CSS.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "bin/libs/test.js",
-					"settings":
-					{
-						"buffer_size": 3962,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								3962
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1071.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "src/slbuilder/core/Utils.hx",
-					"settings":
-					{
-						"buffer_size": 838,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "src/slbuilder/selection/Selection.hx",
-					"settings":
-					{
-						"buffer_size": 5861,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1918,
-								1936
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 714.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "src/slbuilder/selection/RegionDisplay.hx",
-					"settings":
-					{
-						"buffer_size": 548,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								529,
-								529
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "src/slbuilder/core/SLBuilder.hx",
-					"settings":
-					{
-						"buffer_size": 12499,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2702,
-								2702
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 985.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "src/slbuilder/ui/ToolBoxes.hx",
-					"settings":
-					{
-						"buffer_size": 3473,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								515,
-								515
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1003.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "src/slbuilder/ui/PropertiesWidget.hx",
-					"settings":
-					{
-						"buffer_size": 2074,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1652,
-								1652
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HaXe/HaXe.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 765.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -828,10 +314,6 @@
 		]
 	},
 	"menu_visible": true,
-	"output.exec":
-	{
-		"height": 112.0
-	},
 	"replace":
 	{
 		"height": 64.0

@@ -31,3 +31,13 @@ enum ElementType{
  */
 typedef ClassName = String;
 
+
+/**
+ * circular zone, defined by a position and a radius
+ */
+typedef ParametricZone = {
+	x:Int,
+	y:Int,
+	radius:Int,
+}
+

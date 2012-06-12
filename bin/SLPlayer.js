@@ -811,6 +811,7 @@ slbuilder.core.ISLBuilderBridge.prototype = {
 	,removeComponent: null
 	,getComponents: null
 	,getComponent: null
+	,updateComponent: null
 	,getProperties: null
 	,setProperty: null
 	,getProperty: null
@@ -824,13 +825,33 @@ demo.SLBuilderBridge.__name__ = ["demo","SLBuilderBridge"];
 demo.SLBuilderBridge.__interfaces__ = [slbuilder.core.ISLBuilderBridge];
 demo.SLBuilderBridge.prototype = {
 	getComponentFromDom: function(element) {
-		var component = { parentId : { type : slbuilder.data.ElementType.component, seed : element.parentNode.id}, id : { type : slbuilder.data.ElementType.component, seed : element.id}, displayName : element.id, x : 0, y : 0, width : element.clientWidth, height : element.clientHeight, rotation : 0.0};
+		var rot = "rotate(0deg)";
+		if (element.style.transform) rot=element.style.transform;;
+		if (element.style.msTransform) rot=element.style.msTransform;;
+		if (element.style.mozTransform) rot=element.style.mozTransform;;
+		if (element.style.oTransform) rot=element.style.oTransform;;
+		if (element.style.webkitTransform) rot=element.style.webkitTransform;;
+		rot = rot.substr(rot.indexOf("rotate(") + "rotate(".length);
+		rot = rot.substr(0,rot.indexOf("deg"));
+		var rotDeg = Std.parseInt(rot);
+		var rotRad = rotDeg * Math.PI / 180;
+		var component = { parentId : { type : slbuilder.data.ElementType.component, seed : element.parentNode.id}, id : { type : slbuilder.data.ElementType.component, seed : element.id}, displayName : element.id, x : 0, y : 0, width : element.clientWidth, height : element.clientHeight, rotation : rotRad};
 		while(element != null && !Math.isNaN(element.offsetLeft)) {
 			component.x += element.offsetLeft - element.scrollLeft;
 			component.y += element.offsetTop - element.scrollTop;
 			element = element.offsetParent;
 		}
 		return component;
+	}
+	,setComponentToDom: function(element,component) {
+		element.style.left = component.x + "px";
+		element.style.top = component.y + "px";
+		var degRot = Math.round(180 * component.rotation / Math.PI) + "deg";
+		element.style.transform = 'rotate('+degRot+')';;
+		element.style.msTransform = 'rotate('+degRot+')';;
+		element.style.mozTransform = 'rotate('+degRot+')';;
+		element.style.oTransform = 'rotate('+degRot+')';;
+		element.style.webkitTransform = 'rotate('+degRot+')';;
 	}
 	,getMainContainer: function() {
 		return js.Lib.document.getElementById("root_element_for_demo");
@@ -848,7 +869,7 @@ demo.SLBuilderBridge.prototype = {
 		return { id : id, displayName : id.seed, deeplink : deeplink};
 	}
 	,removePage: function(id) {
-		haxe.Log.trace("removePage(" + id.seed,{ fileName : "SLBuilderBridge.hx", lineNumber : 88, className : "demo.SLBuilderBridge", methodName : "removePage"});
+		haxe.Log.trace("removePage(" + id.seed,{ fileName : "SLBuilderBridge.hx", lineNumber : 135, className : "demo.SLBuilderBridge", methodName : "removePage"});
 		if(id.type != slbuilder.data.ElementType.page) throw "Error: trying to remove a page, but the ID is the ID of a " + Std.string(id.type);
 		var element = js.Lib.document.getElementById(id.seed);
 		if(element != null) {
@@ -953,11 +974,15 @@ demo.SLBuilderBridge.prototype = {
 		var res = js.Lib.document.getElementById(id.seed);
 		return this.getComponentFromDom(res);
 	}
+	,updateComponent: function(component) {
+		var dom = js.Lib.document.getElementById(component.id.seed);
+		this.setComponentToDom(dom,component);
+	}
 	,getProperties: function(parentId) {
 		var parent = js.Lib.document.getElementById(parentId.seed);
-		haxe.Log.trace("getProperties " + parentId + " => " + parent,{ fileName : "SLBuilderBridge.hx", lineNumber : 282, className : "demo.SLBuilderBridge", methodName : "getProperties"});
+		haxe.Log.trace("getProperties " + parentId + " => " + parent,{ fileName : "SLBuilderBridge.hx", lineNumber : 336, className : "demo.SLBuilderBridge", methodName : "getProperties"});
 		var properties = Reflect.field(demo.Descriptor,parent.nodeName.toLowerCase());
-		haxe.Log.trace("getProperties " + parent.nodeName + " => " + properties,{ fileName : "SLBuilderBridge.hx", lineNumber : 284, className : "demo.SLBuilderBridge", methodName : "getProperties"});
+		haxe.Log.trace("getProperties " + parent.nodeName + " => " + properties,{ fileName : "SLBuilderBridge.hx", lineNumber : 338, className : "demo.SLBuilderBridge", methodName : "getProperties"});
 		var _g = 0;
 		while(_g < properties.length) {
 			var property = properties[_g];
@@ -1617,6 +1642,41 @@ haxe.Template.prototype = {
 	}
 	,__class__: haxe.Template
 }
+haxe.Timer = $hxClasses["haxe.Timer"] = function(time_ms) {
+	var me = this;
+	this.id = window.setInterval(function() {
+		me.run();
+	},time_ms);
+};
+haxe.Timer.__name__ = ["haxe","Timer"];
+haxe.Timer.delay = function(f,time_ms) {
+	var t = new haxe.Timer(time_ms);
+	t.run = function() {
+		t.stop();
+		f();
+	};
+	return t;
+}
+haxe.Timer.measure = function(f,pos) {
+	var t0 = haxe.Timer.stamp();
+	var r = f();
+	haxe.Log.trace(haxe.Timer.stamp() - t0 + "s",pos);
+	return r;
+}
+haxe.Timer.stamp = function() {
+	return Date.now().getTime() / 1000;
+}
+haxe.Timer.prototype = {
+	id: null
+	,stop: function() {
+		if(this.id == null) return;
+		window.clearInterval(this.id);
+		this.id = null;
+	}
+	,run: function() {
+	}
+	,__class__: haxe.Timer
+}
 var js = js || {}
 js.Boot = $hxClasses["js.Boot"] = function() { }
 js.Boot.__name__ = ["js","Boot"];
@@ -1821,6 +1881,99 @@ slbuilder.core.Config.__name__ = ["slbuilder","core","Config"];
 slbuilder.core.Config.prototype = {
 	__class__: slbuilder.core.Config
 }
+var slplayer = slplayer || {}
+if(!slplayer.ui) slplayer.ui = {}
+slplayer.ui.DisplayObject = $hxClasses["slplayer.ui.DisplayObject"] = function(rootElement) {
+	this.rootElement = rootElement;
+	if(!this.checkFilterOnElt(rootElement)) throw "ERROR: cannot instantiate " + Type.getClassName(Type.getClass(this)) + " on a " + rootElement.nodeName + " element.";
+	slplayer.core.SLPlayer.addAssociatedComponent(rootElement,this);
+};
+slplayer.ui.DisplayObject.__name__ = ["slplayer","ui","DisplayObject"];
+slplayer.ui.DisplayObject.prototype = {
+	rootElement: null
+	,checkFilterOnElt: function(elt) {
+		if(elt.nodeType != js.Lib.document.body.nodeType) return false;
+		var tagFilter = Reflect.field(Type.getClass(this),"rootElementNameFilter");
+		if(tagFilter == null || tagFilter.isEmpty()) return true;
+		if(Lambda.exists(tagFilter,function(s) {
+			return elt.nodeName.toLowerCase() == s.toLowerCase();
+		})) return true;
+		return false;
+	}
+	,init: function() {
+	}
+	,__class__: slplayer.ui.DisplayObject
+}
+slbuilder.core.InPlaceEditor = $hxClasses["slbuilder.core.InPlaceEditor"] = function(d) {
+	slplayer.ui.DisplayObject.call(this,d);
+	this.regions = new Array();
+};
+slbuilder.core.InPlaceEditor.__name__ = ["slbuilder","core","InPlaceEditor"];
+slbuilder.core.InPlaceEditor.__super__ = slplayer.ui.DisplayObject;
+slbuilder.core.InPlaceEditor.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+	regions: null
+	,knob: null
+	,init: function() {
+		haxe.Log.trace("InPlaceEditor init",{ fileName : "InPlaceEditor.hx", lineNumber : 43, className : "slbuilder.core.InPlaceEditor", methodName : "init"});
+		slbuilder.core.SLBuilder.getInstance().selection.refreshRegionsCallbak = this.redraw.$bind(this);
+		var elements = slbuilder.core.Utils.getElementsByClassName(this.rootElement,"Knob");
+		if(elements == null || elements.length <= 0) throw "could not find the element in index.html";
+		var components = slplayer.core.SLPlayer.getAssociatedComponents(elements[0]);
+		if(components == null || components.length <= 0) throw "could not find the knob instance";
+		this.knob = components.first();
+		this.knob.hide();
+		this.knob.onMove = this.moveComponent.$bind(this);
+		this.knob.onRotate = this.rotateComponent.$bind(this);
+	}
+	,rotateComponent: function(angle) {
+		var selectedComponents = slbuilder.core.SLBuilder.getInstance().selection.getComponents();
+		var component = selectedComponents[0];
+		component.rotation = angle;
+		slbuilder.core.SLBuilder.getInstance().updateComponent(component);
+		slbuilder.core.SLBuilder.getInstance().selection.reloadData();
+	}
+	,moveComponent: function(x,y) {
+		var selectedComponents = slbuilder.core.SLBuilder.getInstance().selection.getComponents();
+		var component = selectedComponents[0];
+		component.x = x;
+		component.y = y;
+		slbuilder.core.SLBuilder.getInstance().updateComponent(component);
+		slbuilder.core.SLBuilder.getInstance().selection.reloadData();
+	}
+	,redraw: function() {
+		haxe.Log.trace("redraw ",{ fileName : "InPlaceEditor.hx", lineNumber : 87, className : "slbuilder.core.InPlaceEditor", methodName : "redraw"});
+		var components = slbuilder.core.SLBuilder.getInstance().getComponents(null);
+		var selectedComponents = slbuilder.core.SLBuilder.getInstance().selection.getComponents();
+		this.knob.reset();
+		var _g = 0, _g1 = this.regions;
+		while(_g < _g1.length) {
+			var region = _g1[_g];
+			++_g;
+			region.remove();
+		}
+		this.regions = new Array();
+		var _g = 0;
+		while(_g < selectedComponents.length) {
+			var component = selectedComponents[_g];
+			++_g;
+			this.displaySelected(component);
+		}
+		var _g = 0;
+		while(_g < components.length) {
+			var component = components[_g];
+			++_g;
+			this.displaySelectable(component);
+		}
+	}
+	,displaySelected: function(component) {
+		this.regions.push(new slbuilder.selection.RegionEdit(component,this.rootElement));
+		this.knob.addComponent(component);
+	}
+	,displaySelectable: function(component) {
+		this.regions.push(new slbuilder.selection.RegionDisplay(component,this.rootElement));
+	}
+	,__class__: slbuilder.core.InPlaceEditor
+});
 slbuilder.core.SLBuilder = $hxClasses["slbuilder.core.SLBuilder"] = function() {
 	haxe.Firebug.redirectTraces();
 	slbuilder.core.SLBuilder.isInitOk = false;
@@ -1835,16 +1988,13 @@ slbuilder.core.SLBuilder.getInstance = function() {
 }
 slbuilder.core.SLBuilder.prototype = {
 	selection: null
-	,toolBoxes: null
 	,slBuilderBridge: null
 	,init: function() {
-		haxe.Log.trace("SLBuilder init",{ fileName : "SLBuilder.hx", lineNumber : 55, className : "slbuilder.core.SLBuilder", methodName : "init"});
+		haxe.Log.trace("SLBuilder init",{ fileName : "SLBuilder.hx", lineNumber : 49, className : "slbuilder.core.SLBuilder", methodName : "init"});
 		if(slbuilder.core.SLBuilder.isInitOk) throw "You are supposed to call SLBuilder.getInstance().init() only once";
 		slbuilder.core.SLBuilder.isInitOk = true;
 		this.selection = new slbuilder.selection.Selection();
 		this.selection.onChange = this.selectionChangedCallback.$bind(this);
-		var toolBoxesTag = slbuilder.core.Utils.getElementsByClassName(js.Lib.document.body,"toolboxes")[0];
-		this.toolBoxes = slplayer.core.SLPlayer.getAssociatedComponents(toolBoxesTag)[0];
 	}
 	,selectionChangedCallback: function() {
 		var ids = [];
@@ -1867,12 +2017,16 @@ slbuilder.core.SLBuilder.prototype = {
 	,createPage: function(deeplink) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
-		return this.slBuilderBridge.createPage(deeplink);
+		var val = this.slBuilderBridge.createPage(deeplink);
+		this.selection.invalidate();
+		return val;
 	}
 	,removePage: function(id) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
-		return this.slBuilderBridge.removePage(id);
+		var val = this.slBuilderBridge.removePage(id);
+		this.selection.invalidate();
+		return val;
 	}
 	,getPages: function() {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
@@ -1887,12 +2041,16 @@ slbuilder.core.SLBuilder.prototype = {
 	,createLayer: function(c,id) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
-		return this.slBuilderBridge.createLayer(c,id);
+		var val = this.slBuilderBridge.createLayer(c,id);
+		this.selection.invalidate();
+		return val;
 	}
 	,removeLayer: function(id) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
-		return this.slBuilderBridge.removeLayer(id);
+		var val = this.slBuilderBridge.removeLayer(id);
+		this.selection.invalidate();
+		return val;
 	}
 	,getLayers: function(id) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
@@ -1907,12 +2065,16 @@ slbuilder.core.SLBuilder.prototype = {
 	,createComponent: function(c,id) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
-		return this.slBuilderBridge.createComponent(c,id);
+		var val = this.slBuilderBridge.createComponent(c,id);
+		this.selection.invalidate();
+		return val;
 	}
 	,removeComponent: function(id) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
-		return this.slBuilderBridge.removeComponent(id);
+		var val = this.slBuilderBridge.removeComponent(id);
+		this.selection.invalidate();
+		return val;
 	}
 	,getComponents: function(id) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
@@ -1924,6 +2086,12 @@ slbuilder.core.SLBuilder.prototype = {
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
 		return this.slBuilderBridge.getComponent(id);
 	}
+	,updateComponent: function(component) {
+		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
+		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
+		this.slBuilderBridge.updateComponent(component);
+		this.selection.invalidate();
+	}
 	,getProperties: function(id) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
@@ -1932,7 +2100,9 @@ slbuilder.core.SLBuilder.prototype = {
 	,setProperty: function(id,p,v) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
 		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
-		return this.slBuilderBridge.setProperty(id,p,v);
+		var val = this.slBuilderBridge.setProperty(id,p,v);
+		this.selection.invalidate();
+		return val;
 	}
 	,getProperty: function(parentId,name) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
@@ -1941,11 +2111,11 @@ slbuilder.core.SLBuilder.prototype = {
 	}
 	,selectionChanged: function(ids) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
-		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
+		this.selection.invalidate();
 	}
 	,selectionLockChanged: function(ids) {
 		if(slbuilder.core.SLBuilder.isInitOk == false) throw "You are supposed to call SLBuilder.getInstance().init() before using the SLBuilder singleton";
-		if(this.slBuilderBridge == null) throw "SLBuilder error: the application did not provide a ISLBuilderBridge object";
+		this.selection.invalidate();
 	}
 	,__class__: slbuilder.core.SLBuilder
 }
@@ -1965,6 +2135,9 @@ slbuilder.core.Utils.inspectTrace = function(obj) {
 		++_g;
 		haxe.Log.trace("- " + prop + " = " + Reflect.field(obj,prop),{ fileName : "Utils.hx", lineNumber : 28, className : "slbuilder.core.Utils", methodName : "inspectTrace"});
 	}
+}
+slbuilder.core.Utils.distance = function(x1,y1,x2,y2) {
+	return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 slbuilder.core.Utils.prototype = {
 	__class__: slbuilder.core.Utils
@@ -2025,6 +2198,8 @@ slbuilder.selection.RegionDisplay.prototype = $extend(slbuilder.selection.Region
 });
 slbuilder.selection.RegionEdit = $hxClasses["slbuilder.selection.RegionEdit"] = function(component,container) {
 	slbuilder.selection.Region.call(this,component,container);
+	haxe.Log.trace("new RegionEdit " + component,{ fileName : "RegionEdit.hx", lineNumber : 13, className : "slbuilder.selection.RegionEdit", methodName : "new"});
+	slbuilder.core.Utils.inspectTrace(component);
 	this.dom.className = "region regionedit";
 };
 slbuilder.selection.RegionEdit.__name__ = ["slbuilder","selection","RegionEdit"];
@@ -2036,36 +2211,67 @@ slbuilder.selection.RegionEdit.prototype = $extend(slbuilder.selection.Region.pr
 	,__class__: slbuilder.selection.RegionEdit
 });
 slbuilder.selection.Selection = $hxClasses["slbuilder.selection.Selection"] = function() {
-	haxe.Log.trace("Selection init",{ fileName : "Selection.hx", lineNumber : 46, className : "slbuilder.selection.Selection", methodName : "new"});
-	this.container = js.Lib.document.createElement("div");
-	this.container.id = "slBuilderRegionContainer";
-	js.Lib.document.body.appendChild(this.container);
-	this.regions = new Array();
+	haxe.Log.trace("Selection init",{ fileName : "Selection.hx", lineNumber : 41, className : "slbuilder.selection.Selection", methodName : "new"});
 	this.pages = new Array();
 	this.layers = new Array();
 	this.components = new Array();
-	this.redraw();
+	this.isDirty = false;
+	this.redrawRegions();
 };
 slbuilder.selection.Selection.__name__ = ["slbuilder","selection","Selection"];
 slbuilder.selection.Selection.prototype = {
-	regions: null
-	,container: null
-	,pages: null
+	pages: null
 	,layers: null
 	,components: null
+	,isDirty: null
 	,onChange: null
 	,refreshPagesWidgetCallbak: null
 	,refreshLayersWidgetCallbak: null
 	,refreshComponentsWidgetCallbak: null
 	,refreshPropertiesWidgetCallbak: null
+	,refreshRegionsCallbak: null
+	,redrawRegions: function() {
+		if(this.refreshRegionsCallbak != null) this.refreshRegionsCallbak();
+	}
+	,invalidate: function() {
+		if(this.isDirty == false) {
+			this.isDirty = true;
+			haxe.Timer.delay(this.redraw.$bind(this),25);
+		}
+	}
+	,redraw: function() {
+		if(this.refreshPagesWidgetCallbak != null) this.refreshPagesWidgetCallbak();
+		if(this.refreshLayersWidgetCallbak != null) this.refreshLayersWidgetCallbak();
+		if(this.refreshComponentsWidgetCallbak != null) this.refreshComponentsWidgetCallbak();
+		if(this.refreshPropertiesWidgetCallbak != null) this.refreshPropertiesWidgetCallbak();
+		this.redrawRegions();
+		this.isDirty = false;
+	}
+	,reloadData: function() {
+		var _g1 = 0, _g = this.components.length;
+		while(_g1 < _g) {
+			var idx = _g1++;
+			this.components[idx] = slbuilder.core.SLBuilder.getInstance().getComponent(this.components[idx].id);
+		}
+		var _g1 = 0, _g = this.layers.length;
+		while(_g1 < _g) {
+			var idx = _g1++;
+			this.layers[idx] = slbuilder.core.SLBuilder.getInstance().getLayer(this.layers[idx].id);
+		}
+		var _g1 = 0, _g = this.pages.length;
+		while(_g1 < _g) {
+			var idx = _g1++;
+			this.pages[idx] = slbuilder.core.SLBuilder.getInstance().getPage(this.pages[idx].id);
+		}
+	}
 	,setPages: function(items,invalidateLayers) {
 		if(invalidateLayers == null) invalidateLayers = true;
-		haxe.Log.trace("setPages " + items,{ fileName : "Selection.hx", lineNumber : 94, className : "slbuilder.selection.Selection", methodName : "setPages"});
+		haxe.Log.trace("setPages " + items,{ fileName : "Selection.hx", lineNumber : 145, className : "slbuilder.selection.Selection", methodName : "setPages"});
 		this.pages = items;
-		if(this.refreshPagesWidgetCallbak != null) this.refreshPagesWidgetCallbak(items);
+		if(this.refreshPagesWidgetCallbak != null) this.refreshPagesWidgetCallbak();
 		if(invalidateLayers == true) this.setLayers([],true,false);
 		if(this.onChange != null) this.onChange();
-		this.redraw();
+		this.redrawRegions();
 	}
 	,getPages: function() {
 		return this.pages;
@@ -2073,7 +2279,7 @@ slbuilder.selection.Selection.prototype = {
 	,setLayers: function(items,invalidateComponents,invalidatePages) {
 		if(invalidatePages == null) invalidatePages = true;
 		if(invalidateComponents == null) invalidateComponents = true;
-		haxe.Log.trace("setLayers " + items,{ fileName : "Selection.hx", lineNumber : 126, className : "slbuilder.selection.Selection", methodName : "setLayers"});
+		haxe.Log.trace("setLayers " + items,{ fileName : "Selection.hx", lineNumber : 177, className : "slbuilder.selection.Selection", methodName : "setLayers"});
 		this.layers = items;
 		var pagesArray = [];
 		var pagesIds = [];
@@ -2088,7 +2294,7 @@ slbuilder.selection.Selection.prototype = {
 			}
 		}
 		if(invalidatePages == true) this.setPages(pagesArray,false);
-		if(this.refreshLayersWidgetCallbak != null) this.refreshLayersWidgetCallbak(items);
+		if(this.refreshLayersWidgetCallbak != null) this.refreshLayersWidgetCallbak();
 		if(invalidateComponents == true) this.setComponents([],false);
 		if(this.onChange != null) this.onChange();
 	}
@@ -2097,7 +2303,7 @@ slbuilder.selection.Selection.prototype = {
 	}
 	,setComponents: function(items,invalidateLayers) {
 		if(invalidateLayers == null) invalidateLayers = true;
-		haxe.Log.trace("setComponents " + items,{ fileName : "Selection.hx", lineNumber : 175, className : "slbuilder.selection.Selection", methodName : "setComponents"});
+		haxe.Log.trace("setComponents " + items,{ fileName : "Selection.hx", lineNumber : 226, className : "slbuilder.selection.Selection", methodName : "setComponents"});
 		this.components = items;
 		var layersArray = [];
 		var layerIds = [];
@@ -2112,65 +2318,14 @@ slbuilder.selection.Selection.prototype = {
 			}
 		}
 		if(invalidateLayers == true) this.setLayers(layersArray,false);
-		if(this.refreshComponentsWidgetCallbak != null) this.refreshComponentsWidgetCallbak(items);
-		if(this.refreshPropertiesWidgetCallbak != null) this.refreshPropertiesWidgetCallbak(items);
+		if(this.refreshComponentsWidgetCallbak != null) this.refreshComponentsWidgetCallbak();
+		if(this.refreshPropertiesWidgetCallbak != null) this.refreshPropertiesWidgetCallbak();
 		if(this.onChange != null) this.onChange();
 	}
 	,getComponents: function() {
 		return this.components;
 	}
-	,redraw: function() {
-		var selectableComponents = slbuilder.core.SLBuilder.getInstance().getComponents(null);
-		var _g = 0, _g1 = this.regions;
-		while(_g < _g1.length) {
-			var region = _g1[_g];
-			++_g;
-			region.remove();
-		}
-		this.regions = new Array();
-		var _g = 0, _g1 = this.components;
-		while(_g < _g1.length) {
-			var component = _g1[_g];
-			++_g;
-			this.displaySelected(component);
-		}
-		var _g = 0;
-		while(_g < selectableComponents.length) {
-			var component = selectableComponents[_g];
-			++_g;
-			this.displaySelectable(component);
-		}
-	}
-	,displaySelected: function(component) {
-		this.regions.push(new slbuilder.selection.RegionEdit(component,this.container));
-	}
-	,displaySelectable: function(component) {
-		this.regions.push(new slbuilder.selection.RegionDisplay(component,this.container));
-	}
 	,__class__: slbuilder.selection.Selection
-}
-var slplayer = slplayer || {}
-if(!slplayer.ui) slplayer.ui = {}
-slplayer.ui.DisplayObject = $hxClasses["slplayer.ui.DisplayObject"] = function(rootElement) {
-	this.rootElement = rootElement;
-	if(!this.checkFilterOnElt(rootElement)) throw "ERROR: cannot instantiate " + Type.getClassName(Type.getClass(this)) + " on a " + rootElement.nodeName + " element.";
-	slplayer.core.SLPlayer.addAssociatedComponent(rootElement,this);
-};
-slplayer.ui.DisplayObject.__name__ = ["slplayer","ui","DisplayObject"];
-slplayer.ui.DisplayObject.prototype = {
-	rootElement: null
-	,checkFilterOnElt: function(elt) {
-		if(elt.nodeType != js.Lib.document.body.nodeType) return false;
-		var tagFilter = Reflect.field(Type.getClass(this),"rootElementNameFilter");
-		if(tagFilter == null || tagFilter.isEmpty()) return true;
-		if(Lambda.exists(tagFilter,function(s) {
-			return elt.nodeName.toLowerCase() == s.toLowerCase();
-		})) return true;
-		return false;
-	}
-	,init: function() {
-	}
-	,__class__: slplayer.ui.DisplayObject
 }
 if(!slbuilder.ui) slbuilder.ui = {}
 slbuilder.ui.ListWidget = $hxClasses["slbuilder.ui.ListWidget"] = function(d) {
@@ -2358,8 +2513,8 @@ slbuilder.ui.ComponentsWidget.prototype = $extend(slbuilder.ui.ListWidget.protot
 		slbuilder.ui.ListWidget.prototype.onClick.call(this,e);
 		slbuilder.core.SLBuilder.getInstance().selection.setComponents([this.getSelectedItem()]);
 	}
-	,onSelectionChange: function(components) {
-		haxe.Log.trace("onSelectionChange ComponentsWidget " + components,{ fileName : "ComponentsWidget.hx", lineNumber : 70, className : "slbuilder.ui.ComponentsWidget", methodName : "onSelectionChange"});
+	,onSelectionChange: function() {
+		haxe.Log.trace("onSelectionChange ComponentsWidget ",{ fileName : "ComponentsWidget.hx", lineNumber : 70, className : "slbuilder.ui.ComponentsWidget", methodName : "onSelectionChange"});
 		var selectedComponents = slbuilder.core.SLBuilder.getInstance().selection.getComponents();
 		if(selectedComponents.length > 0) this.setSelectedItem(selectedComponents[0]); else this.setSelectedItem(null);
 		this.refresh();
@@ -2385,6 +2540,184 @@ slbuilder.ui.ComponentsWidget.prototype = $extend(slbuilder.ui.ListWidget.protot
 	}
 	,__class__: slbuilder.ui.ComponentsWidget
 	,__properties__: $extend(slbuilder.ui.ListWidget.prototype.__properties__,{get_parentId:"getParentId"})
+});
+slbuilder.ui.InPlaceEditorState = $hxClasses["slbuilder.ui.InPlaceEditorState"] = { __ename__ : ["slbuilder","ui","InPlaceEditorState"], __constructs__ : ["none","move","resize","rotate"] }
+slbuilder.ui.InPlaceEditorState.none = ["none",0];
+slbuilder.ui.InPlaceEditorState.none.toString = $estr;
+slbuilder.ui.InPlaceEditorState.none.__enum__ = slbuilder.ui.InPlaceEditorState;
+slbuilder.ui.InPlaceEditorState.move = ["move",1];
+slbuilder.ui.InPlaceEditorState.move.toString = $estr;
+slbuilder.ui.InPlaceEditorState.move.__enum__ = slbuilder.ui.InPlaceEditorState;
+slbuilder.ui.InPlaceEditorState.resize = ["resize",2];
+slbuilder.ui.InPlaceEditorState.resize.toString = $estr;
+slbuilder.ui.InPlaceEditorState.resize.__enum__ = slbuilder.ui.InPlaceEditorState;
+slbuilder.ui.InPlaceEditorState.rotate = ["rotate",3];
+slbuilder.ui.InPlaceEditorState.rotate.toString = $estr;
+slbuilder.ui.InPlaceEditorState.rotate.__enum__ = slbuilder.ui.InPlaceEditorState;
+slbuilder.ui.Knob = $hxClasses["slbuilder.ui.Knob"] = function(d) {
+	slplayer.ui.DisplayObject.call(this,d);
+};
+slbuilder.ui.Knob.__name__ = ["slbuilder","ui","Knob"];
+slbuilder.ui.Knob.__super__ = slplayer.ui.DisplayObject;
+slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
+	radius: null
+	,x: null
+	,y: null
+	,_x: null
+	,_y: null
+	,setX: function(val) {
+		this._x = val;
+		this.rootElement.style.left = this.getX() - this.radius + "px";
+		return val;
+	}
+	,getX: function() {
+		return this._x;
+	}
+	,setY: function(val) {
+		this._y = val;
+		this.rootElement.style.top = this.getY() - this.radius + "px";
+		return val;
+	}
+	,getY: function() {
+		return this._y;
+	}
+	,state: null
+	,_state: null
+	,initialMouseX: null
+	,initialMouseY: null
+	,isMouseDown: null
+	,onMove: null
+	,onResize: null
+	,onRotate: null
+	,moveZone: null
+	,resizeZone: null
+	,rotateZone: null
+	,init: function() {
+		haxe.Log.trace("Knob init",{ fileName : "Knob.hx", lineNumber : 95, className : "slbuilder.ui.Knob", methodName : "init"});
+		this.isMouseDown = false;
+		this.setState(slbuilder.ui.InPlaceEditorState.none);
+		js.Lib.document.onmousemove = this.onMouseMove.$bind(this);
+		this.rootElement.onmousedown = this.onMouseDown.$bind(this);
+		js.Lib.document.onmouseup = this.onMouseUpOrOut.$bind(this);
+		this.moveZone = { x : Std.parseInt(this.rootElement.getAttribute("data-movezone-x")), y : Std.parseInt(this.rootElement.getAttribute("data-movezone-y")), radius : Std.parseInt(this.rootElement.getAttribute("data-movezone-radius"))};
+		this.resizeZone = { x : Std.parseInt(this.rootElement.getAttribute("data-resizezone-x")), y : Std.parseInt(this.rootElement.getAttribute("data-resizezone-y")), radius : Std.parseInt(this.rootElement.getAttribute("data-resizezone-radius"))};
+		this.rotateZone = { x : Std.parseInt(this.rootElement.getAttribute("data-rotatezone-x")), y : Std.parseInt(this.rootElement.getAttribute("data-rotatezone-y")), radius : Std.parseInt(this.rootElement.getAttribute("data-rotatezone-radius"))};
+		this.radius = Math.round(this.rootElement.clientWidth / 2);
+		this.setX(200);
+		this.setY(200);
+	}
+	,addComponent: function(component) {
+		if(this.isMouseDown == true) return;
+		this.setX(component.x + Math.round(component.width / 2));
+		this.setY(component.y + Math.round(component.height / 2));
+		this.show();
+	}
+	,reset: function() {
+		this.hide();
+	}
+	,show: function() {
+		this.rootElement.style.visibility = "visible";
+		this.rootElement.style.position = "absolute";
+	}
+	,hide: function() {
+		if(this.isMouseDown == true) return;
+		this.rootElement.style.visibility = "hidden";
+	}
+	,onMouseDown: function(e) {
+		this.isMouseDown = true;
+		this.initialMouseX = e.clientX;
+		this.initialMouseY = e.clientY;
+		haxe.Log.trace(this.initialMouseX + ", " + this.initialMouseY,{ fileName : "Knob.hx", lineNumber : 170, className : "slbuilder.ui.Knob", methodName : "onMouseDown"});
+		return false;;
+	}
+	,onMouseUpOrOut: function(e) {
+		this.isMouseDown = false;
+	}
+	,computeState: function(mouseX,mouseY) {
+		if(this.isMouseDown) return;
+		var polarX = mouseX - (this.getX() - this.radius);
+		var polarY = mouseY - (this.getY() - this.radius);
+		if(slbuilder.core.Utils.distance(polarX,polarY,this.moveZone.x,this.moveZone.y) < this.moveZone.radius) this.setState(slbuilder.ui.InPlaceEditorState.move); else if(slbuilder.core.Utils.distance(polarX,polarY,this.resizeZone.x,this.resizeZone.y) < this.resizeZone.radius) this.setState(slbuilder.ui.InPlaceEditorState.resize); else if(slbuilder.core.Utils.distance(polarX,polarY,this.rotateZone.x,this.rotateZone.y) < this.rotateZone.radius) this.setState(slbuilder.ui.InPlaceEditorState.rotate); else this.setState(slbuilder.ui.InPlaceEditorState.none);
+	}
+	,setState: function(val) {
+		if(this._state == val) return this._state;
+		this._state = val;
+		switch( (this._state)[1] ) {
+		case 0:
+			this.rootElement.style.cursor = "auto";
+			break;
+		case 1:
+			this.rootElement.style.cursor = "move";
+			break;
+		case 2:
+			this.rootElement.style.cursor = "ne-resize";
+			break;
+		case 3:
+			this.rootElement.style.cursor = "hand";
+			break;
+		}
+		return this._state;
+	}
+	,getState: function() {
+		return this._state;
+	}
+	,onMouseMove: function(e) {
+		this.computeState(e.clientX,e.clientY);
+		if(this.isMouseDown) {
+			switch( (this.getState())[1] ) {
+			case 0:
+				break;
+			case 1:
+				var _g = this;
+				_g.setX(_g.getX() + (e.clientX - this.initialMouseX));
+				var _g = this;
+				_g.setY(_g.getY() + (e.clientY - this.initialMouseY));
+				this.trackMove();
+				break;
+			case 2:
+				this.trackResize();
+				break;
+			case 3:
+				var mouseX = e.clientX;
+				var mouseY = e.clientY;
+				var polarX = mouseX - this.getX();
+				var polarY = mouseY - this.getY();
+				var rotation = Math.atan2(polarY,polarX);
+				var degRot = Math.round(180 * rotation / Math.PI) + "deg";
+				var __this__ = this;
+				__this__.rootElement.style.transform = 'rotate('+degRot+')';;
+				__this__.rootElement.style.msTransform = 'rotate('+degRot+')';;
+				__this__.rootElement.style.mozTransform = 'rotate('+degRot+')';;
+				__this__.rootElement.style.oTransform = 'rotate('+degRot+')';;
+				__this__.rootElement.style.webkitTransform = 'rotate('+degRot+')';;
+				this.trackRotate(rotation);
+				break;
+			}
+			this.initialMouseX = e.clientX;
+			this.initialMouseY = e.clientY;
+			return false;;
+		}
+	}
+	,trackMove: function() {
+		if(this.onMove != null) {
+			haxe.Log.trace("tracked Move " + this.getX(),{ fileName : "Knob.hx", lineNumber : 283, className : "slbuilder.ui.Knob", methodName : "trackMove"});
+			this.onMove(this.getX() - this.radius,this.getY() - this.radius);
+		}
+	}
+	,trackResize: function() {
+		if(this.onResize != null) {
+			haxe.Log.trace("tracked Resize ",{ fileName : "Knob.hx", lineNumber : 292, className : "slbuilder.ui.Knob", methodName : "trackResize"});
+			this.onResize(this.getX() - this.radius,this.getY() - this.radius);
+		}
+	}
+	,trackRotate: function(angle) {
+		if(this.onRotate != null) {
+			haxe.Log.trace("tracked ROTATE " + angle,{ fileName : "Knob.hx", lineNumber : 301, className : "slbuilder.ui.Knob", methodName : "trackRotate"});
+			this.onRotate(angle);
+		}
+	}
+	,__class__: slbuilder.ui.Knob
+	,__properties__: {set_state:"setState",get_state:"getState",set_y:"setY",get_y:"getY",set_x:"setX",get_x:"getX"}
 });
 slbuilder.ui.LayersWidget = $hxClasses["slbuilder.ui.LayersWidget"] = function(d) {
 	slbuilder.ui.ListWidget.call(this,d);
@@ -2421,14 +2754,14 @@ slbuilder.ui.LayersWidget.prototype = $extend(slbuilder.ui.ListWidget.prototype,
 		slbuilder.core.SLBuilder.getInstance().selection.refreshPagesWidgetCallbak = this.onPageSelectionChange.$bind(this);
 		this.setPageSelectedIndex(0);
 	}
-	,onSelectionChange: function(layers) {
-		haxe.Log.trace("onSelectionChange LayersWidget " + layers,{ fileName : "LayersWidget.hx", lineNumber : 101, className : "slbuilder.ui.LayersWidget", methodName : "onSelectionChange"});
+	,onSelectionChange: function() {
+		haxe.Log.trace("onSelectionChange LayersWidget ",{ fileName : "LayersWidget.hx", lineNumber : 101, className : "slbuilder.ui.LayersWidget", methodName : "onSelectionChange"});
 		var selectedLayers = slbuilder.core.SLBuilder.getInstance().selection.getLayers();
 		if(selectedLayers.length > 0) this.setSelectedItem(selectedLayers[0]); else this.setSelectedItem(null);
 		this.refresh();
 	}
-	,onPageSelectionChange: function(pages) {
-		haxe.Log.trace("onPageSelectionChange LayersWidget " + pages,{ fileName : "LayersWidget.hx", lineNumber : 116, className : "slbuilder.ui.LayersWidget", methodName : "onPageSelectionChange"});
+	,onPageSelectionChange: function() {
+		haxe.Log.trace("onPageSelectionChange LayersWidget ",{ fileName : "LayersWidget.hx", lineNumber : 116, className : "slbuilder.ui.LayersWidget", methodName : "onPageSelectionChange"});
 		var dataProviderPages = slbuilder.core.SLBuilder.getInstance().getPages();
 		this.refresh();
 	}
@@ -2532,8 +2865,8 @@ slbuilder.ui.PropertiesWidget.prototype = $extend(slbuilder.ui.ListWidget.protot
 		};
 		slbuilder.core.SLBuilder.getInstance().selection.refreshPropertiesWidgetCallbak = this.onSelectionChange.$bind(this);
 	}
-	,onSelectionChange: function(components) {
-		haxe.Log.trace("onSelectionChange " + components,{ fileName : "PropertiesWidget.hx", lineNumber : 66, className : "slbuilder.ui.PropertiesWidget", methodName : "onSelectionChange"});
+	,onSelectionChange: function() {
+		haxe.Log.trace("onSelectionChange ",{ fileName : "PropertiesWidget.hx", lineNumber : 66, className : "slbuilder.ui.PropertiesWidget", methodName : "onSelectionChange"});
 		this.refresh();
 	}
 	,onSubmit: function(e) {
@@ -2545,8 +2878,9 @@ slbuilder.ui.PropertiesWidget.prototype = $extend(slbuilder.ui.ListWidget.protot
 			haxe.Log.trace(idx,{ fileName : "PropertiesWidget.hx", lineNumber : 76, className : "slbuilder.ui.PropertiesWidget", methodName : "onSubmit"});
 			this.dataProvider[idx].value = Reflect.field(inputs[idx],"value");
 			slbuilder.core.SLBuilder.getInstance().setProperty(this.getParentId(),this.dataProvider[idx].name,this.dataProvider[idx].value);
-			slbuilder.core.SLBuilder.getInstance().selection.redraw();
 		}
+		this.reloadData();
+		slbuilder.core.SLBuilder.getInstance().selection.reloadData();
 		if(this.onChange != null) this.onChange(this.dataProvider[0]);
 	}
 	,reloadData: function() {
@@ -2558,17 +2892,6 @@ slbuilder.ui.PropertiesWidget.prototype = $extend(slbuilder.ui.ListWidget.protot
 	}
 	,__class__: slbuilder.ui.PropertiesWidget
 	,__properties__: $extend(slbuilder.ui.ListWidget.prototype.__properties__,{get_parentId:"getParentId"})
-});
-slbuilder.ui.ToolBoxes = $hxClasses["slbuilder.ui.ToolBoxes"] = function(rootElement) {
-	slplayer.ui.DisplayObject.call(this,rootElement);
-};
-slbuilder.ui.ToolBoxes.__name__ = ["slbuilder","ui","ToolBoxes"];
-slbuilder.ui.ToolBoxes.__super__ = slplayer.ui.DisplayObject;
-slbuilder.ui.ToolBoxes.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
-	layersWidget: null
-	,componentsWidget: null
-	,propertiesWidget: null
-	,__class__: slbuilder.ui.ToolBoxes
 });
 if(!slplayer.core) slplayer.core = {}
 slplayer.core.SLPlayer = $hxClasses["slplayer.core.SLPlayer"] = function() {
@@ -2603,8 +2926,10 @@ slplayer.core.SLPlayer.prototype = {
 	,registerComponentsforInit: function() {
 		demo.Application;
 		this.registerComponent("demo.Application");
-		slbuilder.ui.ToolBoxes;
-		this.registerComponent("slbuilder.ui.ToolBoxes");
+		slbuilder.ui.Knob;
+		this.registerComponent("slbuilder.ui.Knob");
+		slbuilder.core.InPlaceEditor;
+		this.registerComponent("slbuilder.core.InPlaceEditor");
 		slbuilder.ui.LayersWidget;
 		this.registerComponent("slbuilder.ui.LayersWidget");
 		slbuilder.ui.ComponentsWidget;

@@ -87,6 +87,10 @@ interface ISLBuilderBridge {
 	 * @return the object corresponding to the Id
 	 */
 	public function getComponent(id:Id):Component;
+	/**
+	 * update a component based on its ID
+	 */
+	public function updateComponent(component:Component):Void;
 
 	/**
 	 * Use class name like the slplayer does to retrieve the class name and path, then instanciate the class. Then look for the getProperties method or use reflexion.

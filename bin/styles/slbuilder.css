@@ -113,13 +113,16 @@
     width: auto;
 }
 .properties{
-	width: 58%;
-	max-width: none;
+    width: 58%;
+    max-width: none;
 }
-.add 
-.remove
-.layers 
-.components
-
-button
-
+.InPlaceEditor{
+//    display: none;
+}
+.Knob{
+    margin: 0;
+    padding: 0;
+    width: 91px;
+	height: 91px;
+    z-index: 10000;
+}

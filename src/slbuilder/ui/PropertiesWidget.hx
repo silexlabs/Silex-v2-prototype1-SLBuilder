@@ -62,8 +62,8 @@ class PropertiesWidget extends ListWidget<Property> {
 	/**
 	 * callback for a change in the selection
 	 */
-	private function onSelectionChange(components:Array<Component>){
-		trace("onSelectionChange "+components);
+	private function onSelectionChange(){
+		trace("onSelectionChange ");
 		refresh();
 	}
 	/**
@@ -76,8 +76,9 @@ class PropertiesWidget extends ListWidget<Property> {
 			trace(idx);
 			dataProvider[idx].value = Reflect.field(inputs[idx], "value");
 			SLBuilder.getInstance().setProperty(parentId, dataProvider[idx].name, dataProvider[idx].value);
-			SLBuilder.getInstance().selection.redraw();
 		}
+		reloadData();
+		SLBuilder.getInstance().selection.reloadData();
 		if (onChange != null){
 			onChange(dataProvider[0]);
 		}

@@ -19,14 +19,6 @@ import js.Dom;
 class Selection
 {
 	/**
-	 * list of editors and regions put over the components
-	 */
-	private var regions:Array<Region>;
-	/**
-	 * container for the regions put over the components
-	 */
-	private var container:HtmlDom;
-	/**
 	 * list of selected items
 	 */
 	private var pages:Array<Page>;
@@ -39,24 +31,24 @@ class Selection
 	 */
 	private var components:Array<Component>;
 	/**
+	 * used to determine if a redraw method call is already planed in the next frame
+	 */
+	private var isDirty:Bool;
+	/**
 	 * constructor
-	 * create a container for the regions and initialize vars
 	 */
 	public function new(){
 		trace("Selection init");
-		// create a container for all regions
-		container = Lib.document.createElement("div");
-		container.id="slBuilderRegionContainer";
-		Lib.document.body.appendChild(container);
-		
 		// init arrays
-		regions = new Array();
 		pages = new Array();
 		layers = new Array();
 		components = new Array();
-		
+
+		// init
+		isDirty = false;
+
 		// refresh regions
-		redraw();
+		redrawRegions();
 	}
 	///////////////////////////////////////////////////////////////////
 	// Callbacks
@@ -68,20 +60,79 @@ class Selection
 	/**
 	 * callback for the widget
 	 */
-	public var refreshPagesWidgetCallbak:Array<Page>->Void;
+	public var refreshPagesWidgetCallbak:Void->Void;
 	/**
 	 * callback for the widget
 	 */
-	public var refreshLayersWidgetCallbak:Array<Layer>->Void;
+	public var refreshLayersWidgetCallbak:Void->Void;
 	/**
 	 * callback for the widget
 	 */
-	public var refreshComponentsWidgetCallbak:Array<Component>->Void;
+	public var refreshComponentsWidgetCallbak:Void->Void;
 	/**
 	 * callback for the widget
 	 */
-	public var refreshPropertiesWidgetCallbak:Array<Component>->Void;
+	public var refreshPropertiesWidgetCallbak:Void->Void;
+	/**
+	 * callback for the widget
+	 */
+	public var refreshRegionsCallbak:Void->Void;
 
+	/**
+	 * refresh the in-place editors
+	 */
+	public function redrawRegions() {
+		if (refreshRegionsCallbak != null)
+			refreshRegionsCallbak();
+	}
+	/**
+	 * invalidate the selection display
+	 * this will ensure that the display will be updated in next frame, 
+	 * and will do not redraw multiple times even if this method is called multiple times
+	 */
+	public function invalidate() {
+		if (isDirty == false){
+			isDirty = true;
+			// do later
+			haxe.Timer.delay(redraw, 25);
+		}
+	}
+	/**
+	 * update the selection display and refresh the in-place editors
+	 */
+	public function redraw() {
+		// notify the widget 
+		if (refreshPagesWidgetCallbak != null)
+			refreshPagesWidgetCallbak();
+		// notify the widget 
+		if (refreshLayersWidgetCallbak != null)
+			refreshLayersWidgetCallbak();
+		// notify the widget 
+		if (refreshComponentsWidgetCallbak != null)
+			refreshComponentsWidgetCallbak();
+		// notify the widget 
+		if (refreshPropertiesWidgetCallbak != null)
+			refreshPropertiesWidgetCallbak();
+		// redraw regions
+		redrawRegions();
+
+		// now we are clean
+		isDirty = false;
+	}
+	/**
+	 * reload all components/layers/pages data from the dom
+	 */
+	public function reloadData(){
+		for(idx in 0...components.length){
+			components[idx] = SLBuilder.getInstance().getComponent(components[idx].id);
+		}
+		for(idx in 0...layers.length){
+			layers[idx] = SLBuilder.getInstance().getLayer(layers[idx].id);
+		}
+		for(idx in 0...pages.length){
+			pages[idx] = SLBuilder.getInstance().getPage(pages[idx].id);
+		}
+	}
 	///////////////////////////////////////////////////////////////////
 	// Manipulate selection 
 	///////////////////////////////////////////////////////////////////
@@ -97,7 +148,7 @@ class Selection
 
 		// notify the widget 
 		if (refreshPagesWidgetCallbak != null)
-			refreshPagesWidgetCallbak(items);
+			refreshPagesWidgetCallbak();
 
 		// empty the selection
 		if (invalidateLayers == true)
@@ -108,7 +159,7 @@ class Selection
 			onChange();
 
 		// redraw regions
-		redraw();
+		redrawRegions();
 	}
 	/**
 	 * retrieve the selection
@@ -149,7 +200,7 @@ class Selection
 
 		// notify the widget 
 		if (refreshLayersWidgetCallbak != null)
-			refreshLayersWidgetCallbak(items);
+			refreshLayersWidgetCallbak();
 
 		// empty the selection
 		if (invalidateComponents == true)
@@ -198,11 +249,11 @@ class Selection
 
 		// notify the widget 
 		if (refreshComponentsWidgetCallbak != null)
-			refreshComponentsWidgetCallbak(items);
+			refreshComponentsWidgetCallbak();
 
 		// notify the widget 
 		if (refreshPropertiesWidgetCallbak != null)
-			refreshPropertiesWidgetCallbak(items);
+			refreshPropertiesWidgetCallbak();
 
 		// notify the SLBuilder singleton
 		if (onChange != null)
@@ -213,42 +264,5 @@ class Selection
 	 */
 	public function getComponents():Array<Component>{
 		return components;
-	}
-	///////////////////////////////////////////////////////////////////
-	// Regions 
-	///////////////////////////////////////////////////////////////////
-	/**
-	 * refresh the in-place editors
-	 * also update the selection display
-	 */
-	public function redraw() {
-		// get selectable components list
-		var selectableComponents = SLBuilder.getInstance().getComponents(null);
-
-		// remove all regions
-		for(region in regions){
-			region.remove();
-		}
-		regions = new Array();
-		// create regions for selection
-		for(component in components){
-			displaySelected(component);
-		}
-		// create regions for selection
-		for(component in selectableComponents){
-			displaySelectable(component);
-		}
-	}
-	/**
-	 * crate an in-place editor and put it over the component
-	 */
-	private function displaySelected(component:Component){
-		regions.push(new RegionEdit(component, container));
-	}
-	/**
-	 * crate a selectable region and put it over the component
-	 */
-	private function displaySelectable(component:Component){
-		regions.push(new RegionDisplay(component, container));
 	}
 }

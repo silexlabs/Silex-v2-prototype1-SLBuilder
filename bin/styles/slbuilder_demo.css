@@ -1,7 +1,7 @@
 .layer{
 	display: inline-block;
-	width: 100px;
-	height: 100px;
+	width: 500px;
+	height: 500px;
 	background-color: Gainsboro;
 	border-style: dotted;
 	margin: 2px;
@@ -10,8 +10,8 @@
 }
 .component{
 	display: inline-block;
-	width: 10px;
-	height: 10px;
+	width: 100px;
+	height: 100px;
 	background-color: grey;
 	margin: 2px;
     opacity: 0.8;

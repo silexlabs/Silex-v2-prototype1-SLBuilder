@@ -97,8 +97,8 @@ class LayersWidget extends ListWidget<Layer> {
 	/**
 	 * callback for a change in the selection
 	 */
-	private function onSelectionChange(layers:Array<Layer>){
-		trace("onSelectionChange LayersWidget "+layers);
+	private function onSelectionChange(){
+		trace("onSelectionChange LayersWidget ");
 
 		// handle selection
 		var selectedLayers = SLBuilder.getInstance().selection.getLayers();
@@ -112,8 +112,8 @@ class LayersWidget extends ListWidget<Layer> {
 	/**
 	 * callback for a change in the selection
 	 */
-	private function onPageSelectionChange(pages:Array<Page>){
-		trace("onPageSelectionChange LayersWidget "+pages);
+	private function onPageSelectionChange(){
+		trace("onPageSelectionChange LayersWidget ");
 
 		// get data provider
 		var dataProviderPages = SLBuilder.getInstance().getPages();
