@@ -862,6 +862,8 @@ demo.SLBuilderBridge.prototype = {
 		element.style.webkitTransform = 'rotate('+degRot+')';;
 		element.style.left = component.x + "px";
 		element.style.top = component.y + "px";
+		element.style.width = component.width + "px";
+		element.style.height = component.height + "px";
 	}
 	,getMainContainer: function() {
 		return js.Lib.document.getElementById("root_element_for_demo");
@@ -879,7 +881,7 @@ demo.SLBuilderBridge.prototype = {
 		return { id : id, displayName : id.seed, deeplink : deeplink};
 	}
 	,removePage: function(id) {
-		haxe.Log.trace("removePage(" + id.seed,{ fileName : "SLBuilderBridge.hx", lineNumber : 162, className : "demo.SLBuilderBridge", methodName : "removePage"});
+		haxe.Log.trace("removePage(" + id.seed,{ fileName : "SLBuilderBridge.hx", lineNumber : 164, className : "demo.SLBuilderBridge", methodName : "removePage"});
 		if(id.type != slbuilder.data.ElementType.page) throw "Error: trying to remove a page, but the ID is the ID of a " + Std.string(id.type);
 		var element = js.Lib.document.getElementById(id.seed);
 		if(element != null) {
@@ -990,9 +992,9 @@ demo.SLBuilderBridge.prototype = {
 	}
 	,getProperties: function(parentId) {
 		var parent = js.Lib.document.getElementById(parentId.seed);
-		haxe.Log.trace("getProperties " + parentId + " => " + parent,{ fileName : "SLBuilderBridge.hx", lineNumber : 363, className : "demo.SLBuilderBridge", methodName : "getProperties"});
+		haxe.Log.trace("getProperties " + parentId + " => " + parent,{ fileName : "SLBuilderBridge.hx", lineNumber : 365, className : "demo.SLBuilderBridge", methodName : "getProperties"});
 		var properties = Reflect.field(demo.Descriptor,parent.nodeName.toLowerCase());
-		haxe.Log.trace("getProperties " + parent.nodeName + " => " + properties,{ fileName : "SLBuilderBridge.hx", lineNumber : 365, className : "demo.SLBuilderBridge", methodName : "getProperties"});
+		haxe.Log.trace("getProperties " + parent.nodeName + " => " + properties,{ fileName : "SLBuilderBridge.hx", lineNumber : 367, className : "demo.SLBuilderBridge", methodName : "getProperties"});
 		var _g = 0;
 		while(_g < properties.length) {
 			var property = properties[_g];
@@ -1934,6 +1936,7 @@ slbuilder.core.InPlaceEditor.prototype = $extend(slplayer.ui.DisplayObject.proto
 		this.knob.hide();
 		this.knob.onMove = this.applyToComponents.$bind(this);
 		this.knob.onRotate = this.applyToComponents.$bind(this);
+		this.knob.onResize = this.applyToComponents.$bind(this);
 	}
 	,applyToComponents: function() {
 		var selectedComponents = slbuilder.core.SLBuilder.getInstance().selection.getComponents();
@@ -1948,7 +1951,7 @@ slbuilder.core.InPlaceEditor.prototype = $extend(slplayer.ui.DisplayObject.proto
 		this.redraw();
 	}
 	,redraw: function() {
-		haxe.Log.trace("redraw ",{ fileName : "InPlaceEditor.hx", lineNumber : 84, className : "slbuilder.core.InPlaceEditor", methodName : "redraw"});
+		haxe.Log.trace("redraw ",{ fileName : "InPlaceEditor.hx", lineNumber : 85, className : "slbuilder.core.InPlaceEditor", methodName : "redraw"});
 		var components = slbuilder.core.SLBuilder.getInstance().getComponents(null);
 		var selectedComponents = slbuilder.core.SLBuilder.getInstance().selection.getComponents();
 		var _g = 0, _g1 = this.regions;
@@ -2572,9 +2575,21 @@ slbuilder.ui.Knob.isInZone = function(angle,dist,zone) {
 slbuilder.ui.Knob.__super__ = slplayer.ui.DisplayObject;
 slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	radius: null
+	,initialWidth: null
+	,initialHeight: null
+	,scale: null
 	,x: null
 	,y: null
 	,rotation: null
+	,_scale: null
+	,setScale: function(val) {
+		this._scale = val;
+		this.rootElement.style.width = this.rootElement.style.height = this.radius * 2 * this._scale + "px";
+		return val;
+	}
+	,getScale: function() {
+		return this._scale;
+	}
 	,_x: null
 	,setX: function(val) {
 		this._x = val;
@@ -2622,7 +2637,7 @@ slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	,resizeZone: null
 	,rotateZone: null
 	,init: function() {
-		haxe.Log.trace("Knob init",{ fileName : "Knob.hx", lineNumber : 146, className : "slbuilder.ui.Knob", methodName : "init"});
+		haxe.Log.trace("Knob init",{ fileName : "Knob.hx", lineNumber : 165, className : "slbuilder.ui.Knob", methodName : "init"});
 		this.isMouseDown = false;
 		this.setState(slbuilder.ui.InPlaceEditorState.none);
 		js.Lib.document.onmousemove = this.onMouseMove.$bind(this);
@@ -2632,8 +2647,6 @@ slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 		this.resizeZone = { maxRadius : Std.parseFloat(this.rootElement.getAttribute("data-resizezone-max-radius")), minRadius : Std.parseFloat(this.rootElement.getAttribute("data-resizezone-min-radius")), maxAngle : Std.parseFloat(this.rootElement.getAttribute("data-resizezone-max-angle")), minAngle : Std.parseFloat(this.rootElement.getAttribute("data-resizezone-min-angle"))};
 		this.rotateZone = { maxRadius : Std.parseFloat(this.rootElement.getAttribute("data-rotatezone-max-radius")), minRadius : Std.parseFloat(this.rootElement.getAttribute("data-rotatezone-min-radius")), maxAngle : Std.parseFloat(this.rootElement.getAttribute("data-rotatezone-max-angle")), minAngle : Std.parseFloat(this.rootElement.getAttribute("data-rotatezone-min-angle"))};
 		this.radius = this.rootElement.clientWidth / 2;
-		this.setX(200);
-		this.setY(200);
 	}
 	,attachToComponents: function(components) {
 		if(components.length > 0) {
@@ -2641,6 +2654,9 @@ slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 			this.setX(component.x + Math.round(component.width / 2));
 			this.setY(component.y + Math.round(component.height / 2));
 			this.setRotation(component.rotation);
+			this.setScale(1);
+			this.initialWidth = component.width;
+			this.initialHeight = component.height;
 			this.show();
 		} else this.hide();
 	}
@@ -2650,6 +2666,8 @@ slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 			component.x = this.getX() - Math.round(component.width / 2);
 			component.y = this.getY() - Math.round(component.height / 2);
 			component.rotation = this.getRotation();
+			component.width = Math.round(this.initialWidth * this.getScale());
+			component.height = Math.round(this.initialHeight * this.getScale());
 		}
 	}
 	,refresh: function() {
@@ -2670,7 +2688,7 @@ slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 		this.initialMouseY = e.clientY;
 		this.initialX = this.getX();
 		this.initialY = this.getY();
-		haxe.Log.trace(this.initialMouseX + ", " + this.initialMouseY,{ fileName : "Knob.hx", lineNumber : 245, className : "slbuilder.ui.Knob", methodName : "onMouseDown"});
+		haxe.Log.trace(this.initialMouseX + ", " + this.initialMouseY,{ fileName : "Knob.hx", lineNumber : 265, className : "slbuilder.ui.Knob", methodName : "onMouseDown"});
 		return false;;
 	}
 	,onMouseUpOrOut: function(e) {
@@ -2685,13 +2703,13 @@ slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 		if(angle > Math.PI) angle -= 2 * Math.PI;
 		if(angle < -Math.PI) angle += 2 * Math.PI;
 		if(slbuilder.ui.Knob.isInZone(angle,dist,this.moveZone)) {
-			haxe.Log.trace("MOVE ZONE",{ fileName : "Knob.hx", lineNumber : 283, className : "slbuilder.ui.Knob", methodName : "computeState"});
+			haxe.Log.trace("MOVE ZONE",{ fileName : "Knob.hx", lineNumber : 303, className : "slbuilder.ui.Knob", methodName : "computeState"});
 			this.setState(slbuilder.ui.InPlaceEditorState.move);
 		} else if(slbuilder.ui.Knob.isInZone(angle,dist,this.resizeZone)) {
-			haxe.Log.trace("RESIZE ZONE",{ fileName : "Knob.hx", lineNumber : 287, className : "slbuilder.ui.Knob", methodName : "computeState"});
+			haxe.Log.trace("RESIZE ZONE",{ fileName : "Knob.hx", lineNumber : 307, className : "slbuilder.ui.Knob", methodName : "computeState"});
 			this.setState(slbuilder.ui.InPlaceEditorState.resize);
 		} else if(slbuilder.ui.Knob.isInZone(angle,dist,this.rotateZone)) {
-			haxe.Log.trace("ROTATE ZONE",{ fileName : "Knob.hx", lineNumber : 291, className : "slbuilder.ui.Knob", methodName : "computeState"});
+			haxe.Log.trace("ROTATE ZONE",{ fileName : "Knob.hx", lineNumber : 311, className : "slbuilder.ui.Knob", methodName : "computeState"});
 			this.setState(slbuilder.ui.InPlaceEditorState.rotate);
 		} else this.setState(slbuilder.ui.InPlaceEditorState.none);
 	}
@@ -2731,6 +2749,10 @@ slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 				if(this.onMove != null) this.onMove();
 				break;
 			case 2:
+				var dist = slbuilder.core.Utils.distance(mouseX,mouseY,0,0);
+				var initialDist = slbuilder.core.Utils.distance(this.initialMouseX,this.initialMouseY,0,0);
+				this.setScale(dist / initialDist);
+				haxe.Log.trace("scale=" + this.getScale(),{ fileName : "Knob.hx", lineNumber : 368, className : "slbuilder.ui.Knob", methodName : "onMouseMove"});
 				if(this.onResize != null) this.onResize();
 				break;
 			case 3:
@@ -2746,7 +2768,7 @@ slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 		}
 	}
 	,__class__: slbuilder.ui.Knob
-	,__properties__: {set_state:"setState",get_state:"getState",set_rotation:"setRotation",get_rotation:"getRotation",set_y:"setY",get_y:"getY",set_x:"setX",get_x:"getX"}
+	,__properties__: {set_state:"setState",get_state:"getState",set_rotation:"setRotation",get_rotation:"getRotation",set_y:"setY",get_y:"getY",set_x:"setX",get_x:"getX",set_scale:"setScale",get_scale:"getScale"}
 });
 slbuilder.ui.LayersWidget = $hxClasses["slbuilder.ui.LayersWidget"] = function(d) {
 	slbuilder.ui.ListWidget.call(this,d);

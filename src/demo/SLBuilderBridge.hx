@@ -118,6 +118,8 @@ class SLBuilderBridge implements ISLBuilderBridge{
 */
 	    element.style.left = (component.x) + "px";
 	    element.style.top = (component.y) + "px";
+	    element.style.width = (component.width) + "px";
+	    element.style.height = (component.height) + "px";
 
 	}
 	/////////////////////////////////////////////////////////////////////

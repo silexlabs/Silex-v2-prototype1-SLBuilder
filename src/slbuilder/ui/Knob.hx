@@ -28,6 +28,13 @@ class Knob extends DisplayObject{
 	 */
 	private var radius:Float;
 
+	private var initialWidth:Int;
+	private var initialHeight:Int;
+	/**
+	 * position of the knob
+	 */
+	private var scale(getScale, setScale):Float;
+
 	/**
 	 * position of the knob
 	 */
@@ -40,6 +47,18 @@ class Knob extends DisplayObject{
 	 * position of the knob
 	 */
 	public var rotation(getRotation, setRotation):Float;
+	/**
+	 * getter/setter
+	 */
+	private var _scale:Float;
+	private function setScale(val:Float):Float{
+		_scale = val;
+		rootElement.style.width = rootElement.style.height = (radius*2*_scale) + "px";
+		return val;
+	}
+	private function getScale():Float{
+		return _scale;
+	}
 	/**
 	 * getter/setter
 	 */
@@ -177,10 +196,6 @@ class Knob extends DisplayObject{
 		};
 		// init radius
 		radius = rootElement.clientWidth / 2;
-
-		// init knob style
-		x = 200;
-		y = 200;
 	}
 	/**
 	 * move the knob over the components
@@ -192,6 +207,9 @@ class Knob extends DisplayObject{
 			x = component.x + Math.round(component.width/2);
 			y = component.y + Math.round(component.height/2);
 			rotation = component.rotation;
+			scale = 1;
+			initialWidth = component.width;
+			initialHeight = component.height;
 			show();
 		}
 		else{
@@ -208,6 +226,8 @@ class Knob extends DisplayObject{
 			component.x = x - Math.round(component.width/2);
 			component.y = y - Math.round(component.height/2);
 			component.rotation = rotation;
+			component.width = Math.round(initialWidth * scale);
+			component.height = Math.round(initialHeight * scale);
 		}
 	}
 	/**
@@ -342,6 +362,10 @@ static public function isInZone(angle:Float, dist:Float, zone:ParametricZone){
 					}
 
 				case resize:
+					var dist = Utils.distance(mouseX,mouseY,0,0);
+					var initialDist = Utils.distance(initialMouseX,initialMouseY,0,0);
+					scale = dist/initialDist;
+					trace("scale="+scale);
 					if (onResize != null){
 						onResize();
 					}

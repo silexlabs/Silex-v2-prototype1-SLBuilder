@@ -57,6 +57,7 @@ class InPlaceEditor extends DisplayObject{
 		/// attach to the knob
 		knob.onMove = applyToComponents;
 		knob.onRotate = applyToComponents;
+		knob.onResize = applyToComponents;
 
 		// refresh regions
 		//redraw();
