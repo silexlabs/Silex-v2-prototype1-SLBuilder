@@ -27,18 +27,42 @@ class SLBuilderBridge implements ISLBuilderBridge{
 	 * this method is not part of SLBuilder API
 	 */
 	private function getComponentFromDom(element:HtmlDom):Component{
-		var rot:String = "rotate(0deg)";
-		untyped __js__ ("if (element.style.transform) rot=element.style.transform;");
+		// center of rotation
+		untyped __js__ ("element.style.transformOrigin = '50%';");
+		untyped __js__ ("element.style.msTransformOrigin = '50%';");
+		untyped __js__ ("element.style.webkitTransformOrigin = '50%';");
+		untyped __js__ ("element.style.mozTransformOrigin = '50%';");
+		untyped __js__ ("element.style.oTransformOrigin = '50%';");
+
+		// rotation
+		var rot:String = "";
 		untyped __js__ ("if (element.style.msTransform) rot=element.style.msTransform;");
 		untyped __js__ ("if (element.style.mozTransform) rot=element.style.mozTransform;");
 		untyped __js__ ("if (element.style.oTransform) rot=element.style.oTransform;");
 		untyped __js__ ("if (element.style.webkitTransform) rot=element.style.webkitTransform;");
-		// remove everything before "rotate("
-		rot = rot.substr(rot.indexOf("rotate(") + "rotate(".length);
-		rot = rot.substr(0, rot.indexOf("deg"));
-		var rotDeg:Int = Std.parseInt(rot);
-		var rotRad:Float = rotDeg*Math.PI/180;
+		untyped __js__ ("if (element.style.transform) rot=element.style.transform;");
 
+		var rotRad:Float = 0;
+		// remove everything before "rotate("
+		if (rot.indexOf("rotate(")>=0){
+			rot = rot.substr(rot.indexOf("rotate(") + "rotate(".length);
+			if (rot.indexOf("deg")>=0){
+				rot = rot.substr(0, rot.indexOf("deg"));
+				var rotDeg:Int = Std.parseInt(rot);
+				if (!Math.isNaN(rotDeg)){
+					rotRad = rotDeg*Math.PI/180;
+				}
+			}
+		}
+
+		// position
+/*	    while(element != null && !Math.isNaN(element.offsetLeft)) {
+			component.x += element.offsetLeft - element.scrollLeft;
+			component.y += element.offsetTop - element.scrollTop;
+			element = element.offsetParent;
+	    }
+*/
+		// return the result
 		var component:Component = {
 			parentId : {
 				type:component,
@@ -49,17 +73,12 @@ class SLBuilderBridge implements ISLBuilderBridge{
 				seed:element.id
 			}, 
 			displayName : element.id,
-			x: 0,
-			y: 0,
+			x: element.offsetLeft,
+			y: element.offsetTop,
 			width: element.clientWidth,
 			height: element.clientHeight,
 			rotation: rotRad
 		};
-	    while(element != null && !Math.isNaN(element.offsetLeft)) {
-			component.x += element.offsetLeft - element.scrollLeft;
-			component.y += element.offsetTop - element.scrollTop;
-			element = element.offsetParent;
-	    }
 	    return component;
 	}
 	/**
@@ -68,6 +87,22 @@ class SLBuilderBridge implements ISLBuilderBridge{
 	 */
 	private function setComponentToDom(element:HtmlDom, component:Component){
 
+		// center of rotation
+		untyped __js__ ("element.style.transformOrigin = '50%';");
+		untyped __js__ ("element.style.msTransformOrigin = '50%';");
+		untyped __js__ ("element.style.webkitTransformOrigin = '50%';");
+		untyped __js__ ("element.style.mozTransformOrigin = '50%';");
+		untyped __js__ ("element.style.oTransformOrigin = '50%';");
+
+		// rotation
+		var degRot:String = Math.round(180*component.rotation/Math.PI) + "deg";
+		untyped __js__ ("element.style.transform = 'rotate('+degRot+')';");
+		untyped __js__ ("element.style.msTransform = 'rotate('+degRot+')';");
+		untyped __js__ ("element.style.mozTransform = 'rotate('+degRot+')';");
+		untyped __js__ ("element.style.oTransform = 'rotate('+degRot+')';");
+		untyped __js__ ("element.style.webkitTransform = 'rotate('+degRot+')';");
+
+		// position
 /*		var tmpElement:HtmlDom = element;
 		var posX:Int = 0;
 		var posY:Int = 0;
@@ -81,17 +116,9 @@ class SLBuilderBridge implements ISLBuilderBridge{
 	    //element.offsetTop = component.y - posY;
 	    trace(component.x +" - "+ posX);
 */
-//	    element.style.left = (component.x - element.offsetLeft) + "px";
-//	    element.style.top = (component.y - element.offsetTop) + "px";
 	    element.style.left = (component.x) + "px";
 	    element.style.top = (component.y) + "px";
 
-		var degRot:String = Math.round(180*component.rotation/Math.PI) + "deg";
-		untyped __js__ ("element.style.transform = 'rotate('+degRot+')';");
-		untyped __js__ ("element.style.msTransform = 'rotate('+degRot+')';");
-		untyped __js__ ("element.style.mozTransform = 'rotate('+degRot+')';");
-		untyped __js__ ("element.style.oTransform = 'rotate('+degRot+')';");
-		untyped __js__ ("element.style.webkitTransform = 'rotate('+degRot+')';");
 	}
 	/////////////////////////////////////////////////////////////////////
 	// Callbacks

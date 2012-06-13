@@ -65,7 +65,7 @@ class Descriptor {
 			value:null,
 			defaultValue:null,
 			canBeNull:true,
-			description:"CSS style width (y position)",
+			description:"CSS style width",
 		},
 		{
 			name:"style.height",
@@ -74,7 +74,16 @@ class Descriptor {
 			value:null,
 			defaultValue:null,
 			canBeNull:true,
-			description:"CSS style height (y position)",
+			description:"CSS style height",
+		},
+		{
+			name:"style.transform",
+			displayName:"css transform",
+			parentId:null,
+			value:null,
+			defaultValue:null,
+			canBeNull:true,
+			description:"CSS transform",
 		},
 	];
 }

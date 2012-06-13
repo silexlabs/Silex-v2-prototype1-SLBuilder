@@ -36,8 +36,9 @@ typedef ClassName = String;
  * circular zone, defined by a position and a radius
  */
 typedef ParametricZone = {
-	x:Int,
-	y:Int,
-	radius:Int,
+	maxRadius:Float,
+	minRadius:Float,
+	maxAngle:Float,
+	minAngle:Float,
 }
 

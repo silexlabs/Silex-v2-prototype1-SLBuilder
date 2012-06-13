@@ -4,10 +4,12 @@ import js.Lib;
 import js.Dom;
 
 import slplayer.ui.DisplayObject;
-import slbuilder.data.Types;
-import slbuilder.core.Utils;
 
+import slbuilder.data.Types;
 import slbuilder.data.Component;
+
+import slbuilder.core.Utils;
+import slbuilder.core.SLBuilder;
 
 enum InPlaceEditorState {
 	none;
@@ -24,51 +26,100 @@ class Knob extends DisplayObject{
 	 * equals the size of the image
 	 * set in the css
 	 */
-	private var radius:Int;
+	private var radius:Float;
+
+	/**
+	 * position of the knob
+	 */
 	public var x(getX, setX):Int;
+	/**
+	 * position of the knob
+	 */
 	public var y(getY, setY):Int;
+	/**
+	 * position of the knob
+	 */
+	public var rotation(getRotation, setRotation):Float;
+	/**
+	 * getter/setter
+	 */
 	private var _x:Int;
-	private var _y:Int;
 	private function setX(val:Int):Int{
 		_x = val;
-		rootElement.style.left = (x - radius) + "px";
+		rootElement.style.left = (_x - radius) + "px";
 		return val;
 	}
 	private function getX():Int{
 		return _x;
 	}
+	/**
+	 * getter/setter
+	 */
+	private var _y:Int;
 	private function setY(val:Int):Int{
 		_y = val;
-		rootElement.style.top = (y - radius)+ "px";
+		rootElement.style.top = (_y - radius)+ "px";
 		return val;
 	}
 	private function getY():Int{
 		return _y;
 	}
+	/**
+	 * getter/setter
+	 */
+	private var _rotation:Float;
+	private function setRotation(val:Float):Float{
+		_rotation = val;
+		var degRot:String = Math.round(180*val/Math.PI) + "deg";
+		var __this__ = this;
+		untyped __js__ ("__this__.rootElement.style.transform = 'rotate('+degRot+')';");
+		untyped __js__ ("__this__.rootElement.style.msTransform = 'rotate('+degRot+')';");
+		untyped __js__ ("__this__.rootElement.style.mozTransform = 'rotate('+degRot+')';");
+		untyped __js__ ("__this__.rootElement.style.oTransform = 'rotate('+degRot+')';");
+		untyped __js__ ("__this__.rootElement.style.webkitTransform = 'rotate('+degRot+')';");
+		return val;
+	}
+	private function getRotation():Float{
+		return _rotation;
+	}
 
 	/**
-	 *
+	 * state of the knob (none, move, rotate, resize...)
 	 */
 	public var state(getState, setState):InPlaceEditorState;
 	private var _state:InPlaceEditorState;
 	/**
-	 *
+	 * initial position
 	 */
 	private var initialMouseX:Int;
+	/**
+	 * initial position
+	 */
 	private var initialMouseY:Int;
+	/**
+	 * initial position
+	 */
+	private var initialX:Int;
+	/**
+	 * initial position
+	 */
+	private var initialY:Int;
+	/**
+	 * is the mouse pressed
+	 */
 	private var isMouseDown:Bool;
 	/**
 	 * callback for the InPlaceEditor
 	 */
-	public var onMove:Int->Int->Void;
+	public var onMove:Void->Void;
 	/**
 	 * callback for the InPlaceEditor
 	 */
-	public var onResize:Int->Int->Void;
+	public var onResize:Void->Void;
 	/**
 	 * callback for the InPlaceEditor
 	 */
-	public var onRotate:Float->Void;
+	public var onRotate:Void->Void;
 	/**
 	 * move zone defines where is the "grip" used to move the knob
 	 */
@@ -107,42 +158,64 @@ class Knob extends DisplayObject{
 
 		// init zone
 		moveZone = {
-			x: Std.parseInt(rootElement.getAttribute("data-movezone-x")),
-			y: Std.parseInt(rootElement.getAttribute("data-movezone-y")),
-			radius: Std.parseInt(rootElement.getAttribute("data-movezone-radius")),
+			maxRadius: Std.parseFloat(rootElement.getAttribute("data-movezone-max-radius")),
+			minRadius: Std.parseFloat(rootElement.getAttribute("data-movezone-min-radius")),
+			maxAngle: Std.parseFloat(rootElement.getAttribute("data-movezone-max-angle")),
+			minAngle: Std.parseFloat(rootElement.getAttribute("data-movezone-min-angle")),
 		};
 		resizeZone = {
-			x: Std.parseInt(rootElement.getAttribute("data-resizezone-x")),
-			y: Std.parseInt(rootElement.getAttribute("data-resizezone-y")),
-			radius: Std.parseInt(rootElement.getAttribute("data-resizezone-radius")),
+			maxRadius: Std.parseFloat(rootElement.getAttribute("data-resizezone-max-radius")),
+			minRadius: Std.parseFloat(rootElement.getAttribute("data-resizezone-min-radius")),
+			maxAngle: Std.parseFloat(rootElement.getAttribute("data-resizezone-max-angle")),
+			minAngle: Std.parseFloat(rootElement.getAttribute("data-resizezone-min-angle")),
 		};
 		rotateZone = {
-			x: Std.parseInt(rootElement.getAttribute("data-rotatezone-x")),
-			y: Std.parseInt(rootElement.getAttribute("data-rotatezone-y")),
-			radius: Std.parseInt(rootElement.getAttribute("data-rotatezone-radius")),
+			maxRadius: Std.parseFloat(rootElement.getAttribute("data-rotatezone-max-radius")),
+			minRadius: Std.parseFloat(rootElement.getAttribute("data-rotatezone-min-radius")),
+			maxAngle: Std.parseFloat(rootElement.getAttribute("data-rotatezone-max-angle")),
+			minAngle: Std.parseFloat(rootElement.getAttribute("data-rotatezone-min-angle")),
 		};
 		// init radius
-		radius = Math.round(rootElement.clientWidth / 2);
+		radius = rootElement.clientWidth / 2;
 
 		// init knob style
 		x = 200;
 		y = 200;
 	}
 	/**
-	 * show/hide the knob
+	 * move the knob over the components
+	 * TODO: handle multi selection
 	 */
-	public function addComponent(component:Component){
-		if (isMouseDown == true)
-			return;
-
-		x = component.x + Math.round(component.width/2);
-		y = component.y + Math.round(component.height/2);
-		show();
+	public function attachToComponents(components:Array<Component>){
+		if (components.length > 0){
+			var component = components[0];
+			x = component.x + Math.round(component.width/2);
+			y = component.y + Math.round(component.height/2);
+			rotation = component.rotation;
+			show();
+		}
+		else{
+			hide();
+		}
 	}
 	/**
+	 * move the components according to the knob 
+	 * TODO: handle multi selection
 	 */
-	public function reset(){
-		hide();
+	public function applyToComponents(components:Array<Component>){
+		if (components.length > 0){
+			var component = components[0];
+			component.x = x - Math.round(component.width/2);
+			component.y = y - Math.round(component.height/2);
+			component.rotation = rotation;
+		}
+	}
+	/**
+	 * attach the knob to the selection
+	 */
+	public function refresh(){
+		var components = SLBuilder.getInstance().selection.getComponents();
+		attachToComponents(components);
 	}
 	/**
 	 * show/hide the knob
@@ -167,6 +240,8 @@ class Knob extends DisplayObject{
 		isMouseDown = true;
 		initialMouseX = e.clientX;
 		initialMouseY = e.clientY;
+		initialX = x;
+		initialY = y;
 		trace(initialMouseX+", "+initialMouseY);
 		// prevent the drag of the image by the browser
 		untyped __js__("return false;");
@@ -178,6 +253,12 @@ class Knob extends DisplayObject{
 		isMouseDown = false;
 	}
 
+static public function isInZone(angle:Float, dist:Float, zone:ParametricZone){
+	return dist < zone.maxRadius 
+			&& dist > zone.minRadius
+			&& (angle < zone.maxAngle
+			|| angle > zone.minAngle);
+}
 	/**
 	 * compute the state in function of the mouse position
 	 */
@@ -186,19 +267,28 @@ class Knob extends DisplayObject{
 		if (isMouseDown)
 			return;
 		// compute coord relatively to center
-		var polarX = mouseX - (x-radius);
-		var polarY = mouseY - (y-radius);
+		var polarX = mouseX - x;
+		var polarY = mouseY - y;
+		var dist = Utils.distance(polarX, polarY, 0, 0);
+		//var angle = Math.atan2(polarY, polarX);
+		var angle = Math.atan2(polarY, polarX) - rotation;
+		if (angle > Math.PI) angle -= 2*Math.PI;
+		if (angle < -Math.PI) angle += 2*Math.PI;
+
+
+//			trace("param zone "+dist+", "+angle+", "+((angle%(2*Math.PI) - moveZone.minAngle%(2*Math.PI))%(2*Math.PI))+", "+((angle - moveZone.maxAngle)%(2*Math.PI)));
+
 		// check in which zone we are
-		if (Utils.distance(polarX, polarY, moveZone.x, moveZone.y) < moveZone.radius){
-			//trace("MOVE ZONE");
+		if (isInZone(angle, dist, moveZone)){
+			trace("MOVE ZONE");
 			state = move;
 		}
-		else if (Utils.distance(polarX, polarY, resizeZone.x, resizeZone.y) < resizeZone.radius){
-			//trace("RESIZE ZONE");
+		else if (isInZone(angle, dist, resizeZone)){
+			trace("RESIZE ZONE");
 			state = resize;
 		}
-		else if (Utils.distance(polarX, polarY, rotateZone.x, rotateZone.y) < rotateZone.radius){
-			//trace("ROTATE ZONE");
+		else if (isInZone(angle, dist, rotateZone)){
+			trace("ROTATE ZONE");
 			state = rotate;
 		}
 		else{
@@ -236,70 +326,43 @@ class Knob extends DisplayObject{
 	 * in charge of the mouse cursor
 	 */
 	private function onMouseMove(e:js.Event){
-		computeState(e.clientX, e.clientY);
+		var mouseX = e.clientX;
+		var mouseY = e.clientY;
+		
+		computeState(mouseX, mouseY);
+
 		if (isMouseDown){
 			switch (state) {
 				case none:
 				case move:
-					x += e.clientX-initialMouseX;
-					y += e.clientY-initialMouseY;
-					trackMove();
+					x = mouseX - initialMouseX + initialX;
+					y = mouseY - initialMouseY + initialY;
+					if (onMove != null){
+						onMove();
+					}
+
 				case resize:
-					trackResize();
+					if (onResize != null){
+						onResize();
+					}
+				
 				case rotate:
-					var mouseX = e.clientX;
-					var mouseY = e.clientY;
-
-/*					var initialPolarX = initialMouseX - x;
-					var initialPolarY = initialMouseY - y;
-					var initialRotation = Math.atan2(initialPolarY, initialPolarX);
-
-*/					var polarX = mouseX - x;
+					var polarX = mouseX - x;
 					var polarY = mouseY - y;
-					var rotation = Math.atan2(polarY, polarX);
+					
+					rotation = Math.atan2(polarY, polarX);
 
-					var degRot:String = Math.round(180*rotation/Math.PI) + "deg";
-					//trace(initialRotation+" - "+rotation+" - "+degRot);
-					var __this__ = this;
-					untyped __js__ ("__this__.rootElement.style.transform = 'rotate('+degRot+')';");
-					untyped __js__ ("__this__.rootElement.style.msTransform = 'rotate('+degRot+')';");
-					untyped __js__ ("__this__.rootElement.style.mozTransform = 'rotate('+degRot+')';");
-					untyped __js__ ("__this__.rootElement.style.oTransform = 'rotate('+degRot+')';");
-					untyped __js__ ("__this__.rootElement.style.webkitTransform = 'rotate('+degRot+')';");
+					x = initialX;
+					y = initialY;
 
-					trackRotate(rotation);
+					if (onRotate != null){
+						onRotate();
+					}
 			}
 			//trace("onMouseMove " + mouseX +", "+mouseY+", "+moveZone.x+", "+moveZone.y+", "+Utils.distance(mouseX, mouseY, moveZone.x, moveZone.y));
-			initialMouseX = e.clientX;
-			initialMouseY = e.clientY;
+			//initialMouseX = mouseX;
+			//initialMouseY = mouseY;
 			untyped __js__("return false;");
-		}
-	}
-	/**
-	 * if the mouse is pressed, compute the delta of the mouse position and notifies the InPlaceEditor
-	 */
-	private function trackMove(){
-		if (onMove != null){
-			trace("tracked Move "+x);
-			onMove(x-radius, y-radius);
-		}
-	}
-	/**
-	 * if the mouse is pressed, compute the delta of the mouse position and notifies the InPlaceEditor
-	 */
-	private function trackResize(){
-		if (onResize != null){
-			trace("tracked Resize ");
-			onResize(x-radius, y-radius);
-		}
-	}
-	/**
-	 * if the mouse is pressed, compute the delta of the mouse position and notifies the InPlaceEditor
-	 */
-	private function trackRotate(angle:Float){
-		if (onRotate != null){
-			trace("tracked ROTATE "+angle);
-			onRotate(angle);
 		}
 	}
 }

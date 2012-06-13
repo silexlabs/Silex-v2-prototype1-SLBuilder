@@ -825,33 +825,43 @@ demo.SLBuilderBridge.__name__ = ["demo","SLBuilderBridge"];
 demo.SLBuilderBridge.__interfaces__ = [slbuilder.core.ISLBuilderBridge];
 demo.SLBuilderBridge.prototype = {
 	getComponentFromDom: function(element) {
-		var rot = "rotate(0deg)";
-		if (element.style.transform) rot=element.style.transform;;
+		element.style.transformOrigin = '50%';;
+		element.style.msTransformOrigin = '50%';;
+		element.style.webkitTransformOrigin = '50%';;
+		element.style.mozTransformOrigin = '50%';;
+		element.style.oTransformOrigin = '50%';;
+		var rot = "";
 		if (element.style.msTransform) rot=element.style.msTransform;;
 		if (element.style.mozTransform) rot=element.style.mozTransform;;
 		if (element.style.oTransform) rot=element.style.oTransform;;
 		if (element.style.webkitTransform) rot=element.style.webkitTransform;;
-		rot = rot.substr(rot.indexOf("rotate(") + "rotate(".length);
-		rot = rot.substr(0,rot.indexOf("deg"));
-		var rotDeg = Std.parseInt(rot);
-		var rotRad = rotDeg * Math.PI / 180;
-		var component = { parentId : { type : slbuilder.data.ElementType.component, seed : element.parentNode.id}, id : { type : slbuilder.data.ElementType.component, seed : element.id}, displayName : element.id, x : 0, y : 0, width : element.clientWidth, height : element.clientHeight, rotation : rotRad};
-		while(element != null && !Math.isNaN(element.offsetLeft)) {
-			component.x += element.offsetLeft - element.scrollLeft;
-			component.y += element.offsetTop - element.scrollTop;
-			element = element.offsetParent;
+		if (element.style.transform) rot=element.style.transform;;
+		var rotRad = 0;
+		if(rot.indexOf("rotate(") >= 0) {
+			rot = rot.substr(rot.indexOf("rotate(") + "rotate(".length);
+			if(rot.indexOf("deg") >= 0) {
+				rot = rot.substr(0,rot.indexOf("deg"));
+				var rotDeg = Std.parseInt(rot);
+				if(!Math.isNaN(rotDeg)) rotRad = rotDeg * Math.PI / 180;
+			}
 		}
+		var component = { parentId : { type : slbuilder.data.ElementType.component, seed : element.parentNode.id}, id : { type : slbuilder.data.ElementType.component, seed : element.id}, displayName : element.id, x : element.offsetLeft, y : element.offsetTop, width : element.clientWidth, height : element.clientHeight, rotation : rotRad};
 		return component;
 	}
 	,setComponentToDom: function(element,component) {
-		element.style.left = component.x + "px";
-		element.style.top = component.y + "px";
+		element.style.transformOrigin = '50%';;
+		element.style.msTransformOrigin = '50%';;
+		element.style.webkitTransformOrigin = '50%';;
+		element.style.mozTransformOrigin = '50%';;
+		element.style.oTransformOrigin = '50%';;
 		var degRot = Math.round(180 * component.rotation / Math.PI) + "deg";
 		element.style.transform = 'rotate('+degRot+')';;
 		element.style.msTransform = 'rotate('+degRot+')';;
 		element.style.mozTransform = 'rotate('+degRot+')';;
 		element.style.oTransform = 'rotate('+degRot+')';;
 		element.style.webkitTransform = 'rotate('+degRot+')';;
+		element.style.left = component.x + "px";
+		element.style.top = component.y + "px";
 	}
 	,getMainContainer: function() {
 		return js.Lib.document.getElementById("root_element_for_demo");
@@ -869,7 +879,7 @@ demo.SLBuilderBridge.prototype = {
 		return { id : id, displayName : id.seed, deeplink : deeplink};
 	}
 	,removePage: function(id) {
-		haxe.Log.trace("removePage(" + id.seed,{ fileName : "SLBuilderBridge.hx", lineNumber : 135, className : "demo.SLBuilderBridge", methodName : "removePage"});
+		haxe.Log.trace("removePage(" + id.seed,{ fileName : "SLBuilderBridge.hx", lineNumber : 162, className : "demo.SLBuilderBridge", methodName : "removePage"});
 		if(id.type != slbuilder.data.ElementType.page) throw "Error: trying to remove a page, but the ID is the ID of a " + Std.string(id.type);
 		var element = js.Lib.document.getElementById(id.seed);
 		if(element != null) {
@@ -980,9 +990,9 @@ demo.SLBuilderBridge.prototype = {
 	}
 	,getProperties: function(parentId) {
 		var parent = js.Lib.document.getElementById(parentId.seed);
-		haxe.Log.trace("getProperties " + parentId + " => " + parent,{ fileName : "SLBuilderBridge.hx", lineNumber : 336, className : "demo.SLBuilderBridge", methodName : "getProperties"});
+		haxe.Log.trace("getProperties " + parentId + " => " + parent,{ fileName : "SLBuilderBridge.hx", lineNumber : 363, className : "demo.SLBuilderBridge", methodName : "getProperties"});
 		var properties = Reflect.field(demo.Descriptor,parent.nodeName.toLowerCase());
-		haxe.Log.trace("getProperties " + parent.nodeName + " => " + properties,{ fileName : "SLBuilderBridge.hx", lineNumber : 338, className : "demo.SLBuilderBridge", methodName : "getProperties"});
+		haxe.Log.trace("getProperties " + parent.nodeName + " => " + properties,{ fileName : "SLBuilderBridge.hx", lineNumber : 365, className : "demo.SLBuilderBridge", methodName : "getProperties"});
 		var _g = 0;
 		while(_g < properties.length) {
 			var property = properties[_g];
@@ -1922,29 +1932,25 @@ slbuilder.core.InPlaceEditor.prototype = $extend(slplayer.ui.DisplayObject.proto
 		if(components == null || components.length <= 0) throw "could not find the knob instance";
 		this.knob = components.first();
 		this.knob.hide();
-		this.knob.onMove = this.moveComponent.$bind(this);
-		this.knob.onRotate = this.rotateComponent.$bind(this);
+		this.knob.onMove = this.applyToComponents.$bind(this);
+		this.knob.onRotate = this.applyToComponents.$bind(this);
 	}
-	,rotateComponent: function(angle) {
+	,applyToComponents: function() {
 		var selectedComponents = slbuilder.core.SLBuilder.getInstance().selection.getComponents();
-		var component = selectedComponents[0];
-		component.rotation = angle;
-		slbuilder.core.SLBuilder.getInstance().updateComponent(component);
+		this.knob.applyToComponents(selectedComponents);
+		var _g = 0;
+		while(_g < selectedComponents.length) {
+			var component = selectedComponents[_g];
+			++_g;
+			slbuilder.core.SLBuilder.getInstance().updateComponent(component);
+		}
 		slbuilder.core.SLBuilder.getInstance().selection.reloadData();
-	}
-	,moveComponent: function(x,y) {
-		var selectedComponents = slbuilder.core.SLBuilder.getInstance().selection.getComponents();
-		var component = selectedComponents[0];
-		component.x = x;
-		component.y = y;
-		slbuilder.core.SLBuilder.getInstance().updateComponent(component);
-		slbuilder.core.SLBuilder.getInstance().selection.reloadData();
+		this.redraw();
 	}
 	,redraw: function() {
-		haxe.Log.trace("redraw ",{ fileName : "InPlaceEditor.hx", lineNumber : 87, className : "slbuilder.core.InPlaceEditor", methodName : "redraw"});
+		haxe.Log.trace("redraw ",{ fileName : "InPlaceEditor.hx", lineNumber : 84, className : "slbuilder.core.InPlaceEditor", methodName : "redraw"});
 		var components = slbuilder.core.SLBuilder.getInstance().getComponents(null);
 		var selectedComponents = slbuilder.core.SLBuilder.getInstance().selection.getComponents();
-		this.knob.reset();
 		var _g = 0, _g1 = this.regions;
 		while(_g < _g1.length) {
 			var region = _g1[_g];
@@ -1952,22 +1958,24 @@ slbuilder.core.InPlaceEditor.prototype = $extend(slplayer.ui.DisplayObject.proto
 			region.remove();
 		}
 		this.regions = new Array();
+		var selectedIdSeeds = [];
 		var _g = 0;
 		while(_g < selectedComponents.length) {
 			var component = selectedComponents[_g];
 			++_g;
+			selectedIdSeeds.push(component.id.seed);
 			this.displaySelected(component);
 		}
 		var _g = 0;
 		while(_g < components.length) {
 			var component = components[_g];
 			++_g;
-			this.displaySelectable(component);
+			if(!Lambda.has(selectedIdSeeds,component.id.seed)) this.displaySelectable(component);
 		}
+		this.knob.attachToComponents(selectedComponents);
 	}
 	,displaySelected: function(component) {
 		this.regions.push(new slbuilder.selection.RegionEdit(component,this.rootElement));
-		this.knob.addComponent(component);
 	}
 	,displaySelectable: function(component) {
 		this.regions.push(new slbuilder.selection.RegionDisplay(component,this.rootElement));
@@ -2558,33 +2566,54 @@ slbuilder.ui.Knob = $hxClasses["slbuilder.ui.Knob"] = function(d) {
 	slplayer.ui.DisplayObject.call(this,d);
 };
 slbuilder.ui.Knob.__name__ = ["slbuilder","ui","Knob"];
+slbuilder.ui.Knob.isInZone = function(angle,dist,zone) {
+	return dist < zone.maxRadius && dist > zone.minRadius && (angle < zone.maxAngle || angle > zone.minAngle);
+}
 slbuilder.ui.Knob.__super__ = slplayer.ui.DisplayObject;
 slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	radius: null
 	,x: null
 	,y: null
+	,rotation: null
 	,_x: null
-	,_y: null
 	,setX: function(val) {
 		this._x = val;
-		this.rootElement.style.left = this.getX() - this.radius + "px";
+		this.rootElement.style.left = this._x - this.radius + "px";
 		return val;
 	}
 	,getX: function() {
 		return this._x;
 	}
+	,_y: null
 	,setY: function(val) {
 		this._y = val;
-		this.rootElement.style.top = this.getY() - this.radius + "px";
+		this.rootElement.style.top = this._y - this.radius + "px";
 		return val;
 	}
 	,getY: function() {
 		return this._y;
 	}
+	,_rotation: null
+	,setRotation: function(val) {
+		this._rotation = val;
+		var degRot = Math.round(180 * val / Math.PI) + "deg";
+		var __this__ = this;
+		__this__.rootElement.style.transform = 'rotate('+degRot+')';;
+		__this__.rootElement.style.msTransform = 'rotate('+degRot+')';;
+		__this__.rootElement.style.mozTransform = 'rotate('+degRot+')';;
+		__this__.rootElement.style.oTransform = 'rotate('+degRot+')';;
+		__this__.rootElement.style.webkitTransform = 'rotate('+degRot+')';;
+		return val;
+	}
+	,getRotation: function() {
+		return this._rotation;
+	}
 	,state: null
 	,_state: null
 	,initialMouseX: null
 	,initialMouseY: null
+	,initialX: null
+	,initialY: null
 	,isMouseDown: null
 	,onMove: null
 	,onResize: null
@@ -2593,27 +2622,39 @@ slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	,resizeZone: null
 	,rotateZone: null
 	,init: function() {
-		haxe.Log.trace("Knob init",{ fileName : "Knob.hx", lineNumber : 95, className : "slbuilder.ui.Knob", methodName : "init"});
+		haxe.Log.trace("Knob init",{ fileName : "Knob.hx", lineNumber : 146, className : "slbuilder.ui.Knob", methodName : "init"});
 		this.isMouseDown = false;
 		this.setState(slbuilder.ui.InPlaceEditorState.none);
 		js.Lib.document.onmousemove = this.onMouseMove.$bind(this);
 		this.rootElement.onmousedown = this.onMouseDown.$bind(this);
 		js.Lib.document.onmouseup = this.onMouseUpOrOut.$bind(this);
-		this.moveZone = { x : Std.parseInt(this.rootElement.getAttribute("data-movezone-x")), y : Std.parseInt(this.rootElement.getAttribute("data-movezone-y")), radius : Std.parseInt(this.rootElement.getAttribute("data-movezone-radius"))};
-		this.resizeZone = { x : Std.parseInt(this.rootElement.getAttribute("data-resizezone-x")), y : Std.parseInt(this.rootElement.getAttribute("data-resizezone-y")), radius : Std.parseInt(this.rootElement.getAttribute("data-resizezone-radius"))};
-		this.rotateZone = { x : Std.parseInt(this.rootElement.getAttribute("data-rotatezone-x")), y : Std.parseInt(this.rootElement.getAttribute("data-rotatezone-y")), radius : Std.parseInt(this.rootElement.getAttribute("data-rotatezone-radius"))};
-		this.radius = Math.round(this.rootElement.clientWidth / 2);
+		this.moveZone = { maxRadius : Std.parseFloat(this.rootElement.getAttribute("data-movezone-max-radius")), minRadius : Std.parseFloat(this.rootElement.getAttribute("data-movezone-min-radius")), maxAngle : Std.parseFloat(this.rootElement.getAttribute("data-movezone-max-angle")), minAngle : Std.parseFloat(this.rootElement.getAttribute("data-movezone-min-angle"))};
+		this.resizeZone = { maxRadius : Std.parseFloat(this.rootElement.getAttribute("data-resizezone-max-radius")), minRadius : Std.parseFloat(this.rootElement.getAttribute("data-resizezone-min-radius")), maxAngle : Std.parseFloat(this.rootElement.getAttribute("data-resizezone-max-angle")), minAngle : Std.parseFloat(this.rootElement.getAttribute("data-resizezone-min-angle"))};
+		this.rotateZone = { maxRadius : Std.parseFloat(this.rootElement.getAttribute("data-rotatezone-max-radius")), minRadius : Std.parseFloat(this.rootElement.getAttribute("data-rotatezone-min-radius")), maxAngle : Std.parseFloat(this.rootElement.getAttribute("data-rotatezone-max-angle")), minAngle : Std.parseFloat(this.rootElement.getAttribute("data-rotatezone-min-angle"))};
+		this.radius = this.rootElement.clientWidth / 2;
 		this.setX(200);
 		this.setY(200);
 	}
-	,addComponent: function(component) {
-		if(this.isMouseDown == true) return;
-		this.setX(component.x + Math.round(component.width / 2));
-		this.setY(component.y + Math.round(component.height / 2));
-		this.show();
+	,attachToComponents: function(components) {
+		if(components.length > 0) {
+			var component = components[0];
+			this.setX(component.x + Math.round(component.width / 2));
+			this.setY(component.y + Math.round(component.height / 2));
+			this.setRotation(component.rotation);
+			this.show();
+		} else this.hide();
 	}
-	,reset: function() {
-		this.hide();
+	,applyToComponents: function(components) {
+		if(components.length > 0) {
+			var component = components[0];
+			component.x = this.getX() - Math.round(component.width / 2);
+			component.y = this.getY() - Math.round(component.height / 2);
+			component.rotation = this.getRotation();
+		}
+	}
+	,refresh: function() {
+		var components = slbuilder.core.SLBuilder.getInstance().selection.getComponents();
+		this.attachToComponents(components);
 	}
 	,show: function() {
 		this.rootElement.style.visibility = "visible";
@@ -2627,7 +2668,9 @@ slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 		this.isMouseDown = true;
 		this.initialMouseX = e.clientX;
 		this.initialMouseY = e.clientY;
-		haxe.Log.trace(this.initialMouseX + ", " + this.initialMouseY,{ fileName : "Knob.hx", lineNumber : 170, className : "slbuilder.ui.Knob", methodName : "onMouseDown"});
+		this.initialX = this.getX();
+		this.initialY = this.getY();
+		haxe.Log.trace(this.initialMouseX + ", " + this.initialMouseY,{ fileName : "Knob.hx", lineNumber : 245, className : "slbuilder.ui.Knob", methodName : "onMouseDown"});
 		return false;;
 	}
 	,onMouseUpOrOut: function(e) {
@@ -2635,9 +2678,22 @@ slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 	}
 	,computeState: function(mouseX,mouseY) {
 		if(this.isMouseDown) return;
-		var polarX = mouseX - (this.getX() - this.radius);
-		var polarY = mouseY - (this.getY() - this.radius);
-		if(slbuilder.core.Utils.distance(polarX,polarY,this.moveZone.x,this.moveZone.y) < this.moveZone.radius) this.setState(slbuilder.ui.InPlaceEditorState.move); else if(slbuilder.core.Utils.distance(polarX,polarY,this.resizeZone.x,this.resizeZone.y) < this.resizeZone.radius) this.setState(slbuilder.ui.InPlaceEditorState.resize); else if(slbuilder.core.Utils.distance(polarX,polarY,this.rotateZone.x,this.rotateZone.y) < this.rotateZone.radius) this.setState(slbuilder.ui.InPlaceEditorState.rotate); else this.setState(slbuilder.ui.InPlaceEditorState.none);
+		var polarX = mouseX - this.getX();
+		var polarY = mouseY - this.getY();
+		var dist = slbuilder.core.Utils.distance(polarX,polarY,0,0);
+		var angle = Math.atan2(polarY,polarX) - this.getRotation();
+		if(angle > Math.PI) angle -= 2 * Math.PI;
+		if(angle < -Math.PI) angle += 2 * Math.PI;
+		if(slbuilder.ui.Knob.isInZone(angle,dist,this.moveZone)) {
+			haxe.Log.trace("MOVE ZONE",{ fileName : "Knob.hx", lineNumber : 283, className : "slbuilder.ui.Knob", methodName : "computeState"});
+			this.setState(slbuilder.ui.InPlaceEditorState.move);
+		} else if(slbuilder.ui.Knob.isInZone(angle,dist,this.resizeZone)) {
+			haxe.Log.trace("RESIZE ZONE",{ fileName : "Knob.hx", lineNumber : 287, className : "slbuilder.ui.Knob", methodName : "computeState"});
+			this.setState(slbuilder.ui.InPlaceEditorState.resize);
+		} else if(slbuilder.ui.Knob.isInZone(angle,dist,this.rotateZone)) {
+			haxe.Log.trace("ROTATE ZONE",{ fileName : "Knob.hx", lineNumber : 291, className : "slbuilder.ui.Knob", methodName : "computeState"});
+			this.setState(slbuilder.ui.InPlaceEditorState.rotate);
+		} else this.setState(slbuilder.ui.InPlaceEditorState.none);
 	}
 	,setState: function(val) {
 		if(this._state == val) return this._state;
@@ -2662,62 +2718,35 @@ slbuilder.ui.Knob.prototype = $extend(slplayer.ui.DisplayObject.prototype,{
 		return this._state;
 	}
 	,onMouseMove: function(e) {
-		this.computeState(e.clientX,e.clientY);
+		var mouseX = e.clientX;
+		var mouseY = e.clientY;
+		this.computeState(mouseX,mouseY);
 		if(this.isMouseDown) {
 			switch( (this.getState())[1] ) {
 			case 0:
 				break;
 			case 1:
-				var _g = this;
-				_g.setX(_g.getX() + (e.clientX - this.initialMouseX));
-				var _g = this;
-				_g.setY(_g.getY() + (e.clientY - this.initialMouseY));
-				this.trackMove();
+				this.setX(mouseX - this.initialMouseX + this.initialX);
+				this.setY(mouseY - this.initialMouseY + this.initialY);
+				if(this.onMove != null) this.onMove();
 				break;
 			case 2:
-				this.trackResize();
+				if(this.onResize != null) this.onResize();
 				break;
 			case 3:
-				var mouseX = e.clientX;
-				var mouseY = e.clientY;
 				var polarX = mouseX - this.getX();
 				var polarY = mouseY - this.getY();
-				var rotation = Math.atan2(polarY,polarX);
-				var degRot = Math.round(180 * rotation / Math.PI) + "deg";
-				var __this__ = this;
-				__this__.rootElement.style.transform = 'rotate('+degRot+')';;
-				__this__.rootElement.style.msTransform = 'rotate('+degRot+')';;
-				__this__.rootElement.style.mozTransform = 'rotate('+degRot+')';;
-				__this__.rootElement.style.oTransform = 'rotate('+degRot+')';;
-				__this__.rootElement.style.webkitTransform = 'rotate('+degRot+')';;
-				this.trackRotate(rotation);
+				this.setRotation(Math.atan2(polarY,polarX));
+				this.setX(this.initialX);
+				this.setY(this.initialY);
+				if(this.onRotate != null) this.onRotate();
 				break;
 			}
-			this.initialMouseX = e.clientX;
-			this.initialMouseY = e.clientY;
 			return false;;
 		}
 	}
-	,trackMove: function() {
-		if(this.onMove != null) {
-			haxe.Log.trace("tracked Move " + this.getX(),{ fileName : "Knob.hx", lineNumber : 283, className : "slbuilder.ui.Knob", methodName : "trackMove"});
-			this.onMove(this.getX() - this.radius,this.getY() - this.radius);
-		}
-	}
-	,trackResize: function() {
-		if(this.onResize != null) {
-			haxe.Log.trace("tracked Resize ",{ fileName : "Knob.hx", lineNumber : 292, className : "slbuilder.ui.Knob", methodName : "trackResize"});
-			this.onResize(this.getX() - this.radius,this.getY() - this.radius);
-		}
-	}
-	,trackRotate: function(angle) {
-		if(this.onRotate != null) {
-			haxe.Log.trace("tracked ROTATE " + angle,{ fileName : "Knob.hx", lineNumber : 301, className : "slbuilder.ui.Knob", methodName : "trackRotate"});
-			this.onRotate(angle);
-		}
-	}
 	,__class__: slbuilder.ui.Knob
-	,__properties__: {set_state:"setState",get_state:"getState",set_y:"setY",get_y:"getY",set_x:"setX",get_x:"getX"}
+	,__properties__: {set_state:"setState",get_state:"getState",set_rotation:"setRotation",get_rotation:"getRotation",set_y:"setY",get_y:"getY",set_x:"setX",get_x:"getX"}
 });
 slbuilder.ui.LayersWidget = $hxClasses["slbuilder.ui.LayersWidget"] = function(d) {
 	slbuilder.ui.ListWidget.call(this,d);
@@ -3101,7 +3130,7 @@ js.Boot.__init();
 		};
 	}
 }
-demo.Descriptor.div = [{ name : "style.display", displayName : "css display", parentId : null, value : null, defaultValue : "block", canBeNull : false, description : "CSS style postions (absolute, relative, ...)"},{ name : "style.position", displayName : "css position", parentId : null, value : null, defaultValue : "relative", canBeNull : false, description : "CSS style postions (absolute, relative, ...)"},{ name : "style.top", displayName : "css top", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style top (y position)"},{ name : "style.bottom", displayName : "css bottom", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style bottom (y position)"},{ name : "style.left", displayName : "css left", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style left (y position)"},{ name : "style.right", displayName : "css right", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style right (y position)"},{ name : "style.width", displayName : "css width", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style width (y position)"},{ name : "style.height", displayName : "css height", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style height (y position)"}];
+demo.Descriptor.div = [{ name : "style.display", displayName : "css display", parentId : null, value : null, defaultValue : "block", canBeNull : false, description : "CSS style postions (absolute, relative, ...)"},{ name : "style.position", displayName : "css position", parentId : null, value : null, defaultValue : "relative", canBeNull : false, description : "CSS style postions (absolute, relative, ...)"},{ name : "style.top", displayName : "css top", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style top (y position)"},{ name : "style.bottom", displayName : "css bottom", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style bottom (y position)"},{ name : "style.left", displayName : "css left", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style left (y position)"},{ name : "style.right", displayName : "css right", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style right (y position)"},{ name : "style.width", displayName : "css width", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style width"},{ name : "style.height", displayName : "css height", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS style height"},{ name : "style.transform", displayName : "css transform", parentId : null, value : null, defaultValue : null, canBeNull : true, description : "CSS transform"}];
 haxe.Template.splitter = new EReg("(::[A-Za-z0-9_ ()&|!+=/><*.\"-]+::|\\$\\$([A-Za-z0-9_-]+)\\()","");
 haxe.Template.expr_splitter = new EReg("(\\(|\\)|[ \r\n\t]*\"[^\"]*\"[ \r\n\t]*|[!+=/><*.&|-]+)","");
 haxe.Template.expr_trim = new EReg("^[ ]*([^ ]+)[ ]*$","");

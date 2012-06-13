@@ -55,26 +55,23 @@ class InPlaceEditor extends DisplayObject{
 		knob.hide();
 
 		/// attach to the knob
-		knob.onMove = moveComponent;
-		knob.onRotate = rotateComponent;
+		knob.onMove = applyToComponents;
+		knob.onRotate = applyToComponents;
 
 		// refresh regions
 		//redraw();
 	}
-	private function rotateComponent(angle:Float){
+	/**
+	 * callback for the knob
+	 */
+	private function applyToComponents(){
 		var selectedComponents = SLBuilder.getInstance().selection.getComponents();
-		var component = selectedComponents[0];
-		component.rotation = angle;
-		SLBuilder.getInstance().updateComponent(component);
+		knob.applyToComponents(selectedComponents);
+		for (component in selectedComponents)
+			SLBuilder.getInstance().updateComponent(component);
+
 		SLBuilder.getInstance().selection.reloadData();
-	}
-	private function moveComponent(x:Int, y:Int){
-		var selectedComponents = SLBuilder.getInstance().selection.getComponents();
-		var component = selectedComponents[0];
-		component.x = x;
-		component.y = y;
-		SLBuilder.getInstance().updateComponent(component);
-		SLBuilder.getInstance().selection.reloadData();
+		redraw();
 	}
 	///////////////////////////////////////////////////////////////////
 	// Regions 
@@ -89,28 +86,35 @@ class InPlaceEditor extends DisplayObject{
 		var components = SLBuilder.getInstance().getComponents(null);
 		var selectedComponents = SLBuilder.getInstance().selection.getComponents();
 
-		knob.reset();
-
 		// remove all regions
 		for(region in regions){
 			region.remove();
 		}
+
+		// reset
 		regions = new Array();
+		var selectedIdSeeds:Array<String> = [];
+
 		// create regions for selection
 		for(component in selectedComponents){
+			selectedIdSeeds.push(component.id.seed);
 			displaySelected(component);
 		}
+
 		// create regions for selection
 		for(component in components){
-			displaySelectable(component);
+			if (!Lambda.has(selectedIdSeeds, component.id.seed)){
+				displaySelectable(component);
+			}
 		}
+		// refresh position of the knob
+		knob.attachToComponents(selectedComponents);
 	}
 	/**
 	 * crate an in-place editor and put it over the component
 	 */
 	private function displaySelected(component:Component){
 		regions.push(new RegionEdit(component, rootElement));
-		knob.addComponent(component);
 	}
 	/**
 	 * crate a selectable region and put it over the component
